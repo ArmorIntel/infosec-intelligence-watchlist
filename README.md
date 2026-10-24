@@ -8,25 +8,31 @@ The goal is to help professionals, researchers, and enthusiasts stay up to date 
 
 ## Repository contents
 
-- `infosec-intelligence-watchlist.xml` &mdash; is an OPML (Outline Processor Markup Language) file grouped by categories:
-  - Threat Intelligence
-  - Research & Labs
-  - Vendor & Industry Updates
-  - Government & CERT Bulletins
-  - Alerts & Monitoring
-  - Investigations & Breach Reporting
-  - Communities & Experts
-  - Knowledge Sharing & Podcasts
-  - Intelligence Newsletters
-  - Technology Intelligence
-  - AI & Data Science
-  - Privacy, Compliance & Governance
-  - Cryptocurrency & Blockchain
-  - Apple Ecosystem
-  - Hardware & IoT
-  - Software & Open Source
-  - Enterprise Platforms
-  - Science & Academia
+- `infosec-intelligence-watchlist.xml` &mdash; is an OPML (Outline Processor Markup Language) file of 309 feeds, grouped by categories:
+  - **Threat Intelligence**
+    - Security News
+    - Research & Labs
+    - AI Security
+    - Vendor & Industry Updates
+    - Government & CERT Bulletins
+    - Alerts & Monitoring
+    - Investigations & Breach Reporting
+    - Communities & Experts
+    - Knowledge Sharing & Podcasts
+    - Intelligence Newsletters
+    - OSINT & Tooling
+  - **Technology Intelligence**
+    - Industry & Innovation
+    - AI & Data Science
+    - Privacy, Compliance & Governance
+    - Cryptocurrency & Blockchain
+    - Apple Ecosystem
+    - Hardware & IoT
+    - Software & Open Source
+    - Enterprise Platforms
+    - Science & Academia
+
+Last review: **October 2026**.
 
 ## How to use the watchlist
 
@@ -67,6 +73,13 @@ Pro tips : you can subscribe to Telegram channels, use tags, filter feeds and cr
 - Check the list periodically to remove inactive feeds and add new relevant sources
 - Contribute to the project, so everybody can use your new relevant sources
 - When introducing new feeds, ensure they are **unique** and placed in the most relevant subcategory to preserve low noise
+
+Review criteria used to keep the list clean:
+- **Dead feed**: fails twice in a row (DNS error, HTTP 404/410/5xx, timeout, invalid certificate, or not a valid RSS/Atom document). When the source has moved, the feed URL is updated instead of being removed
+- **Inactive feed**: nothing published for more than 6 months
+- **Exceptions**: low-frequency but high-value sources (CERTs and government agencies, research labs, recognised researchers, primary sources) are kept as long as they published within the last 24 months
+- Feeds blocked by anti-bot protections (HTTP 403/429 to scripts) but working in RSS readers are kept
+- Entries specific to a personal RSS reader account (keyword alerts, newsletter addresses) are not part of the shared list
 
 ## Contributing
 
