@@ -8,6 +8,7 @@ The goal is to help professionals, researchers, and enthusiasts stay up to date 
 
 ## Repository contents
 
+<!-- BEGIN generated:categories -->
 - `infosec-intelligence-watchlist.xml` &mdash; is an OPML (Outline Processor Markup Language) file of 309 feeds, grouped by categories:
   - **Threat Intelligence**
     - Security News
@@ -31,9 +32,15 @@ The goal is to help professionals, researchers, and enthusiasts stay up to date 
     - Software & Open Source
     - Enterprise Platforms
     - Science & Academia
+<!-- END generated:categories -->
 
 - `opml/` &mdash; one OPML file per subcategory, generated from the global file, to subscribe only to the topics you need (see [Subscribe to a single category](#subscribe-to-a-single-category))
-- `scripts/build_category_opml.py` &mdash; regenerates the `opml/` files from the global file
+- `scripts/` &mdash; maintenance scripts used by the GitHub Actions (see [Automation](#automation)):
+  - `build_category_opml.py` &mdash; regenerates the `opml/` files and the generated parts of this README
+  - `check_feeds.py` &mdash; checks the health of every feed (dead, inactive, to check manually)
+  - `feed-exceptions.txt` &mdash; low-frequency high-value sources and known quirks the health check should not flag
+  - `validate_opml.py` &mdash; validates the OPML structure (two folder levels, no duplicate, sorted feeds)
+  - `changelog.py` &mdash; lists the feeds added, removed and moved between two versions
 
 Last review: **October 2026**.
 
@@ -64,6 +71,7 @@ You will need to use the raw file url from the xml file of this repository.
 
 If you don't want the whole watchlist (or if your RSS reader plan limits the number of feeds), import or subscribe to one or several category files instead. Each file contains one subcategory of the global watchlist and is updated along with it.
 
+<!-- BEGIN generated:category-table -->
 | Category | Subcategory | Feeds | Raw OPML URL |
 |---|---|---:|---|
 | Threat Intelligence | [Security News](./opml/threat-intelligence/security-news.opml) | 21 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/threat-intelligence/security-news.opml` |
@@ -86,6 +94,7 @@ If you don't want the whole watchlist (or if your RSS reader plan limits the num
 | Technology Intelligence | [Software & Open Source](./opml/technology-intelligence/software-and-open-source.opml) | 10 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/software-and-open-source.opml` |
 | Technology Intelligence | [Enterprise Platforms](./opml/technology-intelligence/enterprise-platforms.opml) | 6 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/enterprise-platforms.opml` |
 | Technology Intelligence | [Science & Academia](./opml/technology-intelligence/science-and-academia.opml) | 6 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/science-and-academia.opml` |
+<!-- END generated:category-table -->
 
 #### Explore feeds
 ![Feeds view](./inoreader_screens/feeds_view.png)
@@ -111,13 +120,31 @@ Review criteria used to keep the list clean:
 - Feeds blocked by anti-bot protections (HTTP 403/429 to scripts) but working in RSS readers are kept
 - Entries specific to a personal RSS reader account (keyword alerts, newsletter addresses) are not part of the shared list
 
+## Automation
+
+The repository is maintained with GitHub Actions:
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| [Monthly feed health check](.github/workflows/feed-health.yml) | 1st of each month, or manually | Checks every feed and keeps a single [`feed-health`](../../issues?q=label%3Afeed-health) issue up to date with the dead, inactive and suspicious feeds to review |
+| [Validate watchlist](.github/workflows/validate-pr.yml) | Pull requests and pushes changing the watchlist | Validates the OPML structure, rejects duplicates, and checks that every added feed answers, is valid RSS/Atom and published within the last 6 months |
+| [Sync generated files](.github/workflows/sync-generated.yml) | Pushes to `main` changing the watchlist | Regenerates the per-category OPML files and the generated parts of this README (category list, feed count, subscription table) and commits them |
+| [Release a reviewed watchlist](.github/workflows/release.yml) | Manually, after a review | Creates a dated release (e.g. `2026.10`) with the list of feeds added, removed and moved since the previous one, and the OPML files attached |
+
+To run the checks locally (Python 3.10+ and curl, no dependency):
+
+```bash
+python3 scripts/validate_opml.py
+python3 scripts/check_feeds.py --markdown report.md
+```
+
 ## Contributing
 
 Contributions are welcome!
 If you want to add new feeds or suggest improvements:
 - Fork this repository
-- Update the xml file (`infosec-intelligence-watchlist.xml` is the only file to edit)
-- Regenerate the category files with `python3 scripts/build_category_opml.py --table`, and update the table above if the folders changed
+- Update the xml file (`infosec-intelligence-watchlist.xml` is the only file to edit): keep two folder levels and feeds sorted alphabetically
+- Don't edit the `opml/` files or the generated parts of this README: they are regenerated automatically once your change is merged
 - Submit a pull request with a description
 
 Maintained by [ArmorIntel](https://github.com/ArmorIntel/).
