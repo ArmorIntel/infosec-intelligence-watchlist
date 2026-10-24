@@ -1,0 +1,60 @@
+name: Validate watchlist
+
+# Runs on every pull request (and push to main) that touches the watchlist:
+# structure checks on the OPML, then a live check of the feeds added by the PR.
+
+on:
+  pull_request:
+    paths:
+      - "infosec-intelligence-watchlist.xml"
+      - "scripts/**"
+      - ".github/workflows/validate-pr.yml"
+  push:
+    branches: [main]
+    paths:
+      - "infosec-intelligence-watchlist.xml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Find the base version of the watchlist
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="origin/${{ github.base_ref }}"
+          elif [ "${{ github.event_name }}" = "push" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+            base="${{ github.event.before }}"
+          else
+            base="HEAD~1"
+          fi
+          git show "$base:infosec-intelligence-watchlist.xml" > base.xml 2>/dev/null || : > base.xml
+          echo "Comparing with $base"
+
+      - name: Validate OPML structure
+        run: python3 scripts/validate_opml.py --base base.xml --new-urls new-urls.txt
+
+      - name: Check the added feeds
+        # new feeds must answer, be valid RSS/Atom and have published within 6 months
+        run: |
+          if [ -s new-urls.txt ]; then
+            rc=0
+            python3 scripts/check_feeds.py --urls-file new-urls.txt --retry-delay 30 \
+              --fail-on dead,inactive,abandoned --markdown new-feeds.md || rc=$?
+            cat new-feeds.md >> "$GITHUB_STEP_SUMMARY"
+            exit $rc
+          else
+            echo "No feed added." | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
