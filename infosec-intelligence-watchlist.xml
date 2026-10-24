@@ -116,7 +116,7 @@
         <outline text="WeLiveSecurity" title="WeLiveSecurity" type="rss" xmlUrl="https://www.welivesecurity.com/en/rss/feed/" htmlUrl="" />
       </outline>
       <outline text="Government &amp; CERT Bulletins" title="Government &amp; CERT Bulletins">
-        <outline text="ANSSI - Actualités" title="ANSSI - Actualités" type="rss" xmlUrl="https://cyber.gouv.fr/actualites/feed" htmlUrl="https://cyber.gouv.fr/" />
+        <outline text="ANSSI - Actualités" title="ANSSI - Actualités" type="rss" xmlUrl="https://cyber.gouv.fr/actualites/rss/" htmlUrl="https://cyber.gouv.fr/actualites" />
         <outline text="BIO-ISAC" title="BIO-ISAC" type="rss" xmlUrl="https://www.isac.bio/blog-feed.xml" htmlUrl="https://www.isac.bio/news" />
         <outline text="Canadian Centre for Cyber Security - Alerts" title="Canadian Centre for Cyber Security - Alerts" type="rss" xmlUrl="https://www.cyber.gc.ca/api/cccs/atom/v1/get?feed=alerts_advisories&amp;lang=en" htmlUrl="https://www.cyber.gc.ca/webservice/en/rss/alerts" />
         <outline text="Canadian Centre for Cyber Security - News" title="Canadian Centre for Cyber Security - News" type="rss" xmlUrl="https://www.cyber.gc.ca/api/cccs/atom/v1/get?feed=news_events_guidance&amp;lang=en" htmlUrl="https://www.cyber.gc.ca/webservice/en/rss/news" />
