@@ -1,7 +1,13 @@
 name: Monthly feed health check
 
-# Checks every feed of the watchlist and keeps a single "feed-health" issue
-# up to date with the dead, inactive and blocked feeds to review.
+# Checks every feed of the watchlist, then:
+# - keeps each feed's monthly status on the "feed-health-history" branch, so a
+#   feed is only reported after failing 3 months in a row (temporary outages
+#   and anti-bot blocks don't need any action)
+# - opens a pull request with automatic fixes: replacement URL found on the
+#   same website for dead feeds, removal of abandoned feeds
+# - keeps a single "feed-health" issue with what is left to review, and closes
+#   it when there is nothing left
 
 on:
   schedule:
@@ -9,17 +15,23 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   issues: write
+  pull-requests: write
 
 concurrency:
   group: feed-health
   cancel-in-progress: false
 
+env:
+  HISTORY_BRANCH: feed-health-history
+  FIX_BRANCH: feed-health/autofix
+  PERSIST_MONTHS: "3"
+
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7
 
@@ -27,16 +39,99 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Check feeds
-        run: python3 scripts/check_feeds.py --retry-delay 120 --markdown report.md --json report.json
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Open or update the feed-health issue
+      - name: Load the history of previous checks
+        run: |
+          if git fetch -q origin "$HISTORY_BRANCH:refs/remotes/origin/$HISTORY_BRANCH"; then
+            git show "origin/$HISTORY_BRANCH:history.json" > history.json
+            echo "HISTORY_EXISTS=1" >> "$GITHUB_ENV"
+          else
+            echo "No history yet, starting a new one."
+            echo '{}' > history.json
+          fi
+
+      - name: Check feeds
+        run: |
+          python3 scripts/check_feeds.py --retry-delay 120 --history history.json \
+            --persist-months "$PERSIST_MONTHS" --json results.json > /dev/null
+
+      - name: Save the history
+        run: |
+          if [ -n "$HISTORY_EXISTS" ]; then
+            git worktree add -q history-branch "origin/$HISTORY_BRANCH"
+            cd history-branch
+          else
+            git worktree add -q --detach history-branch
+            cd history-branch
+            git switch -q --orphan "$HISTORY_BRANCH"
+          fi
+          cp ../history.json history.json
+          git add history.json
+          if git diff --cached --quiet; then
+            echo "History unchanged."
+          else
+            git commit -q -m "Feed health history $(date -u +%Y-%m-%d)"
+            git push -q origin "HEAD:refs/heads/$HISTORY_BRANCH"
+          fi
+
+      - name: Look for automatic fixes
+        run: |
+          python3 scripts/autofix_feeds.py --json results.json --pr-body pr.md \
+            --persist-months "$PERSIST_MONTHS"
+
+      - name: Open or update the fix pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          existing=$(gh pr list --head "$FIX_BRANCH" --state open --json url --jq '.[0].url')
+          if [ ! -s pr.md ]; then
+            if [ -n "$existing" ]; then
+              gh pr close "$existing" --delete-branch --comment "No automatic fix needed any more."
+            fi
+            echo "PR_URL=" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          python3 scripts/validate_opml.py
+          git switch -q -c "$FIX_BRANCH"
+          git add infosec-intelligence-watchlist.xml scripts/feed-exceptions.txt
+          git commit -q -m "Fix dead and abandoned feeds (automatic, $(date -u +%Y-%m))"
+          git push -q -f origin "HEAD:refs/heads/$FIX_BRANCH"
+          title="Feed fixes - $(date -u +%Y-%m)"
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --title "$title" --body-file pr.md
+            url="$existing"
+          elif ! url=$(gh pr create --base main --head "$FIX_BRANCH" --title "$title" --body-file pr.md); then
+            # Settings > Actions > "Allow GitHub Actions to create and approve pull requests" is off
+            url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/compare/main...${FIX_BRANCH}?expand=1"
+            echo "::warning::Could not open the pull request, open it from $url"
+          fi
+          echo "PR_URL=$url" >> "$GITHUB_ENV"
+
+      - name: Write the report
+        run: |
+          python3 scripts/check_feeds.py --render results.json --persist-months "$PERSIST_MONTHS" \
+            --pr-url "$PR_URL" --markdown report.md --status-file status.txt > /dev/null
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open, update or close the feed-health issue
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh label create feed-health --color d93f0b --description "Monthly feed health report" --force
+          number=$(gh issue list --label feed-health --state open --json number --jq '.[0].number')
+          if [ "$(cat status.txt)" = "clean" ]; then
+            if [ -n "$number" ]; then
+              gh issue close "$number" --comment "Nothing left to review on $(date -u +%Y-%m-%d). $(head -1 report.md)"
+            fi
+            echo "Nothing to review."
+            exit 0
+          fi
           {
-            echo "_Automatic report from [this run](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}). It is updated every month; close it once the list is cleaned._"
+            echo "_Automatic report from [this run](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}), updated every month and closed automatically once nothing is left to review._"
             echo
             cat report.md
           } > body.md
@@ -47,7 +142,6 @@ jobs:
             mv body.tmp body.md
           fi
           title="Feed health report - $(date -u +%Y-%m)"
-          number=$(gh issue list --label feed-health --state open --json number --jq '.[0].number')
           if [ -n "$number" ]; then
             gh issue edit "$number" --title "$title" --body-file body.md
             echo "Updated issue #$number"
@@ -62,5 +156,6 @@ jobs:
           name: feed-health-report
           path: |
             report.md
-            report.json
+            results.json
+            history.json
           if-no-files-found: ignore

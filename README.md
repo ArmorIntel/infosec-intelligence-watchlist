@@ -37,7 +37,8 @@ The goal is to help professionals, researchers, and enthusiasts stay up to date 
 - `opml/` &mdash; one OPML file per subcategory, generated from the global file, to subscribe only to the topics you need (see [Subscribe to a single category](#subscribe-to-a-single-category))
 - `scripts/` &mdash; maintenance scripts used by the GitHub Actions (see [Automation](#automation)):
   - `build_category_opml.py` &mdash; regenerates the `opml/` files and the generated parts of this README
-  - `check_feeds.py` &mdash; checks the health of every feed (dead, inactive, to check manually)
+  - `check_feeds.py` &mdash; checks the health of every feed (dead, inactive, unreachable), with a month-by-month history
+  - `autofix_feeds.py` &mdash; finds replacement URLs for dead feeds and removes abandoned ones
   - `feed-exceptions.txt` &mdash; low-frequency high-value sources and known quirks the health check should not flag
   - `validate_opml.py` &mdash; validates the OPML structure (two folder levels, no duplicate, sorted feeds)
   - `changelog.py` &mdash; lists the feeds added, removed and moved between two versions
@@ -126,10 +127,18 @@ The repository is maintained with GitHub Actions:
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| [Monthly feed health check](.github/workflows/feed-health.yml) | 1st of each month, or manually | Checks every feed and keeps a single [`feed-health`](../../issues?q=label%3Afeed-health) issue up to date with the dead, inactive and suspicious feeds to review |
+| [Monthly feed health check](.github/workflows/feed-health.yml) | 1st of each month, or manually | Checks every feed, opens a pull request with automatic fixes (replacement URL found on the same website for dead feeds, removal of abandoned feeds) and keeps a single [`feed-health`](../../issues?q=label%3Afeed-health) issue with what is left to review |
 | [Validate watchlist](.github/workflows/validate-pr.yml) | Pull requests and pushes changing the watchlist | Validates the OPML structure, rejects duplicates, and checks that every added feed answers, is valid RSS/Atom and published within the last 6 months |
 | [Sync generated files](.github/workflows/sync-generated.yml) | Pushes to `main` changing the watchlist | Regenerates the per-category OPML files and the generated parts of this README (category list, feed count, subscription table) and commits them |
 | [Release a reviewed watchlist](.github/workflows/release.yml) | Manually, after a review | Creates a dated release (e.g. `2026.10`) with the list of feeds added, removed and moved since the previous one, and the OPML files attached |
+
+How the monthly check limits manual work:
+- **History**: each feed's status is kept month by month on the `feed-health-history` branch. A dead or unreachable feed is only reported after failing **3 months in a row**; until then it is listed as "under watch" in a collapsed section. Temporary outages and anti-bot blocks of GitHub servers therefore need no action
+- **Automatic fixes**: for a dead feed, or one unreachable for 3 months, the workflow looks for a replacement on the same website (feed autodiscovery links, then common feed paths) and keeps it only if it is a valid feed that published within 6 months. Abandoned feeds (nothing for 24 months) are removed. The fixes are proposed in a single `feed-health/autofix` pull request to review and merge
+- **Exceptions**: feeds that work in RSS readers but not for the checker, or agreed low-frequency high-value sources, go in [`scripts/feed-exceptions.txt`](scripts/feed-exceptions.txt) and are never flagged again (unless abandoned)
+- The issue is closed automatically once nothing is left to review
+
+For the workflow to open the fix pull request itself, enable *Settings > Actions > General > Allow GitHub Actions to create and approve pull requests*. Otherwise the issue links to the branch so the pull request can be opened in one click.
 
 To run the checks locally (Python 3.10+ and curl, no dependency):
 

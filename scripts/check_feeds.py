@@ -17,9 +17,16 @@ Feeds listed in scripts/feed-exceptions.txt (agreed low-frequency, high-value
 sources, known server quirks) are reported separately instead of being flagged,
 unless they are abandoned.
 
+With --history, each feed's status is kept month by month: a dead or
+unreachable feed is only reported once it has failed for --persist-months
+months in a row (default 3); until then it is listed as "under watch".
+Feeds for which scripts/autofix_feeds.py proposed a fix are reported apart.
+
 Usage:
     python3 scripts/check_feeds.py --markdown report.md --json report.json
     python3 scripts/check_feeds.py --urls-file new.txt --fail-on dead,inactive
+    python3 scripts/check_feeds.py --history history.json --json results.json
+    python3 scripts/check_feeds.py --render results.json --markdown report.md
 """
 import argparse
 import html.entities
@@ -174,7 +181,7 @@ def load_feeds(opml, urls_file=None):
         for o in node.findall("outline"):
             if o.get("xmlUrl"):
                 feeds.append({"title": o.get("title") or o.get("text"), "url": o.get("xmlUrl"),
-                              "folder": " > ".join(path)})
+                              "html": o.get("htmlUrl") or "", "folder": " > ".join(path)})
             else:
                 walk(o, path + [o.get("title") or o.get("text")])
 
@@ -183,7 +190,7 @@ def load_feeds(opml, urls_file=None):
         wanted = {u.strip() for u in Path(urls_file).read_text().splitlines() if u.strip()}
         known = {f["url"] for f in feeds}
         feeds = [f for f in feeds if f["url"] in wanted]
-        feeds += [{"title": u, "url": u, "folder": ""} for u in sorted(wanted - known)]
+        feeds += [{"title": u, "url": u, "html": "", "folder": ""} for u in sorted(wanted - known)]
     return feeds
 
 
@@ -200,22 +207,67 @@ def load_exceptions(path):
 
 
 SECTIONS = [
-    ("dead", "Dead feeds", "Failed twice. Update the URL if the source moved, otherwise remove the feed."),
+    ("dead", "Dead feeds", "Failing for {persist}+ months and no replacement found automatically. Update the URL if the source moved, otherwise remove the feed."),
     ("abandoned", "Abandoned feeds", "Nothing published for more than {abandoned} days. Remove, even for high-value sources."),
     ("inactive", "Inactive feeds", "Nothing published for more than {max_age} days. Remove, or add it to `scripts/feed-exceptions.txt` if it is a low-frequency high-value source (CERT, government, research lab, recognised researcher, primary source)."),
-    ("check", "To check manually", "Anti-bot protection, incomplete TLS certificate chain or unsupported encoding: these feeds usually still work in RSS readers. Check in your reader before acting."),
-    ("undated", "Feeds without dates", "Valid feeds whose items carry no date: check manually."),
+    ("check", "Unreachable for {persist}+ months", "Blocked, empty or unreadable for the checker for {persist} months in a row (anti-bot protection, TLS chain, encoding). Check in your RSS reader: add it to `scripts/feed-exceptions.txt` if it works, otherwise fix or remove it."),
+    ("undated", "Feeds without dates", "Valid feeds whose items carry no date: check manually, then add them to `scripts/feed-exceptions.txt`."),
 ]
+FAILING = ("dead", "check")
 
 
-def table(rows, show_reason=False):
+def update_history(results, path, full_run):
+    """Record this month's class of each feed and count consecutive failing months.
+
+    History format: {url: {"YYYY-MM": class, ...}}, last 12 months kept. Several
+    runs in the same month overwrite each other, so re-runs don't count twice.
+    """
+    try:
+        history = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        history = {}
+    month = f"{NOW:%Y-%m}"
+    for r in results:
+        months = history.setdefault(r["url"], {})
+        months[month] = r["class"]
+        for old in sorted(months)[:-12]:
+            del months[old]
+        streak = 0
+        for m in sorted(months, reverse=True):
+            if months[m] not in FAILING:
+                break
+            streak += 1
+        r["failing_months"] = streak
+    if full_run:  # forget feeds that left the watchlist
+        current = {r["url"] for r in results}
+        history = {u: h for u, h in history.items() if u in current}
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    Path(path).write_text(json.dumps(history, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def annotate(results, persist):
+    """Split non-healthy feeds into: exception, fix proposed, watching, to review."""
+    for r in results:
+        r["watching"] = (r["class"] in FAILING and not r.get("exception") and not r.get("fix")
+                         and r.get("failing_months", persist) < persist)
+
+
+def to_review(r):
+    return r["class"] != "ok" and not (r.get("exception") or r.get("fix") or r.get("watching"))
+
+
+def table(rows, show_reason=False, show_streak=0):
     lines = ["| Feed | Folder | Detail |", "|---|---|---|"]
     for r in sorted(rows, key=lambda r: (r["folder"], r["title"].casefold())):
         detail = r.get("error") or (f"last item {r['latest'][:10]}" if r.get("latest") else "")
         if show_reason and r.get("exception"):
             detail = f"{detail} ({r['exception']})" if detail else r["exception"]
+        if show_streak:
+            detail = f"{r.get('failing_months', 1)}/{show_streak} months: {detail}"
+        if r.get("fix"):
+            detail = r["fix"]
         moved = r.get("final_url")
-        if r["class"] == "dead" and moved and moved.rstrip("/") != r["url"].rstrip("/"):
+        if r["class"] == "dead" and not r.get("fix") and moved and moved.rstrip("/") != r["url"].rstrip("/"):
             detail += f" (redirects to {moved})"
         title = r["title"].replace("|", "\\|")
         lines.append(f"| [{title}]({r['url']}) | {r['folder']} | {detail.replace('|', '/')} |")
@@ -223,26 +275,37 @@ def table(rows, show_reason=False):
 
 
 def markdown(results, args):
-    flagged = [r for r in results if r["class"] != "ok" and not r.get("exception")]
+    flagged = [r for r in results if to_review(r)]
+    fixed = [r for r in results if r.get("fix")]
+    watching = [r for r in results if r.get("watching")]
     known = [r for r in results if r["class"] != "ok" and r.get("exception")]
-    counts = {k: sum(1 for r in flagged if r["class"] == k) for k, *_ in SECTIONS}
-    lines = [f"Feed health check of **{len(results)} feeds** run on {NOW:%Y-%m-%d}: "
-             f"**{len(results) - len(flagged) - len(known)} healthy**, {len(flagged)} to review, "
-             f"{len(known)} known exceptions.", "",
-             "| Status | Feeds |", "|---|---:|"]
-    lines += [f"| {title} | {counts[k]} |" for k, title, _ in SECTIONS]
+    healthy = len(results) - len(flagged) - len(fixed) - len(watching) - len(known)
+    fmt = {"max_age": args.max_age_days, "abandoned": args.abandoned_days, "persist": args.persist_months}
+    lines = [f"Feed health check of **{len(results)} feeds** run on {NOW:%Y-%m-%d}: **{healthy} healthy**, "
+             f"**{len(flagged)} to review**, {len(fixed)} with a fix proposed, {len(watching)} under watch, "
+             f"{len(known)} known exceptions."]
+    if fixed:
+        target = f" in {args.pr_url}" if args.pr_url else ""
+        lines += ["", f"### Fixes proposed automatically ({len(fixed)})", "",
+                  f"Review and merge the fixes{target}.", ""]
+        lines += table(fixed)
     for key, title, help_text in SECTIONS:
         rows = [r for r in flagged if r["class"] == key]
         if rows:
-            lines += ["", f"### {title} ({len(rows)})", "",
-                      help_text.format(max_age=args.max_age_days, abandoned=args.abandoned_days), ""]
+            lines += ["", f"### {title.format(**fmt)} ({len(rows)})", "", help_text.format(**fmt), ""]
             lines += table(rows)
+    if watching:
+        lines += ["", f"<details><summary>Under watch ({len(watching)})</summary>", "",
+                  f"Failed this month but for less than {args.persist_months} months in a row: usually a "
+                  "temporary outage or anti-bot protection. Nothing to do unless they keep failing.", ""]
+        lines += table(watching, show_streak=args.persist_months)
+        lines += ["", "</details>"]
     if known:
         lines += ["", f"<details><summary>Known exceptions ({len(known)})</summary>", "",
                   "Listed in `scripts/feed-exceptions.txt`.", ""]
         lines += table(known, show_reason=True)
         lines += ["", "</details>"]
-    if not flagged:
+    if not flagged and not fixed:
         lines += ["", "Nothing to review this month."]
     return "\n".join(lines) + "\n"
 
@@ -256,15 +319,51 @@ def main():
     p.add_argument("--retry-delay", type=int, default=60, help="seconds before retrying failed feeds")
     p.add_argument("--timeout", type=int, default=40)
     p.add_argument("--workers", type=int, default=12)
+    p.add_argument("--history", help="JSON file keeping each feed's monthly status (read and updated)")
+    p.add_argument("--persist-months", type=int, default=3,
+                   help="months in a row a feed must fail before it is reported (with --history)")
+    p.add_argument("--render", metavar="JSON", help="don't fetch: render the report from a previous --json output")
+    p.add_argument("--pr-url", default="", help="pull request holding the automatic fixes, for the report")
     p.add_argument("--markdown", help="write a Markdown report to this file")
     p.add_argument("--json", help="write the raw results to this file")
+    p.add_argument("--status-file", help="write 'action' if something needs review, 'clean' otherwise")
     p.add_argument("--fail-on", default="", help="comma-separated classes that make the script exit 1, e.g. dead,inactive")
     args = p.parse_args()
 
+    if args.render:
+        results = json.loads(Path(args.render).read_text(encoding="utf-8"))
+    else:
+        results = run_checks(args)
+        if results is None:
+            print("No feed to check.")
+            return 0
+        if args.history:
+            update_history(results, args.history, full_run=not args.urls_file)
+    if not args.history and not args.render:
+        args.persist_months = 1  # without history, report every failure right away
+    annotate(results, args.persist_months)
+
+    report = markdown(results, args)
+    if args.markdown:
+        Path(args.markdown).write_text(report, encoding="utf-8")
+    if args.json:
+        Path(args.json).write_text(json.dumps(results, indent=1, ensure_ascii=False), encoding="utf-8")
+    if args.status_file:
+        needs_action = any(to_review(r) or r.get("fix") for r in results)
+        Path(args.status_file).write_text("action\n" if needs_action else "clean\n")
+    print(report)
+
+    fail_on = {c.strip() for c in args.fail_on.split(",") if c.strip()}
+    failing = [r for r in results if r["class"] in fail_on and not r.get("exception")]
+    for r in failing:
+        print(f"::error title=Feed check failed::{r['title']} ({r['url']}): {r['class']} {r.get('error', '')}")
+    return 1 if failing else 0
+
+
+def run_checks(args):
     feeds = [f for f in load_feeds(args.opml, args.urls_file) if f["url"].startswith(("http://", "https://"))]
     if not feeds:
-        print("No feed to check.")
-        return 0
+        return None
 
     def fetch_one(feed):
         return {**feed, **fetch(feed["url"], args.timeout)}
@@ -285,19 +384,7 @@ def main():
         r["class"] = classify(r, args.max_age_days, args.abandoned_days)
         if r["url"] in exceptions and r["class"] != "abandoned":
             r["exception"] = exceptions[r["url"]] or "known exception"
-
-    report = markdown(results, args)
-    if args.markdown:
-        Path(args.markdown).write_text(report, encoding="utf-8")
-    if args.json:
-        Path(args.json).write_text(json.dumps(results, indent=1, ensure_ascii=False), encoding="utf-8")
-    print(report)
-
-    fail_on = {c.strip() for c in args.fail_on.split(",") if c.strip()}
-    failing = [r for r in results if r["class"] in fail_on and not r.get("exception")]
-    for r in failing:
-        print(f"::error title=Feed check failed::{r['title']} ({r['url']}): {r['class']} {r.get('error', '')}")
-    return 1 if failing else 0
+    return results
 
 
 if __name__ == "__main__":
