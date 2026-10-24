@@ -1,0 +1,66 @@
+name: Monthly feed health check
+
+# Checks every feed of the watchlist and keeps a single "feed-health" issue
+# up to date with the dead, inactive and blocked feeds to review.
+
+on:
+  schedule:
+    - cron: "0 6 1 * *" # 1st day of each month, 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: feed-health
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check feeds
+        run: python3 scripts/check_feeds.py --retry-delay 120 --markdown report.md --json report.json
+
+      - name: Open or update the feed-health issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create feed-health --color d93f0b --description "Monthly feed health report" --force
+          {
+            echo "_Automatic report from [this run](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}). It is updated every month; close it once the list is cleaned._"
+            echo
+            cat report.md
+          } > body.md
+          # GitHub limits issue bodies to 65536 characters
+          if [ "$(wc -c < body.md)" -gt 65000 ]; then
+            head -c 64000 body.md > body.tmp
+            printf '\n\n_Report truncated, see the run artifacts for the full version._\n' >> body.tmp
+            mv body.tmp body.md
+          fi
+          title="Feed health report - $(date -u +%Y-%m)"
+          number=$(gh issue list --label feed-health --state open --json number --jq '.[0].number')
+          if [ -n "$number" ]; then
+            gh issue edit "$number" --title "$title" --body-file body.md
+            echo "Updated issue #$number"
+          else
+            gh issue create --title "$title" --label feed-health --body-file body.md
+          fi
+
+      - name: Upload full report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: feed-health-report
+          path: |
+            report.md
+            report.json
+          if-no-files-found: ignore

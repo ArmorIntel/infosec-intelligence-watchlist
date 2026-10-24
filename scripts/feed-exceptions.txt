@@ -1,0 +1,23 @@
+# Feeds kept on purpose although the health check flags them.
+# One URL per line, optionally followed by "# reason".
+# An abandoned feed (nothing published for more than 24 months) is always
+# reported, even when listed here.
+
+# Low-frequency, high-value sources (published within the last 24 months)
+https://www.ncsc.gov.uk/api/1/services/v1/report-rss-feed.xml # Government reports, low frequency
+https://ddosecrets.substack.com/feed/ # Primary source, low frequency
+https://contagiodump.blogspot.com/feeds/posts/default?alt=rss # Reference malware sample repository
+https://seclists.org/rss/dailydave.rss # Historic expert mailing list
+https://rekt.news/rss/feed.xml # DeFi exploit post-mortems, primary source
+https://community.arm.com/arm-research/rss # Research lab, low frequency
+https://security.googleblog.com/feeds/posts/default # Google security research, low frequency
+https://hshrzd.wordpress.com/feed/ # Recognised malware researcher (hasherezade)
+https://44con.com/feed/ # Conference, publishes around events
+
+# Valid feeds without item dates
+https://www.europol.europa.eu/cms/api/rss/news # Items carry no date
+https://csdl-api.computer.org/api/rss/periodicals/mags/sp/rss.xml # Items carry no date
+https://csdl-api.computer.org/api/rss/periodicals/trans/tq/rss.xml # Items carry no date
+
+# Works in RSS readers despite a server quirk
+https://www.lightbluetouchpaper.org/feed/ # Expired certificate but still active (Cambridge security group)
