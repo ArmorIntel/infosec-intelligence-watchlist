@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version="2.0">
+  <head>
+    <title>Infosec intelligence watchlist - https://github.com/ArmorIntel - Technology Intelligence - Industry &amp; Innovation</title>
+    <dateModified>Sat, 24 Oct 2026 19:07:26 GMT</dateModified>
+    <ownerName>ArmorIntel</ownerName>
+    <ownerId>https://github.com/ArmorIntel</ownerId>
+  </head>
+  <body>
+    <outline text="Technology Intelligence" title="Technology Intelligence">
+      <outline text="Industry &amp; Innovation" title="Industry &amp; Innovation">
+        <outline text="9to5Linux" title="9to5Linux" type="rss" xmlUrl="https://9to5linux.com/feed" htmlUrl="https://9to5linux.com/" />
+        <outline text="Ars Technica" title="Ars Technica" type="rss" xmlUrl="https://feeds.arstechnica.com/arstechnica/index" htmlUrl="https://arstechnica.com/" />
+        <outline text="Ars Technica - Features" title="Ars Technica - Features" type="rss" xmlUrl="https://feeds.arstechnica.com/arstechnica/features" htmlUrl="https://arstechnica.com/" />
+        <outline text="Ars Technica - Gear &amp; Gadgets" title="Ars Technica - Gear &amp; Gadgets" type="rss" xmlUrl="https://feeds.arstechnica.com/arstechnica/gadgets" htmlUrl="https://arstechnica.com/" />
+        <outline text="Ars Technica - Science" title="Ars Technica - Science" type="rss" xmlUrl="http://feeds.arstechnica.com/arstechnica/science" htmlUrl="https://arstechnica.com/" />
+        <outline text="BBC News - Technology" title="BBC News - Technology" type="rss" xmlUrl="https://feeds.bbci.co.uk/news/technology/rss.xml" htmlUrl="https://www.bbc.co.uk/news/technology/#sa-ns_mchannel=rss&amp;ns_source=PublicRSS20-sa" />
+        <outline text="BetaNews" title="BetaNews" type="rss" xmlUrl="https://betanews.com/feed/" htmlUrl="https://betanews.com/" />
+        <outline text="Bits of Freedom" title="Bits of Freedom" type="rss" xmlUrl="https://www.bitsoffreedom.nl/feed/" htmlUrl="https://www.bof.nl/" />
+        <outline text="Bloomberg Technology" title="Bloomberg Technology" type="rss" xmlUrl="https://www.bloomberg.com/feeds/technology/news.rss" htmlUrl="https://bloomberg.com/technology/" />
+        <outline text="Boing Boing" title="Boing Boing" type="rss" xmlUrl="https://boingboing.net/feed" htmlUrl="https://boingboing.net/" />
+        <outline text="Business Insider" title="Business Insider" type="rss" xmlUrl="https://feeds2.feedburner.com/businessinsider" htmlUrl="https://www.businessinsider.com/" />
+        <outline text="Business Insider - Tech" title="Business Insider - Tech" type="rss" xmlUrl="http://feeds.feedburner.com/typepad/alleyinsider/silicon_alley_insider" htmlUrl="https://www.businessinsider.com" />
+        <outline text="CIO Dive" title="CIO Dive" type="rss" xmlUrl="https://www.ciodive.com/feeds/news/" htmlUrl="https://www.ciodive.com/news/" />
+        <outline text="Clubic" title="Clubic" type="rss" xmlUrl="https://www.clubic.com/feed/rss" htmlUrl="https://www.clubic.com/feed/news.rss" />
+        <outline text="CNBC - Tech" title="CNBC - Tech" type="rss" xmlUrl="https://www.cnbc.com/id/19854910/device/rss/rss.html" htmlUrl="https://www.cnbc.com/id/19854910" />
+        <outline text="Engadget" title="Engadget" type="rss" xmlUrl="https://www.engadget.com/rss.xml" htmlUrl="https://www.engadget.com/" />
+        <outline text="Fast Company (YouTube)" title="Fast Company (YouTube)" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCqeXB2WsPdzcdCdP-bUc52g" htmlUrl="https://www.youtube.com/channel/UCqeXB2WsPdzcdCdP-bUc52g/videos" />
+        <outline text="Fast Company - Technology" title="Fast Company - Technology" type="rss" xmlUrl="https://www.fastcompany.com/technology/rss" htmlUrl="https://www.fastcompany.com/" />
+        <outline text="Forbes - Innovation" title="Forbes - Innovation" type="rss" xmlUrl="https://www.forbes.com/innovation/feed/" htmlUrl="https://www.forbes.com/innovation/" />
+        <outline text="Gizmodo" title="Gizmodo" type="rss" xmlUrl="https://gizmodo.com/feed" htmlUrl="https://gizmodo.com/" />
+        <outline text="Hacker News" title="Hacker News" type="rss" xmlUrl="https://news.ycombinator.com/rss" htmlUrl="https://news.ycombinator.com/" />
+        <outline text="Interesting Engineering" title="Interesting Engineering" type="rss" xmlUrl="https://interestingengineering.com/feed" htmlUrl="https://interestingengineering.com/" />
+        <outline text="Korben" title="Korben" type="rss" xmlUrl="https://feeds.feedburner.com/KorbensBlog-UpgradeYourMind" htmlUrl="https://korben.info/" />
+        <outline text="Les Numériques" title="Les Numériques" type="rss" xmlUrl="https://www.lesnumeriques.com/rss.xml" htmlUrl="https://www.lesnumeriques.com/" />
+        <outline text="Lifehacker" title="Lifehacker" type="rss" xmlUrl="https://lifehacker.com/feed/rss" htmlUrl="https://lifehacker.com/" />
+        <outline text="MakeUseOf" title="MakeUseOf" type="rss" xmlUrl="https://www.makeuseof.com/feed/" htmlUrl="https://www.makeuseof.com" />
+        <outline text="Mashable" title="Mashable" type="rss" xmlUrl="http://feeds.mashable.com/Mashable" htmlUrl="https://mashable.com/feeds/rss/all" />
+        <outline text="MIT Technology Review" title="MIT Technology Review" type="rss" xmlUrl="https://www.technologyreview.com/feed/" htmlUrl="https://www.technologyreview.com/stories.rss" />
+        <outline text="NYT - Technology" title="NYT - Technology" type="rss" xmlUrl="https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml" htmlUrl="https://www.nytimes.com/pages/technology/index.html?partner=rss&amp;emc=rss" />
+        <outline text="OS X Daily" title="OS X Daily" type="rss" xmlUrl="https://osxdaily.com/feed/" htmlUrl="https://osxdaily.com" />
+        <outline text="Reporterre" title="Reporterre" type="rss" xmlUrl="https://reporterre.net/spip.php?page=backend-simple" htmlUrl="https://reporterre.net/" />
+        <outline text="RIPE Labs" title="RIPE Labs" type="rss" xmlUrl="https://labs.ripe.net/feed.xml" htmlUrl="https://labs.ripe.net/site-rss" />
+        <outline text="Siècle Digital" title="Siècle Digital" type="rss" xmlUrl="https://siecledigital.fr/feed/" htmlUrl="https://siecledigital.fr/" />
+        <outline text="Slashdot" title="Slashdot" type="rss" xmlUrl="https://rss.slashdot.org/Slashdot/slashdotMain" htmlUrl="https://slashdot.org/" />
+        <outline text="Tech Xplore" title="Tech Xplore" type="rss" xmlUrl="https://techxplore.com/rss-feed/" htmlUrl="https://techxplore.com/" />
+        <outline text="TechCrunch" title="TechCrunch" type="rss" xmlUrl="https://techcrunch.com/feed/" htmlUrl="https://techcrunch.com/" />
+        <outline text="Techmeme" title="Techmeme" type="rss" xmlUrl="https://www.techmeme.com/feed.xml" htmlUrl="https://www.techmeme.com/" />
+        <outline text="TED Talks Daily" title="TED Talks Daily" type="rss" xmlUrl="https://www.ted.com/feeds/talks.rss" htmlUrl="https://www.ted.com/talks/list" />
+        <outline text="The Loop" title="The Loop" type="rss" xmlUrl="https://loopinsight.com/feed/" htmlUrl="https://www.loopinsight.com/" />
+        <outline text="The Next Web" title="The Next Web" type="rss" xmlUrl="https://thenextweb.com/feed" htmlUrl="https://thenextweb.com/" />
+        <outline text="The Verge" title="The Verge" type="rss" xmlUrl="https://www.theverge.com/rss/index.xml" htmlUrl="https://www.theverge.com/" />
+        <outline text="The Verge - Science" title="The Verge - Science" type="rss" xmlUrl="https://www.theverge.com/rss/science/index.xml" htmlUrl="https://www.theverge.com/science" />
+        <outline text="WIRED" title="WIRED" type="rss" xmlUrl="https://www.wired.com/feed/rss" htmlUrl="https://www.wired.com/" />
+        <outline text="WSJ Tech" title="WSJ Tech" type="rss" xmlUrl="https://feeds.content.dowjones.io/public/rss/RSSWSJD" htmlUrl="https://www.wsj.com/tech" />
+      </outline>
+    </outline>
+  </body>
+</opml>

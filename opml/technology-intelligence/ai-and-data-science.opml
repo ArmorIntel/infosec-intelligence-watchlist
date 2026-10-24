@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version="2.0">
+  <head>
+    <title>Infosec intelligence watchlist - https://github.com/ArmorIntel - Technology Intelligence - AI &amp; Data Science</title>
+    <dateModified>Sat, 24 Oct 2026 19:07:26 GMT</dateModified>
+    <ownerName>ArmorIntel</ownerName>
+    <ownerId>https://github.com/ArmorIntel</ownerId>
+  </head>
+  <body>
+    <outline text="Technology Intelligence" title="Technology Intelligence">
+      <outline text="AI &amp; Data Science" title="AI &amp; Data Science">
+        <outline text="arXiv - cs.AI" title="arXiv - cs.AI" type="rss" xmlUrl="https://export.arxiv.org/rss/cs.AI" htmlUrl="https://arxiv.org/" />
+        <outline text="Google DeepMind" title="Google DeepMind" type="rss" xmlUrl="https://deepmind.google/blog/rss.xml" htmlUrl="https://deepmind.google/discover/blog/" />
+        <outline text="Google News - Machine Learning" title="Google News - Machine Learning" type="rss" xmlUrl="https://news.google.com/rss/search?hl=en-US&amp;gl=US&amp;q=Machine+Learning&amp;ceid=US:en" htmlUrl="https://news.google.com/news?gl=us&amp;pz=1&amp;ned=us&amp;hl=en&amp;q=Machine+Learning" />
+        <outline text="Google Research Blog" title="Google Research Blog" type="rss" xmlUrl="https://research.google/blog/rss/" htmlUrl="https://research.google/blog/" />
+        <outline text="Hugging Face Blog" title="Hugging Face Blog" type="rss" xmlUrl="https://huggingface.co/blog/feed.xml" htmlUrl="https://huggingface.co/blog" />
+        <outline text="Import AI" title="Import AI" type="rss" xmlUrl="https://importai.substack.com/feed" htmlUrl="https://importai.substack.com/" />
+        <outline text="MIT News - CSAIL" title="MIT News - CSAIL" type="rss" xmlUrl="https://news.mit.edu/topic/mitcomputers-rss.xml" htmlUrl="https://newsoffice.mit.edu/topic/mitcomputer-science-and-artificial-intelligence-laboratory-csail-rss.xml" />
+        <outline text="OpenAI News" title="OpenAI News" type="rss" xmlUrl="https://openai.com/news/rss.xml" htmlUrl="https://openai.com/news/" />
+        <outline text="Singularity Hub" title="Singularity Hub" type="rss" xmlUrl="https://singularityhub.com/feed/" htmlUrl="https://singularityhub.com/" />
+        <outline text="The Guardian - Artificial Intelligence" title="The Guardian - Artificial Intelligence" type="rss" xmlUrl="https://www.theguardian.com/technology/artificialintelligenceai/rss" htmlUrl="https://www.theguardian.com/technology/artificialintelligenceai" />
+        <outline text="Towards Data Science" title="Towards Data Science" type="rss" xmlUrl="https://towardsdatascience.com/feed" htmlUrl="https://towardsdatascience.com/?source=rss----7f60cf5620c9---4" />
+      </outline>
+    </outline>
+  </body>
+</opml>

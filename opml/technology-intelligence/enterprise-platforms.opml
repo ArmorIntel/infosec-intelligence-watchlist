@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version="2.0">
+  <head>
+    <title>Infosec intelligence watchlist - https://github.com/ArmorIntel - Technology Intelligence - Enterprise Platforms</title>
+    <dateModified>Sat, 24 Oct 2026 19:07:26 GMT</dateModified>
+    <ownerName>ArmorIntel</ownerName>
+    <ownerId>https://github.com/ArmorIntel</ownerId>
+  </head>
+  <body>
+    <outline text="Technology Intelligence" title="Technology Intelligence">
+      <outline text="Enterprise Platforms" title="Enterprise Platforms">
+        <outline text="Google - The Keyword" title="Google - The Keyword" type="rss" xmlUrl="https://blog.google/rss" htmlUrl="https://blog.google/" />
+        <outline text="Meta Engineering" title="Meta Engineering" type="rss" xmlUrl="https://engineering.fb.com/feed/" htmlUrl="https://engineering.fb.com/" />
+        <outline text="Netflix Press Releases" title="Netflix Press Releases" type="rss" xmlUrl="https://ir.netflix.net/rss/pressrelease.aspx" htmlUrl="https://www.netflixinvestor.com/" />
+        <outline text="Netflix TechBlog" title="Netflix TechBlog" type="rss" xmlUrl="https://medium.com/feed/netflix-techblog" htmlUrl="https://techblog.netflix.com/" />
+        <outline text="Netflix TechBlog - Security" title="Netflix TechBlog - Security" type="rss" xmlUrl="https://medium.com/feed/netflix-techblog/tagged/security" htmlUrl="https://medium.com/netflix-techblog/tagged/security?source=rss----2615bd06b42e--security" />
+        <outline text="Windows Central" title="Windows Central" type="rss" xmlUrl="https://www.windowscentral.com/feeds.xml" htmlUrl="https://www.windowscentral.com" />
+      </outline>
+    </outline>
+  </body>
+</opml>

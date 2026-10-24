@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version="2.0">
+  <head>
+    <title>Infosec intelligence watchlist - https://github.com/ArmorIntel - Threat Intelligence - Research &amp; Labs</title>
+    <dateModified>Sat, 24 Oct 2026 19:07:26 GMT</dateModified>
+    <ownerName>ArmorIntel</ownerName>
+    <ownerId>https://github.com/ArmorIntel</ownerId>
+  </head>
+  <body>
+    <outline text="Threat Intelligence" title="Threat Intelligence">
+      <outline text="Research &amp; Labs" title="Research &amp; Labs">
+        <outline text="360 Netlab" title="360 Netlab" type="rss" xmlUrl="https://blog.netlab.360.com/rss/" htmlUrl="https://blog.netlab.360.com/" />
+        <outline text="arXiv - cs.CR (Cryptography and Security)" title="arXiv - cs.CR (Cryptography and Security)" type="rss" xmlUrl="https://export.arxiv.org/rss/cs.CR" htmlUrl="https://arxiv.org/" />
+        <outline text="Check Point Research" title="Check Point Research" type="rss" xmlUrl="https://research.checkpoint.com/feed" htmlUrl="https://research.checkpoint.com/feed" />
+        <outline text="Cyber Threat Alliance" title="Cyber Threat Alliance" type="rss" xmlUrl="https://www.cyberthreatalliance.org/feed/" htmlUrl="https://www.cyberthreatalliance.org/" />
+        <outline text="Datadog Security Labs" title="Datadog Security Labs" type="rss" xmlUrl="https://securitylabs.datadoghq.com/rss/feed.xml" htmlUrl="https://securitylabs.datadoghq.com/" />
+        <outline text="DiabloHorn" title="DiabloHorn" type="rss" xmlUrl="https://diablohorn.com/feed/" htmlUrl="https://diablohorn.com/" />
+        <outline text="Didier Stevens" title="Didier Stevens" type="rss" xmlUrl="https://blog.didierstevens.com/feed/" htmlUrl="https://blog.didierstevens.com" />
+        <outline text="Doyensec Blog" title="Doyensec Blog" type="rss" xmlUrl="https://blog.doyensec.com/atom.xml" htmlUrl="https://localhost:4000/" />
+        <outline text="Elastic Security Labs" title="Elastic Security Labs" type="rss" xmlUrl="https://www.elastic.co/security-labs/rss/feed.xml" htmlUrl="https://www.elastic.co/security-labs" />
+        <outline text="Google Online Security Blog" title="Google Online Security Blog" type="rss" xmlUrl="https://security.googleblog.com/feeds/posts/default" htmlUrl="https://security.googleblog.com/" />
+        <outline text="Google Threat Intelligence (TAG &amp; Mandiant)" title="Google Threat Intelligence (TAG &amp; Mandiant)" type="rss" xmlUrl="https://feeds.feedburner.com/threatintelligence/pvexyqv7v0v" htmlUrl="https://cloud.google.com/blog/topics/threat-intelligence" />
+        <outline text="hasherezade" title="hasherezade" type="rss" xmlUrl="https://hshrzd.wordpress.com/feed/" htmlUrl="https://hshrzd.wordpress.com" />
+        <outline text="Horizon3.ai" title="Horizon3.ai" type="rss" xmlUrl="https://horizon3.ai/feed/" htmlUrl="https://horizon3.ai/attack-research/" />
+        <outline text="IEEE Security &amp; Privacy" title="IEEE Security &amp; Privacy" type="rss" xmlUrl="https://csdl-api.computer.org/api/rss/periodicals/mags/sp/rss.xml" htmlUrl="https://www.computer.org/csdl/mags/sp/index.html" />
+        <outline text="IEEE Transactions on Dependable and Secure Computing" title="IEEE Transactions on Dependable and Secure Computing" type="rss" xmlUrl="https://csdl-api.computer.org/api/rss/periodicals/trans/tq/rss.xml" htmlUrl="https://www.computer.org/csdl/trans/tq/index.html" />
+        <outline text="IEEE Transactions on Information Forensics and Security" title="IEEE Transactions on Information Forensics and Security" type="rss" xmlUrl="https://ieeexplore.ieee.org/rss/TOC10206.XML" htmlUrl="https://ieeexplore.ieee.org/" />
+        <outline text="Light Blue Touchpaper" title="Light Blue Touchpaper" type="rss" xmlUrl="https://www.lightbluetouchpaper.org/feed/" htmlUrl="https://www.lightbluetouchpaper.org/" />
+        <outline text="Mozilla Security Blog" title="Mozilla Security Blog" type="rss" xmlUrl="https://blog.mozilla.org/security/feed/" htmlUrl="https://blog.mozilla.org/security" />
+        <outline text="OALABS Research" title="OALABS Research" type="rss" xmlUrl="https://research.openanalysis.net/feed.xml" htmlUrl="https://research.openanalysis.net/" />
+        <outline text="Objective-See" title="Objective-See" type="rss" xmlUrl="https://objective-see.org/rss.xml" htmlUrl="https://www.objective-see.com/" />
+        <outline text="Pen Test Partners" title="Pen Test Partners" type="rss" xmlUrl="https://www.pentestpartners.com/feed/" htmlUrl="https://www.pentestpartners.com/" />
+        <outline text="PortSwigger Blog" title="PortSwigger Blog" type="rss" xmlUrl="https://portswigger.net/blog/rss" htmlUrl="https://blog.portswigger.net/" />
+        <outline text="PortSwigger Research" title="PortSwigger Research" type="rss" xmlUrl="https://portswigger.net/research/rss" htmlUrl="https://portswigger.net/research" />
+        <outline text="Project Zero" title="Project Zero" type="rss" xmlUrl="https://projectzero.google/feed.xml" htmlUrl="https://googleprojectzero.blogspot.com/" />
+        <outline text="r/ReverseEngineering" title="r/ReverseEngineering" type="rss" xmlUrl="https://www.reddit.com/r/ReverseEngineering/.rss" htmlUrl="https://www.reddit.com/r/ReverseEngineering/" />
+        <outline text="reverse.put.as" title="reverse.put.as" type="rss" xmlUrl="https://reverse.put.as/index.xml" htmlUrl="https://reverse.put.as/" />
+        <outline text="Rhino Security Labs" title="Rhino Security Labs" type="rss" xmlUrl="https://rhinosecuritylabs.com/feed/" htmlUrl="https://rhinosecuritylabs.com" />
+        <outline text="Securelist (Kaspersky)" title="Securelist (Kaspersky)" type="rss" xmlUrl="https://securelist.com/feed/" htmlUrl="https://securelist.com/" />
+        <outline text="SentinelLabs" title="SentinelLabs" type="rss" xmlUrl="https://www.sentinelone.com/labs/feed/" htmlUrl="https://www.sentinelone.com/labs/" />
+        <outline text="Talos Blog" title="Talos Blog" type="rss" xmlUrl="http://feeds.feedburner.com/feedburner/Talos" htmlUrl="https://blog.talosintelligence.com/" />
+        <outline text="The DFIR Report" title="The DFIR Report" type="rss" xmlUrl="https://thedfirreport.com/feed/" htmlUrl="https://thedfirreport.com/" />
+        <outline text="Trail of Bits Blog" title="Trail of Bits Blog" type="rss" xmlUrl="https://blog.trailofbits.com/index.xml" htmlUrl="https://blog.trailofbits.com/" />
+        <outline text="Unit 42 (Palo Alto Networks)" title="Unit 42 (Palo Alto Networks)" type="rss" xmlUrl="https://unit42.paloaltonetworks.com/feed/" htmlUrl="https://unit42.paloaltonetworks.com/" />
+        <outline text="watchTowr Labs" title="watchTowr Labs" type="rss" xmlUrl="https://labs.watchtowr.com/rss/" htmlUrl="https://labs.watchtowr.com/" />
+        <outline text="Wiz Blog" title="Wiz Blog" type="rss" xmlUrl="https://www.wiz.io/feed/rss.xml" htmlUrl="https://www.wiz.io/blog/" />
+        <outline text="ZDI Blog" title="ZDI Blog" type="rss" xmlUrl="https://www.thezdi.com/blog?format=rss" htmlUrl="https://www.thezdi.com/blog/" />
+      </outline>
+    </outline>
+  </body>
+</opml>

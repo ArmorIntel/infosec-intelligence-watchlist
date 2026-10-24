@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version="2.0">
+  <head>
+    <title>Infosec intelligence watchlist - https://github.com/ArmorIntel - Threat Intelligence - Security News</title>
+    <dateModified>Sat, 24 Oct 2026 19:07:26 GMT</dateModified>
+    <ownerName>ArmorIntel</ownerName>
+    <ownerId>https://github.com/ArmorIntel</ownerId>
+  </head>
+  <body>
+    <outline text="Threat Intelligence" title="Threat Intelligence">
+      <outline text="Security News" title="Security News">
+        <outline text="BleepingComputer" title="BleepingComputer" type="rss" xmlUrl="https://www.bleepingcomputer.com/feed/" htmlUrl="https://www.bleepingcomputer.com/forums/f/2/news/" />
+        <outline text="Cyberscoop" title="Cyberscoop" type="rss" xmlUrl="https://www.cyberscoop.com/feed/" htmlUrl="https://www.cyberscoop.com/" />
+        <outline text="Dark Reading" title="Dark Reading" type="rss" xmlUrl="https://www.darkreading.com/rss.xml" htmlUrl="https://www.darkreading.com/" />
+        <outline text="HackRead" title="HackRead" type="rss" xmlUrl="https://hackread.com/feed/" htmlUrl="https://www.hackread.com" />
+        <outline text="Homeland Security News Wire" title="Homeland Security News Wire" type="rss" xmlUrl="https://www.homelandsecuritynewswire.com/rss.xml" htmlUrl="https://www.homelandsecuritynewswire.com/" />
+        <outline text="Krebs on Security" title="Krebs on Security" type="rss" xmlUrl="https://krebsonsecurity.com/feed/" htmlUrl="https://krebsonsecurity.com/" />
+        <outline text="Le Monde Informatique - Sécurité" title="Le Monde Informatique - Sécurité" type="rss" xmlUrl="https://www.lemondeinformatique.fr/flux-rss/thematique/securite/rss.xml" htmlUrl="https://www.lemondeinformatique.fr/securite-informatique-3.html" />
+        <outline text="LeMagIT" title="LeMagIT" type="rss" xmlUrl="https://www.lemagit.fr/rss/ContentSyndication.xml" htmlUrl="https://lemagit.fr/rss/ContentSyndication.xml" />
+        <outline text="Numerama - Cyberguerre" title="Numerama - Cyberguerre" type="rss" xmlUrl="https://www.numerama.com/cyberguerre/feed/" htmlUrl="https://www.numerama.com/cyberguerre/" />
+        <outline text="Risky Business News" title="Risky Business News" type="rss" xmlUrl="https://risky.biz/feeds/risky-business-news/" htmlUrl="https://risky.biz/" />
+        <outline text="Security Affairs" title="Security Affairs" type="rss" xmlUrl="https://securityaffairs.com/feed" htmlUrl="https://securityaffairs.co/wordpress" />
+        <outline text="SecurityWeek" title="SecurityWeek" type="rss" xmlUrl="https://www.securityweek.com/feed/" htmlUrl="https://www.securityweek.com/" />
+        <outline text="Tech Xplore - Security" title="Tech Xplore - Security" type="rss" xmlUrl="https://techxplore.com/rss-feed/security-news/" htmlUrl="https://techxplore.com/security-news/" />
+        <outline text="TechRepublic - Security" title="TechRepublic - Security" type="rss" xmlUrl="https://www.techrepublic.com/rssfeeds/topic/security/" htmlUrl="https://www.techrepublic.com/rssfeeds/topic/security/" />
+        <outline text="The CyberWire" title="The CyberWire" type="rss" xmlUrl="https://thecyberwire.com/feeds/rss.xml" htmlUrl="https://thecyberwire.com/index.html" />
+        <outline text="The Hacker News" title="The Hacker News" type="rss" xmlUrl="https://feeds.feedburner.com/TheHackersNews" htmlUrl="https://thehackernews.com/" />
+        <outline text="The Record" title="The Record" type="rss" xmlUrl="https://therecord.media/feed/" htmlUrl="https://therecord.media/" />
+        <outline text="The Register - Security" title="The Register - Security" type="rss" xmlUrl="https://www.theregister.com/security/headlines.atom" htmlUrl="https://www.theregister.co.uk/security/" />
+        <outline text="Thomas Fox-Brewster" title="Thomas Fox-Brewster" type="rss" xmlUrl="https://www.forbes.com/sites/thomasbrewster/feed/" htmlUrl="https://www.forbes.com/sites/thomasbrewster/" />
+        <outline text="WIRED - Security" title="WIRED - Security" type="rss" xmlUrl="https://www.wired.com/feed/category/security/latest/rss" htmlUrl="https://www.wired.com/category/security/latest" />
+        <outline text="ZATAZ Magazine" title="ZATAZ Magazine" type="rss" xmlUrl="https://feeds.feedburner.com/ZatazNews" htmlUrl="https://www.zataz.com/" />
+      </outline>
+    </outline>
+  </body>
+</opml>

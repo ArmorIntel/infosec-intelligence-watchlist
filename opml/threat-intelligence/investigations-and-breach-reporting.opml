@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version="2.0">
+  <head>
+    <title>Infosec intelligence watchlist - https://github.com/ArmorIntel - Threat Intelligence - Investigations &amp; Breach Reporting</title>
+    <dateModified>Sat, 24 Oct 2026 19:07:26 GMT</dateModified>
+    <ownerName>ArmorIntel</ownerName>
+    <ownerId>https://github.com/ArmorIntel</ownerId>
+  </head>
+  <body>
+    <outline text="Threat Intelligence" title="Threat Intelligence">
+      <outline text="Investigations &amp; Breach Reporting" title="Investigations &amp; Breach Reporting">
+        <outline text="404 Media" title="404 Media" type="rss" xmlUrl="https://www.404media.co/rss/" htmlUrl="https://www.404media.co/" />
+        <outline text="bellingcat" title="bellingcat" type="rss" xmlUrl="https://www.bellingcat.com/feed/" htmlUrl="https://www.bellingcat.com/" />
+        <outline text="Distributed Email of Secrets" title="Distributed Email of Secrets" type="rss" xmlUrl="https://ddosecrets.substack.com/feed/" htmlUrl="https://ddosecrets.substack.com/" />
+        <outline text="Hackmageddon" title="Hackmageddon" type="rss" xmlUrl="https://www.hackmageddon.com/feed/" htmlUrl="https://www.hackmageddon.com/" />
+        <outline text="Have I Been Pwned - Latest Breaches" title="Have I Been Pwned - Latest Breaches" type="rss" xmlUrl="https://feeds.feedburner.com/HaveIBeenPwnedLatestBreaches" htmlUrl="https://haveibeenpwned.com/" />
+        <outline text="International Consortium of Investigative Journalists" title="International Consortium of Investigative Journalists" type="rss" xmlUrl="https://www.icij.org/feed/" htmlUrl="https://www.icij.org/" />
+        <outline text="ProPublica" title="ProPublica" type="rss" xmlUrl="https://www.propublica.org/feeds/propublica/main" htmlUrl="https://www.propublica.org/" />
+        <outline text="The Citizen Lab" title="The Citizen Lab" type="rss" xmlUrl="https://citizenlab.ca/feed" htmlUrl="https://citizenlab.ca/" />
+        <outline text="The Intercept" title="The Intercept" type="rss" xmlUrl="https://theintercept.com/feed/?lang=en" htmlUrl="https://theintercept.com/" />
+        <outline text="WIRED - Backchannel" title="WIRED - Backchannel" type="rss" xmlUrl="https://www.wired.com/feed/category/backchannel/latest/rss" htmlUrl="https://www.wired.com/category/backchannel/latest" />
+      </outline>
+    </outline>
+  </body>
+</opml>

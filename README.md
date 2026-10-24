@@ -32,6 +32,9 @@ The goal is to help professionals, researchers, and enthusiasts stay up to date 
     - Enterprise Platforms
     - Science & Academia
 
+- `opml/` &mdash; one OPML file per subcategory, generated from the global file, to subscribe only to the topics you need (see [Subscribe to a single category](#subscribe-to-a-single-category))
+- `scripts/build_category_opml.py` &mdash; regenerates the `opml/` files from the global file
+
 Last review: **October 2026**.
 
 ## How to use the watchlist
@@ -56,6 +59,33 @@ Subscribing to the OPML file :
 You will need to use the raw file url from the xml file of this repository.
 `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/infosec-intelligence-watchlist.xml`
 ![Subscribing to OPML file](./inoreader_screens/subscribe_opml.png)
+
+### Subscribe to a single category
+
+If you don't want the whole watchlist (or if your RSS reader plan limits the number of feeds), import or subscribe to one or several category files instead. Each file contains one subcategory of the global watchlist and is updated along with it.
+
+| Category | Subcategory | Feeds | Raw OPML URL |
+|---|---|---:|---|
+| Threat Intelligence | [Security News](./opml/threat-intelligence/security-news.opml) | 21 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/threat-intelligence/security-news.opml` |
+| Threat Intelligence | [Research & Labs](./opml/threat-intelligence/research-and-labs.opml) | 36 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/threat-intelligence/research-and-labs.opml` |
+| Threat Intelligence | [AI Security](./opml/threat-intelligence/ai-security.opml) | 10 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/threat-intelligence/ai-security.opml` |
+| Threat Intelligence | [Vendor & Industry Updates](./opml/threat-intelligence/vendor-and-industry-updates.opml) | 32 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/threat-intelligence/vendor-and-industry-updates.opml` |
+| Threat Intelligence | [Government & CERT Bulletins](./opml/threat-intelligence/government-and-cert-bulletins.opml) | 22 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/threat-intelligence/government-and-cert-bulletins.opml` |
+| Threat Intelligence | [Alerts & Monitoring](./opml/threat-intelligence/alerts-and-monitoring.opml) | 11 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/threat-intelligence/alerts-and-monitoring.opml` |
+| Threat Intelligence | [Investigations & Breach Reporting](./opml/threat-intelligence/investigations-and-breach-reporting.opml) | 10 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/threat-intelligence/investigations-and-breach-reporting.opml` |
+| Threat Intelligence | [Communities & Experts](./opml/threat-intelligence/communities-and-experts.opml) | 26 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/threat-intelligence/communities-and-experts.opml` |
+| Threat Intelligence | [Knowledge Sharing & Podcasts](./opml/threat-intelligence/knowledge-sharing-and-podcasts.opml) | 3 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/threat-intelligence/knowledge-sharing-and-podcasts.opml` |
+| Threat Intelligence | [Intelligence Newsletters](./opml/threat-intelligence/intelligence-newsletters.opml) | 11 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/threat-intelligence/intelligence-newsletters.opml` |
+| Threat Intelligence | [OSINT & Tooling](./opml/threat-intelligence/osint-and-tooling.opml) | 8 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/threat-intelligence/osint-and-tooling.opml` |
+| Technology Intelligence | [Industry & Innovation](./opml/technology-intelligence/industry-and-innovation.opml) | 44 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/industry-and-innovation.opml` |
+| Technology Intelligence | [AI & Data Science](./opml/technology-intelligence/ai-and-data-science.opml) | 11 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/ai-and-data-science.opml` |
+| Technology Intelligence | [Privacy, Compliance & Governance](./opml/technology-intelligence/privacy-compliance-and-governance.opml) | 11 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/privacy-compliance-and-governance.opml` |
+| Technology Intelligence | [Cryptocurrency & Blockchain](./opml/technology-intelligence/cryptocurrency-and-blockchain.opml) | 15 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/cryptocurrency-and-blockchain.opml` |
+| Technology Intelligence | [Apple Ecosystem](./opml/technology-intelligence/apple-ecosystem.opml) | 11 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/apple-ecosystem.opml` |
+| Technology Intelligence | [Hardware & IoT](./opml/technology-intelligence/hardware-and-iot.opml) | 5 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/hardware-and-iot.opml` |
+| Technology Intelligence | [Software & Open Source](./opml/technology-intelligence/software-and-open-source.opml) | 10 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/software-and-open-source.opml` |
+| Technology Intelligence | [Enterprise Platforms](./opml/technology-intelligence/enterprise-platforms.opml) | 6 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/enterprise-platforms.opml` |
+| Technology Intelligence | [Science & Academia](./opml/technology-intelligence/science-and-academia.opml) | 6 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/science-and-academia.opml` |
 
 #### Explore feeds
 ![Feeds view](./inoreader_screens/feeds_view.png)
@@ -86,7 +116,8 @@ Review criteria used to keep the list clean:
 Contributions are welcome!
 If you want to add new feeds or suggest improvements:
 - Fork this repository
-- Update the xml file
+- Update the xml file (`infosec-intelligence-watchlist.xml` is the only file to edit)
+- Regenerate the category files with `python3 scripts/build_category_opml.py --table`, and update the table above if the folders changed
 - Submit a pull request with a description
 
 Maintained by [ArmorIntel](https://github.com/ArmorIntel/).

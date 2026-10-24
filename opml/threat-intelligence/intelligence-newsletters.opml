@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version="2.0">
+  <head>
+    <title>Infosec intelligence watchlist - https://github.com/ArmorIntel - Threat Intelligence - Intelligence Newsletters</title>
+    <dateModified>Sat, 24 Oct 2026 19:07:26 GMT</dateModified>
+    <ownerName>ArmorIntel</ownerName>
+    <ownerId>https://github.com/ArmorIntel</ownerId>
+  </head>
+  <body>
+    <outline text="Threat Intelligence" title="Threat Intelligence">
+      <outline text="Intelligence Newsletters" title="Intelligence Newsletters">
+        <outline text="BadCyber" title="BadCyber" type="rss" xmlUrl="https://badcyber.com/feed.xml" htmlUrl="https://badcyber.com/" />
+        <outline text="BlockThreat" title="BlockThreat" type="rss" xmlUrl="https://blockthreat.com/rss/" htmlUrl="https://blockthreat.com/" />
+        <outline text="CloudSecList" title="CloudSecList" type="rss" xmlUrl="https://cloudseclist.com/feed.xml" htmlUrl="https://cloudseclist.com/" />
+        <outline text="Daniel Miessler" title="Daniel Miessler" type="rss" xmlUrl="https://danielmiessler.com/feed.rss" htmlUrl="https://danielmiessler.com/" />
+        <outline text="Detection Engineering Weekly" title="Detection Engineering Weekly" type="rss" xmlUrl="https://www.detectionengineering.net/feed" htmlUrl="https://www.detectionengineering.net/" />
+        <outline text="Last Week in AWS" title="Last Week in AWS" type="rss" xmlUrl="https://www.lastweekinaws.com/feed.xml" htmlUrl="https://www.lastweekinaws.com/" />
+        <outline text="MEMCM (SCCM)" title="MEMCM (SCCM)" type="rss" xmlUrl="https://www.danielengberg.com/category/newsletter/feed/" htmlUrl="https://www.danielengberg.com/" />
+        <outline text="RTC security" title="RTC security" type="rss" xmlUrl="https://kill-the-newsletter.com/feeds/kll2l1ge3jr4xhtc.xml" htmlUrl="https://kill-the-newsletter.com/" />
+        <outline text="This Week In 4n6" title="This Week In 4n6" type="rss" xmlUrl="https://thisweekin4n6.com/feed/" htmlUrl="https://thisweekin4n6.com/" />
+        <outline text="tl;dr sec" title="tl;dr sec" type="rss" xmlUrl="https://tldrsec.com/feed.xml" htmlUrl="https://tldrsec.com/" />
+        <outline text="Zero Day" title="Zero Day" type="rss" xmlUrl="https://zetter.substack.com/feed" htmlUrl="https://zetter.substack.com/" />
+      </outline>
+    </outline>
+  </body>
+</opml>

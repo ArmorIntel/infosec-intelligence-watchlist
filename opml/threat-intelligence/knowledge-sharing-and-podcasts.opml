@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version="2.0">
+  <head>
+    <title>Infosec intelligence watchlist - https://github.com/ArmorIntel - Threat Intelligence - Knowledge Sharing &amp; Podcasts</title>
+    <dateModified>Sat, 24 Oct 2026 19:07:26 GMT</dateModified>
+    <ownerName>ArmorIntel</ownerName>
+    <ownerId>https://github.com/ArmorIntel</ownerId>
+  </head>
+  <body>
+    <outline text="Threat Intelligence" title="Threat Intelligence">
+      <outline text="Knowledge Sharing &amp; Podcasts" title="Knowledge Sharing &amp; Podcasts">
+        <outline text="44CON" title="44CON" type="rss" xmlUrl="https://44con.com/feed/" htmlUrl="https://44con.com/" />
+        <outline text="CyberWire Daily (podcast)" title="CyberWire Daily (podcast)" type="rss" xmlUrl="https://feeds.megaphone.fm/cyberwire-daily-podcast" htmlUrl="https://thecyberwire.com/podcasts/daily-podcast" />
+        <outline text="Darknet Diaries" title="Darknet Diaries" type="rss" xmlUrl="https://feeds.megaphone.fm/darknetdiaries" htmlUrl="https://darknetdiaries.com/" />
+      </outline>
+    </outline>
+  </body>
+</opml>

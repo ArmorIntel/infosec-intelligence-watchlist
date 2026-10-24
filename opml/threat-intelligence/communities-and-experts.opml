@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version="2.0">
+  <head>
+    <title>Infosec intelligence watchlist - https://github.com/ArmorIntel - Threat Intelligence - Communities &amp; Experts</title>
+    <dateModified>Sat, 24 Oct 2026 19:07:26 GMT</dateModified>
+    <ownerName>ArmorIntel</ownerName>
+    <ownerId>https://github.com/ArmorIntel</ownerId>
+  </head>
+  <body>
+    <outline text="Threat Intelligence" title="Threat Intelligence">
+      <outline text="Communities &amp; Experts" title="Communities &amp; Experts">
+        <outline text="/r/netsec" title="/r/netsec" type="rss" xmlUrl="https://www.reddit.com/r/netsec/.rss" htmlUrl="https://www.reddit.com/r/netsec/" />
+        <outline text="A Few Thoughts on Cryptographic Engineering" title="A Few Thoughts on Cryptographic Engineering" type="rss" xmlUrl="https://blog.cryptographyengineering.com/feed/" htmlUrl="https://blog.cryptographyengineering.com/" />
+        <outline text="Adam Shostack" title="Adam Shostack" type="rss" xmlUrl="https://shostack.org/feed.xml" htmlUrl="https://shostack.org/blog" />
+        <outline text="Daily Dave" title="Daily Dave" type="rss" xmlUrl="https://seclists.org/rss/dailydave.rss" htmlUrl="https://seclists.org/#dailydave" />
+        <outline text="Electrospaces.net" title="Electrospaces.net" type="rss" xmlUrl="https://www.electrospaces.net/feeds/posts/default" htmlUrl="https://www.electrospaces.net/" />
+        <outline text="Eric Conrad" title="Eric Conrad" type="rss" xmlUrl="https://www.ericconrad.com/feeds/posts/default?alt=rss" htmlUrl="https://www.ericconrad.com/" />
+        <outline text="Graham Cluley" title="Graham Cluley" type="rss" xmlUrl="https://www.grahamcluley.com/feed/" htmlUrl="https://www.grahamcluley.com" />
+        <outline text="ImperialViolet (Adam Langley)" title="ImperialViolet (Adam Langley)" type="rss" xmlUrl="https://www.imperialviolet.org/iv-rss.xml" htmlUrl="https://www.imperialviolet.org/" />
+        <outline text="Javvad Malik" title="Javvad Malik" type="rss" xmlUrl="https://javvadmalik.com/feed/" htmlUrl="https://javvadmalik.com" />
+        <outline text="Krypt3ia" title="Krypt3ia" type="rss" xmlUrl="https://krypt3ia.wordpress.com/feed/" htmlUrl="https://krypt3ia.wordpress.com" />
+        <outline text="MalwareTech" title="MalwareTech" type="rss" xmlUrl="https://www.malwaretech.com/feed" htmlUrl="https://www.malwaretech.com/" />
+        <outline text="OSSIR" title="OSSIR" type="rss" xmlUrl="https://infosec.exchange/@ossir.rss" htmlUrl="https://infosec.exchange/@ossir" />
+        <outline text="r/blueteamsec" title="r/blueteamsec" type="rss" xmlUrl="https://www.reddit.com/r/blueteamsec/.rss" htmlUrl="https://www.reddit.com/r/blueteamsec/" />
+        <outline text="r/fulldisclosure" title="r/fulldisclosure" type="rss" xmlUrl="https://www.reddit.com/r/fulldisclosure/.rss" htmlUrl="https://www.reddit.com/r/fulldisclosure/" />
+        <outline text="r/InformationSecurity" title="r/InformationSecurity" type="rss" xmlUrl="https://www.reddit.com/r/Information_Security/.rss" htmlUrl="https://www.reddit.com/r/Information_Security/" />
+        <outline text="r/ITCareerQuestions" title="r/ITCareerQuestions" type="rss" xmlUrl="https://www.reddit.com/r/ITCareerQuestions/.rss" htmlUrl="https://www.reddit.com/r/ITCareerQuestions/" />
+        <outline text="r/Malware" title="r/Malware" type="rss" xmlUrl="https://www.reddit.com/r/Malware/.rss" htmlUrl="https://www.reddit.com/r/Malware/" />
+        <outline text="r/pwned" title="r/pwned" type="rss" xmlUrl="https://www.reddit.com/r/pwned/.rss" htmlUrl="https://www.reddit.com/r/pwned/" />
+        <outline text="r/redteamsec" title="r/redteamsec" type="rss" xmlUrl="https://www.reddit.com/r/redteamsec/.rss" htmlUrl="https://www.reddit.com/r/redteamsec/" />
+        <outline text="r/websec" title="r/websec" type="rss" xmlUrl="https://www.reddit.com/r/websec/.rss" htmlUrl="https://www.reddit.com/r/websec/" />
+        <outline text="r/zeroday" title="r/zeroday" type="rss" xmlUrl="https://www.reddit.com/r/zeroday/.rss" htmlUrl="https://www.reddit.com/r/zeroday/" />
+        <outline text="SCADA Mag (Infracritical)" title="SCADA Mag (Infracritical)" type="rss" xmlUrl="https://scadamag.infracritical.com/index.php/feed/" htmlUrl="https://scadamag.infracritical.com" />
+        <outline text="Schneier on Security" title="Schneier on Security" type="rss" xmlUrl="https://www.schneier.com/feed/atom/" htmlUrl="https://www.schneier.com/blog/" />
+        <outline text="Secjuice" title="Secjuice" type="rss" xmlUrl="https://www.secjuice.com/rss/" htmlUrl="https://www.secjuice.com/" />
+        <outline text="Studio d'Informatica Forense" title="Studio d'Informatica Forense" type="rss" xmlUrl="https://www.dalchecco.it/feed/" htmlUrl="https://www.dalchecco.it/" />
+        <outline text="TaoSecurity (Richard Bejtlich)" title="TaoSecurity (Richard Bejtlich)" type="rss" xmlUrl="https://taosecurity.blogspot.com/feeds/posts/default" htmlUrl="https://taosecurity.blogspot.com/" />
+      </outline>
+    </outline>
+  </body>
+</opml>

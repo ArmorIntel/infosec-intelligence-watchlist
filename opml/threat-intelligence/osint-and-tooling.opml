@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version="2.0">
+  <head>
+    <title>Infosec intelligence watchlist - https://github.com/ArmorIntel - Threat Intelligence - OSINT &amp; Tooling</title>
+    <dateModified>Sat, 24 Oct 2026 19:07:26 GMT</dateModified>
+    <ownerName>ArmorIntel</ownerName>
+    <ownerId>https://github.com/ArmorIntel</ownerId>
+  </head>
+  <body>
+    <outline text="Threat Intelligence" title="Threat Intelligence">
+      <outline text="OSINT &amp; Tooling" title="OSINT &amp; Tooling">
+        <outline text="Binary Ninja" title="Binary Ninja" type="rss" xmlUrl="https://binary.ninja/feed.xml" htmlUrl="https://binary.ninja/" />
+        <outline text="capa" title="capa" type="rss" xmlUrl="https://github.com/mandiant/capa/commits/master.atom" htmlUrl="https://github.com/mandiant/capa/commits/master" />
+        <outline text="capa-rules" title="capa-rules" type="rss" xmlUrl="https://github.com/mandiant/capa-rules/commits/master.atom" htmlUrl="https://github.com/mandiant/capa-rules/commits/master" />
+        <outline text="contagio" title="contagio" type="rss" xmlUrl="https://contagiodump.blogspot.com/feeds/posts/default?alt=rss" htmlUrl="https://contagiodump.blogspot.com/" />
+        <outline text="Darknet - Hacking Tools" title="Darknet - Hacking Tools" type="rss" xmlUrl="https://www.darknet.org.uk/category/hacking-tools/feed/" htmlUrl="https://www.darknet.org.uk/" />
+        <outline text="Exploit-DB" title="Exploit-DB" type="rss" xmlUrl="https://www.exploit-db.com/rss.xml" htmlUrl="https://www.exploit-db.com" />
+        <outline text="r/OSINT" title="r/OSINT" type="rss" xmlUrl="https://www.reddit.com/r/OSINT/.rss" htmlUrl="https://www.reddit.com/r/OSINT/" />
+        <outline text="Sploitus" title="Sploitus" type="rss" xmlUrl="https://sploitus.com/rss" htmlUrl="https://sploitus.com/rss" />
+      </outline>
+    </outline>
+  </body>
+</opml>

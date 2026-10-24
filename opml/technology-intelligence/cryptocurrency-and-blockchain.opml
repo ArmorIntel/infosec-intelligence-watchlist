@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version="2.0">
+  <head>
+    <title>Infosec intelligence watchlist - https://github.com/ArmorIntel - Technology Intelligence - Cryptocurrency &amp; Blockchain</title>
+    <dateModified>Sat, 24 Oct 2026 19:07:26 GMT</dateModified>
+    <ownerName>ArmorIntel</ownerName>
+    <ownerId>https://github.com/ArmorIntel</ownerId>
+  </head>
+  <body>
+    <outline text="Technology Intelligence" title="Technology Intelligence">
+      <outline text="Cryptocurrency &amp; Blockchain" title="Cryptocurrency &amp; Blockchain">
+        <outline text="Chainalysis" title="Chainalysis" type="rss" xmlUrl="https://www.chainalysis.com/feed/" htmlUrl="https://blog.chainalysis.com/" />
+        <outline text="CoinDesk" title="CoinDesk" type="rss" xmlUrl="https://www.coindesk.com/arc/outboundfeeds/rss?outputType=xml" htmlUrl="https://www.coindesk.com/" />
+        <outline text="Cointelegraph.com News" title="Cointelegraph.com News" type="rss" xmlUrl="https://cointelegraph.com/rss" htmlUrl="https://cointelegraph.com/" />
+        <outline text="Crypto Briefing" title="Crypto Briefing" type="rss" xmlUrl="https://cryptobriefing.com/feed/" htmlUrl="https://cryptobriefing.com/" />
+        <outline text="CryptoActu" title="CryptoActu" type="rss" xmlUrl="https://cryptoactu.com/feed.xml" htmlUrl="https://cryptoactu.com/" />
+        <outline text="Cryptoast" title="Cryptoast" type="rss" xmlUrl="https://cryptoast.fr/feed/" htmlUrl="https://cryptoast.fr/" />
+        <outline text="Cryptonews" title="Cryptonews" type="rss" xmlUrl="https://cryptonews.com/fr/news/feed/" htmlUrl="https://fr.cryptonews.com/" />
+        <outline text="CryptoPotato" title="CryptoPotato" type="rss" xmlUrl="https://cryptopotato.com/feed/" htmlUrl="https://cryptopotato.com/" />
+        <outline text="CryptoSlate" title="CryptoSlate" type="rss" xmlUrl="https://cryptoslate.com/feed/" htmlUrl="https://cryptoslate.com/" />
+        <outline text="Enter The Crypto Matrix" title="Enter The Crypto Matrix" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCefQC4Y-X9MBRuYBKc2waiQ" htmlUrl="https://www.youtube.com/channel/UCefQC4Y-X9MBRuYBKc2waiQ" />
+        <outline text="eToro - Crypto News" title="eToro - Crypto News" type="rss" xmlUrl="https://www.etoro.com/en-us/news-and-analysis/crypto/feed/" htmlUrl="https://www.etoro.com/en-us/" />
+        <outline text="Finance Magnates - Crypto" title="Finance Magnates - Crypto" type="rss" xmlUrl="https://www.financemagnates.com/cryptocurrency/feed/" htmlUrl="https://www.financemagnates.com/cryptocurrency" />
+        <outline text="Google News - Crypto &amp; Blockchain" title="Google News - Crypto &amp; Blockchain" type="rss" xmlUrl="https://news.google.com/rss/search?hl=en-US&amp;gl=US&amp;q=bitcoin+OR+blockchain+OR+cryptocurrency&amp;ceid=US:en" htmlUrl="https://news.google.com/news?gl=us&amp;pz=1&amp;ned=us&amp;hl=en&amp;q=bitcoin+OR+blockchain+OR+cryptocurrency" />
+        <outline text="r/CryptoCurrencies" title="r/CryptoCurrencies" type="rss" xmlUrl="https://www.reddit.com/r/CryptoCurrencies/.rss" htmlUrl="https://www.reddit.com/r/CryptoCurrencies/" />
+        <outline text="Rekt" title="Rekt" type="rss" xmlUrl="https://rekt.news/rss/feed.xml" htmlUrl="https://www.rekt.news/" />
+      </outline>
+    </outline>
+  </body>
+</opml>

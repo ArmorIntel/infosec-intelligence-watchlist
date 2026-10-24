@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version="2.0">
+  <head>
+    <title>Infosec intelligence watchlist - https://github.com/ArmorIntel - Technology Intelligence - Apple Ecosystem</title>
+    <dateModified>Sat, 24 Oct 2026 19:07:26 GMT</dateModified>
+    <ownerName>ArmorIntel</ownerName>
+    <ownerId>https://github.com/ArmorIntel</ownerId>
+  </head>
+  <body>
+    <outline text="Technology Intelligence" title="Technology Intelligence">
+      <outline text="Apple Ecosystem" title="Apple Ecosystem">
+        <outline text="512 Pixels" title="512 Pixels" type="rss" xmlUrl="https://feedpress.me/512pixels" htmlUrl="https://www.512pixels.net/" />
+        <outline text="9to5Mac" title="9to5Mac" type="rss" xmlUrl="https://9to5mac.com/feed/" htmlUrl="https://9to5mac.com/" />
+        <outline text="Apple Newsroom" title="Apple Newsroom" type="rss" xmlUrl="https://www.apple.com/newsroom/rss-feed.rss" htmlUrl="https://www.apple.com/pr/" />
+        <outline text="AppleInsider" title="AppleInsider" type="rss" xmlUrl="https://appleinsider.com/rss/news" htmlUrl="https://appleinsider.com/" />
+        <outline text="Cult of Mac" title="Cult of Mac" type="rss" xmlUrl="https://www.cultofmac.com/feed/" htmlUrl="https://www.cultofmac.com/" />
+        <outline text="iClarified" title="iClarified" type="rss" xmlUrl="https://www.iclarified.com/rss/rss.xml" htmlUrl="https://www.iclarified.com/" />
+        <outline text="iMore" title="iMore" type="rss" xmlUrl="https://feeds.feedburner.com/theiphoneblog" htmlUrl="https://www.imore.com/" />
+        <outline text="MacRumors - All Stories" title="MacRumors - All Stories" type="rss" xmlUrl="https://feeds.macrumors.com/MacRumors-All" htmlUrl="https://www.macrumors.com/" />
+        <outline text="MacRumors - Front Page" title="MacRumors - Front Page" type="rss" xmlUrl="https://feeds.macrumors.com/MacRumors-Front" htmlUrl="https://www.macrumors.com" />
+        <outline text="MacStories" title="MacStories" type="rss" xmlUrl="https://www.macstories.net/feed/" htmlUrl="https://www.macstories.net/" />
+        <outline text="r/apple" title="r/apple" type="rss" xmlUrl="https://www.reddit.com/r/apple/.rss" htmlUrl="https://www.reddit.com/r/apple/" />
+      </outline>
+    </outline>
+  </body>
+</opml>

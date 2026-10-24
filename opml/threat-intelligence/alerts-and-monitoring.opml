@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version="2.0">
+  <head>
+    <title>Infosec intelligence watchlist - https://github.com/ArmorIntel - Threat Intelligence - Alerts &amp; Monitoring</title>
+    <dateModified>Sat, 24 Oct 2026 19:07:26 GMT</dateModified>
+    <ownerName>ArmorIntel</ownerName>
+    <ownerId>https://github.com/ArmorIntel</ownerId>
+  </head>
+  <body>
+    <outline text="Threat Intelligence" title="Threat Intelligence">
+      <outline text="Alerts &amp; Monitoring" title="Alerts &amp; Monitoring">
+        <outline text="abuse.ch" title="abuse.ch" type="rss" xmlUrl="http://feeds.feedburner.com/Abusech" htmlUrl="https://abuse.ch/" />
+        <outline text="CISA - Alerts &amp; Advisories" title="CISA - Alerts &amp; Advisories" type="rss" xmlUrl="https://www.cisa.gov/cybersecurity-advisories/cybersecurity-advisories.xml" htmlUrl="https://www.us-cert.gov/ncas/alerts" />
+        <outline text="CISA ICS Advisories" title="CISA ICS Advisories" type="rss" xmlUrl="https://www.cisa.gov/cybersecurity-advisories/ics-advisories.xml" htmlUrl="https://ics-cert.us-cert.gov/advisories/advisories.xml" />
+        <outline text="Full Disclosure" title="Full Disclosure" type="rss" xmlUrl="https://seclists.org/rss/fulldisclosure.rss" htmlUrl="https://seclists.org/#fulldisclosure" />
+        <outline text="GitLab Security Releases" title="GitLab Security Releases" type="rss" xmlUrl="https://docs.gitlab.com/releases/patch-releases.xml" htmlUrl="https://about.gitlab.com/blog/categories/releases/" />
+        <outline text="NCSC UK - Reports" title="NCSC UK - Reports" type="rss" xmlUrl="https://www.ncsc.gov.uk/api/1/services/v1/report-rss-feed.xml" htmlUrl="https://www.ncsc.gov.uk/" />
+        <outline text="Ransomware.live - Cyberattacks" title="Ransomware.live - Cyberattacks" type="rss" xmlUrl="https://www.ransomware.live/cyberattacks.xml" htmlUrl="https://www.ransomware.live/cyberattacks.xml" />
+        <outline text="Ransomware.live - Victims" title="Ransomware.live - Victims" type="rss" xmlUrl="https://www.ransomware.live/rss.xml" htmlUrl="https://www.ransomware.live/rss.xml" />
+        <outline text="SANS Internet Storm Center" title="SANS Internet Storm Center" type="rss" xmlUrl="https://isc.sans.edu/rssfeed.xml" htmlUrl="https://isc.sans.edu/" />
+        <outline text="Ubuntu security notices" title="Ubuntu security notices" type="rss" xmlUrl="https://ubuntu.com/security/notices/rss.xml" htmlUrl="https://usn.ubuntu.com/" />
+        <outline text="ZDI - Upcoming Advisories" title="ZDI - Upcoming Advisories" type="rss" xmlUrl="https://www.zerodayinitiative.com/rss/upcoming/" htmlUrl="https://www.zerodayinitiative.com/advisories/upcoming/" />
+      </outline>
+    </outline>
+  </body>
+</opml>

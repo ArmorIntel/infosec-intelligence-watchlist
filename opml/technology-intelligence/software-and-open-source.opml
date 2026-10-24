@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version="2.0">
+  <head>
+    <title>Infosec intelligence watchlist - https://github.com/ArmorIntel - Technology Intelligence - Software &amp; Open Source</title>
+    <dateModified>Sat, 24 Oct 2026 19:07:26 GMT</dateModified>
+    <ownerName>ArmorIntel</ownerName>
+    <ownerId>https://github.com/ArmorIntel</ownerId>
+  </head>
+  <body>
+    <outline text="Technology Intelligence" title="Technology Intelligence">
+      <outline text="Software &amp; Open Source" title="Software &amp; Open Source">
+        <outline text="GitHub Blog" title="GitHub Blog" type="rss" xmlUrl="https://github.blog/feed/" htmlUrl="https://github.blog/" />
+        <outline text="GitLab" title="GitLab" type="rss" xmlUrl="https://about.gitlab.com/atom.xml" htmlUrl="https://www.gitlab.com/" />
+        <outline text="GitLab All Releases" title="GitLab All Releases" type="rss" xmlUrl="https://docs.gitlab.com/releases/all-releases.xml" htmlUrl="https://about.gitlab.com/releases/categories/releases/" />
+        <outline text="GitLab Major Releases" title="GitLab Major Releases" type="rss" xmlUrl="https://docs.gitlab.com/releases/releases.xml" htmlUrl="https://about.gitlab.com/releases/categories/releases/" />
+        <outline text="ISRG" title="ISRG" type="rss" xmlUrl="https://www.abetterinternet.org/index.xml" htmlUrl="https://www.abetterinternet.org/" />
+        <outline text="Latest Linux Kernel Versions" title="Latest Linux Kernel Versions" type="rss" xmlUrl="https://www.kernel.org/feeds/kdist.xml" htmlUrl="https://www.kernel.org/" />
+        <outline text="Let's Encrypt" title="Let's Encrypt" type="rss" xmlUrl="https://letsencrypt.org/feed.xml" htmlUrl="https://letsencrypt.org//" />
+        <outline text="r/opensource" title="r/opensource" type="rss" xmlUrl="https://www.reddit.com/r/opensource/.rss" htmlUrl="https://www.reddit.com/r/opensource/" />
+        <outline text="r/selfhosted" title="r/selfhosted" type="rss" xmlUrl="https://www.reddit.com/r/selfhosted/.rss" htmlUrl="https://www.reddit.com/r/selfhosted/" />
+        <outline text="Ubuntu Blog" title="Ubuntu Blog" type="rss" xmlUrl="https://ubuntu.com/blog/feed" htmlUrl="https://insights.ubuntu.com/" />
+      </outline>
+    </outline>
+  </body>
+</opml>

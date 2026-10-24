@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version="2.0">
+  <head>
+    <title>Infosec intelligence watchlist - https://github.com/ArmorIntel - Technology Intelligence - Science &amp; Academia</title>
+    <dateModified>Sat, 24 Oct 2026 19:07:26 GMT</dateModified>
+    <ownerName>ArmorIntel</ownerName>
+    <ownerId>https://github.com/ArmorIntel</ownerId>
+  </head>
+  <body>
+    <outline text="Technology Intelligence" title="Technology Intelligence">
+      <outline text="Science &amp; Academia" title="Science &amp; Academia">
+        <outline text="ACM Computing Surveys" title="ACM Computing Surveys" type="rss" xmlUrl="https://dl.acm.org/action/showFeed?type=etoc&amp;feed=rss&amp;jc=csur" htmlUrl="https://dl.acm.org/loi/csur?af=R" />
+        <outline text="Business Insider - Science" title="Business Insider - Science" type="rss" xmlUrl="https://feeds.feedburner.com/businessinsider/science" htmlUrl="https://www.businessinsider.com/science" />
+        <outline text="IEEE Transactions on Software Engineering" title="IEEE Transactions on Software Engineering" type="rss" xmlUrl="https://ieeexplore.ieee.org/rss/TOC32.XML" htmlUrl="https://ieeexplore.ieee.org/" />
+        <outline text="Microsoft Research" title="Microsoft Research" type="rss" xmlUrl="https://www.microsoft.com/en-us/research/feed/" htmlUrl="https://www.microsoft.com/en-us/research" />
+        <outline text="r/science" title="r/science" type="rss" xmlUrl="https://www.reddit.com/r/science/.rss" htmlUrl="https://www.reddit.com/r/science/" />
+        <outline text="WIRED - Science" title="WIRED - Science" type="rss" xmlUrl="https://www.wired.com/feed/category/science/latest/rss" htmlUrl="https://www.wired.com/category/science/latest" />
+      </outline>
+    </outline>
+  </body>
+</opml>

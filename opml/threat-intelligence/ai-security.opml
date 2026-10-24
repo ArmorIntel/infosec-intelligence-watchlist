@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version="2.0">
+  <head>
+    <title>Infosec intelligence watchlist - https://github.com/ArmorIntel - Threat Intelligence - AI Security</title>
+    <dateModified>Sat, 24 Oct 2026 19:07:26 GMT</dateModified>
+    <ownerName>ArmorIntel</ownerName>
+    <ownerId>https://github.com/ArmorIntel</ownerId>
+  </head>
+  <body>
+    <outline text="Threat Intelligence" title="Threat Intelligence">
+      <outline text="AI Security" title="AI Security">
+        <outline text="Adversa AI" title="Adversa AI" type="rss" xmlUrl="https://adversa.ai/rss.xml" htmlUrl="https://adversa.ai/blog/" />
+        <outline text="AI Incident Database" title="AI Incident Database" type="rss" xmlUrl="https://incidentdatabase.ai/rss.xml" htmlUrl="https://incidentdatabase.ai/" />
+        <outline text="Cisco AI Blog" title="Cisco AI Blog" type="rss" xmlUrl="https://blogs.cisco.com/ai/feed" htmlUrl="https://blogs.cisco.com/ai" />
+        <outline text="Embrace The Red" title="Embrace The Red" type="rss" xmlUrl="https://embracethered.com/blog/index.xml" htmlUrl="https://embracethered.com/blog/" />
+        <outline text="Joseph Thacker (rez0)" title="Joseph Thacker (rez0)" type="rss" xmlUrl="https://josephthacker.com/feed.xml" htmlUrl="https://josephthacker.com/" />
+        <outline text="MITRE ATLAS - Releases" title="MITRE ATLAS - Releases" type="rss" xmlUrl="https://github.com/mitre-atlas/atlas-data/releases.atom" htmlUrl="https://atlas.mitre.org/" />
+        <outline text="NVIDIA - AI Red Team" title="NVIDIA - AI Red Team" type="rss" xmlUrl="https://developer.nvidia.com/blog/tag/ai-red-team/feed/" htmlUrl="https://developer.nvidia.com/blog/tag/ai-red-team/" />
+        <outline text="NVIDIA garak - Releases" title="NVIDIA garak - Releases" type="rss" xmlUrl="https://github.com/NVIDIA/garak/releases.atom" htmlUrl="https://github.com/NVIDIA/garak" />
+        <outline text="OWASP GenAI Security Project" title="OWASP GenAI Security Project" type="rss" xmlUrl="https://genai.owasp.org/feed/" htmlUrl="https://genai.owasp.org/" />
+        <outline text="Simon Willison - Prompt Injection" title="Simon Willison - Prompt Injection" type="rss" xmlUrl="https://simonwillison.net/tags/prompt-injection.atom" htmlUrl="https://simonwillison.net/tags/prompt-injection/" />
+      </outline>
+    </outline>
+  </body>
+</opml>

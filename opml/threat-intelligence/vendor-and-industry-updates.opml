@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version="2.0">
+  <head>
+    <title>Infosec intelligence watchlist - https://github.com/ArmorIntel - Threat Intelligence - Vendor &amp; Industry Updates</title>
+    <dateModified>Sat, 24 Oct 2026 19:07:26 GMT</dateModified>
+    <ownerName>ArmorIntel</ownerName>
+    <ownerId>https://github.com/ArmorIntel</ownerId>
+  </head>
+  <body>
+    <outline text="Threat Intelligence" title="Threat Intelligence">
+      <outline text="Vendor &amp; Industry Updates" title="Vendor &amp; Industry Updates">
+        <outline text="Aqua Security Blog" title="Aqua Security Blog" type="rss" xmlUrl="https://www.aquasec.com/feed/" htmlUrl="https://www.aquasec.com/blog/" />
+        <outline text="AWS Security Blog" title="AWS Security Blog" type="rss" xmlUrl="https://aws.amazon.com/blogs/security/feed/" htmlUrl="https://aws.amazon.com/blogs/security/" />
+        <outline text="BH Consulting" title="BH Consulting" type="rss" xmlUrl="http://bhconsulting.ie/feed/" htmlUrl="https://bhconsulting.ie/" />
+        <outline text="Check Point Blog" title="Check Point Blog" type="rss" xmlUrl="https://blog.checkpoint.com/feed/" htmlUrl="https://blog.checkpoint.com/" />
+        <outline text="Cisco Blog" title="Cisco Blog" type="rss" xmlUrl="https://blogs.cisco.com/feed" htmlUrl="https://blogs.cisco.com/" />
+        <outline text="Cisco Umbrella Blog" title="Cisco Umbrella Blog" type="rss" xmlUrl="https://umbrella.cisco.com/blog/feed/" htmlUrl="https://umbrella.cisco.com/blog" />
+        <outline text="ClamAV Blog" title="ClamAV Blog" type="rss" xmlUrl="https://feeds.feedburner.com/Clamav" htmlUrl="https://blog.clamav.net/" />
+        <outline text="ClearSky Cyber Security" title="ClearSky Cyber Security" type="rss" xmlUrl="https://www.clearskysec.com/feed/" htmlUrl="https://www.clearskysec.com/" />
+        <outline text="Cloudflare Blog" title="Cloudflare Blog" type="rss" xmlUrl="https://blog.cloudflare.com/rss/" htmlUrl="https://blog.cloudflare.com" />
+        <outline text="CrowdStrike Blog" title="CrowdStrike Blog" type="rss" xmlUrl="https://www.crowdstrike.com/en-us/blog/feed" htmlUrl="https://www.crowdstrike.com/blog" />
+        <outline text="Duo Security Bulletin" title="Duo Security Bulletin" type="rss" xmlUrl="https://duo.com/feed" htmlUrl="https://duo.com/" />
+        <outline text="ForeScout" title="ForeScout" type="rss" xmlUrl="https://www.forescout.com/feed/" htmlUrl="https://www.forescout.com/" />
+        <outline text="GreyNoise Blog" title="GreyNoise Blog" type="rss" xmlUrl="https://www.greynoise.io/blog/rss.xml" htmlUrl="https://www.greynoise.io/" />
+        <outline text="Huntress Blog" title="Huntress Blog" type="rss" xmlUrl="https://www.huntress.com/blog/rss.xml" htmlUrl="https://www.huntress.com/blog" />
+        <outline text="Malwarebytes Labs" title="Malwarebytes Labs" type="rss" xmlUrl="https://www.malwarebytes.com/blog/feed/index.xml" htmlUrl="https://blog.malwarebytes.org/" />
+        <outline text="Microsoft Security" title="Microsoft Security" type="rss" xmlUrl="https://www.microsoft.com/en-us/security/blog/feed/" htmlUrl="https://www.microsoft.com/security/blog" />
+        <outline text="Microsoft Security Update Guide (MSRC)" title="Microsoft Security Update Guide (MSRC)" type="rss" xmlUrl="https://api.msrc.microsoft.com/update-guide/rss" htmlUrl="https://msrc.microsoft.com/update-guide" />
+        <outline text="Netskope Blog" title="Netskope Blog" type="rss" xmlUrl="https://www.netskope.com/feed" htmlUrl="https://www.netskope.com/blog" />
+        <outline text="Qualys Blog" title="Qualys Blog" type="rss" xmlUrl="https://blog.qualys.com/feed" htmlUrl="https://blog.qualys.com/" />
+        <outline text="Rapid7 - Detection &amp; Response" title="Rapid7 - Detection &amp; Response" type="rss" xmlUrl="https://www.rapid7.com/blog/tag/detection-and-response/rss/" htmlUrl="https://blog.rapid7.com/" />
+        <outline text="Red Canary" title="Red Canary" type="rss" xmlUrl="https://redcanary.com/feed/" htmlUrl="https://redcanary.com/blog/" />
+        <outline text="SentinelOne Blog" title="SentinelOne Blog" type="rss" xmlUrl="https://www.sentinelone.com/blog/feed/" htmlUrl="https://www.sentinelone.com/blog/" />
+        <outline text="SOCRadar" title="SOCRadar" type="rss" xmlUrl="https://socradar.io/feed/" htmlUrl="https://socradar.io/" />
+        <outline text="Sophos News" title="Sophos News" type="rss" xmlUrl="https://news.sophos.com/feed/" htmlUrl="https://nakedsecurity.sophos.com/" />
+        <outline text="Symantec Enterprise Blogs" title="Symantec Enterprise Blogs" type="rss" xmlUrl="https://sed-cms.broadcom.com/rss/v1/blogs/rss.xml" htmlUrl="https://symantec-blogs.broadcom.com/blogs/" />
+        <outline text="Tenable - Resources" title="Tenable - Resources" type="rss" xmlUrl="https://www.xorlab.com/en/blog/rss.xml" htmlUrl="https://www.xorlab.com/en/blog" />
+        <outline text="Tenable Blog" title="Tenable Blog" type="rss" xmlUrl="https://feeds.feedburner.com/tenable/qaXL" htmlUrl="https://www.tenable.com/podcast" />
+        <outline text="Tenable News" title="Tenable News" type="rss" xmlUrl="https://www.tenable.com/feed/news" htmlUrl="https://www.tenable.com/feed/news" />
+        <outline text="Trend Micro Research" title="Trend Micro Research" type="rss" xmlUrl="http://feeds.trendmicro.com/TrendMicroResearch" htmlUrl="https://www.trendmicro.com/en_us/research.html" />
+        <outline text="Trend Micro Simply Security" title="Trend Micro Simply Security" type="rss" xmlUrl="http://feeds.trendmicro.com/TrendMicroSimplySecurity" htmlUrl="https://blog.trendmicro.com/" />
+        <outline text="VirusTotal Blog" title="VirusTotal Blog" type="rss" xmlUrl="https://blog.virustotal.com/feeds/posts/default" htmlUrl="https://blog.virustotal.com/" />
+        <outline text="WeLiveSecurity" title="WeLiveSecurity" type="rss" xmlUrl="https://www.welivesecurity.com/en/rss/feed/" htmlUrl="" />
+      </outline>
+    </outline>
+  </body>
+</opml>
