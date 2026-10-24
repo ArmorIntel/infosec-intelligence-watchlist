@@ -1,0 +1,64 @@
+name: Release a reviewed watchlist
+
+# Run manually after a review: creates a dated tag (YYYY.MM by default) and a
+# GitHub release whose notes list the feeds added, removed and moved since the
+# previous release. The OPML files are attached to the release.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (default: current year.month, e.g. 2026.10)"
+        required: false
+      since:
+        description: "Compare with this tag or commit (default: previous release)"
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate the watchlist
+        run: python3 scripts/validate_opml.py
+
+      - name: Prepare release notes
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+          INPUT_SINCE: ${{ inputs.since }}
+        run: |
+          tag="${INPUT_TAG:-$(date -u +%Y.%m)}"
+          if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+            echo "::error::Tag $tag already exists, pass another tag (e.g. $tag.1)"
+            exit 1
+          fi
+          since="${INPUT_SINCE:-$(git describe --tags --abbrev=0 2>/dev/null || git rev-list --max-parents=0 HEAD | tail -1)}"
+          python3 scripts/changelog.py --from "$since" --to HEAD > notes.md
+          {
+            echo
+            echo "Subscribe to the whole watchlist or to a single category: see the [README](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}#readme)."
+          } >> notes.md
+          (cd opml && zip -qr ../category-opml.zip .)
+          echo "TAG=$tag" >> "$GITHUB_ENV"
+          cat notes.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$TAG" \
+            --target "$GITHUB_SHA" \
+            --title "Watchlist $TAG" \
+            --notes-file notes.md \
+            infosec-intelligence-watchlist.xml category-opml.zip
