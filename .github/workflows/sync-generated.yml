@@ -1,0 +1,52 @@
+name: Sync generated files
+
+# The global OPML is the single source of truth. After each change on main,
+# this regenerates the per-category OPML files (opml/) and the generated blocks
+# of the README (category list, feed count, subscription table), then commits
+# them if they changed. Commits pushed with GITHUB_TOKEN do not re-trigger
+# workflows, so there is no loop.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "infosec-intelligence-watchlist.xml"
+      - "scripts/build_category_opml.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-generated
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate the watchlist
+        run: python3 scripts/validate_opml.py
+
+      - name: Regenerate category OPML files and README
+        run: python3 scripts/build_category_opml.py --readme
+
+      - name: Commit changes
+        run: |
+          git add -A opml README.md
+          if git diff --cached --quiet; then
+            echo "Generated files already up to date."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Regenerate category OPML files and README"
+          git pull --rebase origin main
+          git push origin HEAD:main

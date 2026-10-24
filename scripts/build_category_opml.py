@@ -19,6 +19,7 @@ from xml.sax.saxutils import escape, quoteattr
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "infosec-intelligence-watchlist.xml"
 OUT_DIR = ROOT / "opml"
+README = ROOT / "README.md"
 RAW_BASE = "https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main"
 
 
@@ -55,6 +56,7 @@ def render(title, date_modified, category, subcategory, feeds):
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--table", action="store_true", help="print the README subscription table")
+    parser.add_argument("--readme", action="store_true", help="rewrite the generated blocks of the README")
     args = parser.parse_args()
 
     tree = ET.parse(SOURCE)
@@ -80,12 +82,43 @@ def main():
             rows.append((cat_name, sub_name, len(feeds), path.relative_to(ROOT).as_posix()))
 
     print(f"Generated {len(rows)} files in {OUT_DIR.relative_to(ROOT)}/")
+    table = render_table(rows)
     if args.table:
         print()
-        print("| Category | Subcategory | Feeds | Raw OPML URL |")
-        print("|---|---|---:|---|")
-        for cat_name, sub_name, count, rel in rows:
-            print(f"| {cat_name} | [{sub_name}](./{rel}) | {count} | `{RAW_BASE}/{rel}` |")
+        print(table)
+    if args.readme:
+        readme = README.read_text(encoding="utf-8")
+        readme = replace_block(readme, "categories", render_categories(rows))
+        readme = replace_block(readme, "category-table", table)
+        README.write_text(readme, encoding="utf-8")
+        print(f"Updated {README.name}")
+
+
+def render_table(rows):
+    lines = ["| Category | Subcategory | Feeds | Raw OPML URL |", "|---|---|---:|---|"]
+    for cat_name, sub_name, count, rel in rows:
+        lines.append(f"| {cat_name} | [{sub_name}](./{rel}) | {count} | `{RAW_BASE}/{rel}` |")
+    return "\n".join(lines)
+
+
+def render_categories(rows):
+    total = sum(count for _, _, count, _ in rows)
+    lines = [f"- `{SOURCE.name}` &mdash; is an OPML (Outline Processor Markup Language) file of {total} feeds, grouped by categories:"]
+    current = None
+    for cat_name, sub_name, _, _ in rows:
+        if cat_name != current:
+            lines.append(f"  - **{cat_name}**")
+            current = cat_name
+        lines.append(f"    - {sub_name}")
+    return "\n".join(lines)
+
+
+def replace_block(text, name, content):
+    """Replace the content between <!-- BEGIN generated:name --> and its END marker."""
+    pattern = re.compile(rf"(<!-- BEGIN generated:{name} -->\n).*?(\n<!-- END generated:{name} -->)", re.S)
+    if not pattern.search(text):
+        raise SystemExit(f"{README.name}: missing 'generated:{name}' markers")
+    return pattern.sub(lambda m: m.group(1) + content + m.group(2), text)
 
 
 if __name__ == "__main__":
