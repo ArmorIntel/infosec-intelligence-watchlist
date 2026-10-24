@@ -1,0 +1,929 @@
+{
+ "http://bhconsulting.ie/feed/": {
+  "2026-10": "ok"
+ },
+ "http://feeds.arstechnica.com/arstechnica/science": {
+  "2026-10": "ok"
+ },
+ "http://feeds.feedburner.com/Abusech": {
+  "2026-10": "ok"
+ },
+ "http://feeds.feedburner.com/feedburner/Talos": {
+  "2026-10": "ok"
+ },
+ "http://feeds.feedburner.com/typepad/alleyinsider/silicon_alley_insider": {
+  "2026-10": "ok"
+ },
+ "http://feeds.mashable.com/Mashable": {
+  "2026-10": "ok"
+ },
+ "http://feeds.trendmicro.com/TrendMicroResearch": {
+  "2026-10": "ok"
+ },
+ "http://feeds.trendmicro.com/TrendMicroSimplySecurity": {
+  "2026-10": "ok"
+ },
+ "http://gouvsi.blogspot.com/feeds/posts/default": {
+  "2026-10": "ok"
+ },
+ "https://44con.com/feed/": {
+  "2026-10": "inactive"
+ },
+ "https://9to5linux.com/feed": {
+  "2026-10": "ok"
+ },
+ "https://9to5mac.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://about.gitlab.com/atom.xml": {
+  "2026-10": "ok"
+ },
+ "https://act.eff.org/action.atom": {
+  "2026-10": "ok"
+ },
+ "https://adversa.ai/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://api.msrc.microsoft.com/update-guide/rss": {
+  "2026-10": "ok"
+ },
+ "https://appleinsider.com/rss/news": {
+  "2026-10": "ok"
+ },
+ "https://aws.amazon.com/blogs/security/feed/": {
+  "2026-10": "ok"
+ },
+ "https://badcyber.com/feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://betanews.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://binary.ninja/feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://blockthreat.com/rss/": {
+  "2026-10": "ok"
+ },
+ "https://blog.arduino.cc/feed/": {
+  "2026-10": "ok"
+ },
+ "https://blog.checkpoint.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://blog.cloudflare.com/rss/": {
+  "2026-10": "ok"
+ },
+ "https://blog.cryptographyengineering.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://blog.didierstevens.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://blog.doyensec.com/atom.xml": {
+  "2026-10": "ok"
+ },
+ "https://blog.google/rss": {
+  "2026-10": "ok"
+ },
+ "https://blog.mozilla.org/security/feed/": {
+  "2026-10": "ok"
+ },
+ "https://blog.netlab.360.com/rss/": {
+  "2026-10": "ok"
+ },
+ "https://blog.qualys.com/feed": {
+  "2026-10": "ok"
+ },
+ "https://blog.trailofbits.com/index.xml": {
+  "2026-10": "ok"
+ },
+ "https://blog.virustotal.com/feeds/posts/default": {
+  "2026-10": "ok"
+ },
+ "https://blogs.cisco.com/ai/feed": {
+  "2026-10": "ok"
+ },
+ "https://blogs.cisco.com/feed": {
+  "2026-10": "ok"
+ },
+ "https://blogs.jpcert.or.jp/en/atom.xml": {
+  "2026-10": "ok"
+ },
+ "https://blogs.microsoft.com/on-the-issues/feed/": {
+  "2026-10": "ok"
+ },
+ "https://boingboing.net/feed": {
+  "2026-10": "ok"
+ },
+ "https://cert.at/cert-at.en.blog.rss_2.0.xml": {
+  "2026-10": "ok"
+ },
+ "https://cert.cyber.gouv.fr/feed/": {
+  "2026-10": "ok"
+ },
+ "https://cert.lv/en/feed/rss/all": {
+  "2026-10": "ok"
+ },
+ "https://cert.pl/en/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://citizenlab.ca/feed": {
+  "2026-10": "ok"
+ },
+ "https://cloudseclist.com/feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://cloudsecurityalliance.org/feed/": {
+  "2026-10": "ok"
+ },
+ "https://cointelegraph.com/rss": {
+  "2026-10": "ok"
+ },
+ "https://community.arm.com/arm-research/rss": {
+  "2026-10": "inactive"
+ },
+ "https://contagiodump.blogspot.com/feeds/posts/default?alt=rss": {
+  "2026-10": "inactive"
+ },
+ "https://cryptoactu.com/feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://cryptoast.fr/feed/": {
+  "2026-10": "ok"
+ },
+ "https://cryptobriefing.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://cryptonews.com/fr/news/feed/": {
+  "2026-10": "ok"
+ },
+ "https://cryptopotato.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://cryptoslate.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://csdl-api.computer.org/api/rss/periodicals/mags/sp/rss.xml": {
+  "2026-10": "undated"
+ },
+ "https://csdl-api.computer.org/api/rss/periodicals/trans/tq/rss.xml": {
+  "2026-10": "undated"
+ },
+ "https://cyber.gouv.fr/actualites/rss/": {
+  "2026-10": "ok"
+ },
+ "https://danielmiessler.com/feed.rss": {
+  "2026-10": "ok"
+ },
+ "https://ddosecrets.substack.com/feed/": {
+  "2026-10": "check"
+ },
+ "https://deepmind.google/blog/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://developer.nvidia.com/blog/tag/ai-red-team/feed/": {
+  "2026-10": "ok"
+ },
+ "https://diablohorn.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://dl.acm.org/action/showFeed?type=etoc&feed=rss&jc=csur": {
+  "2026-10": "ok"
+ },
+ "https://docs.gitlab.com/releases/all-releases.xml": {
+  "2026-10": "ok"
+ },
+ "https://docs.gitlab.com/releases/patch-releases.xml": {
+  "2026-10": "ok"
+ },
+ "https://docs.gitlab.com/releases/releases.xml": {
+  "2026-10": "ok"
+ },
+ "https://duo.com/feed": {
+  "2026-10": "ok"
+ },
+ "https://embracethered.com/blog/index.xml": {
+  "2026-10": "ok"
+ },
+ "https://engineering.fb.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://export.arxiv.org/rss/cs.AI": {
+  "2026-10": "ok"
+ },
+ "https://export.arxiv.org/rss/cs.CR": {
+  "2026-10": "ok"
+ },
+ "https://feedpress.me/512pixels": {
+  "2026-10": "ok"
+ },
+ "https://feeds.arstechnica.com/arstechnica/features": {
+  "2026-10": "ok"
+ },
+ "https://feeds.arstechnica.com/arstechnica/gadgets": {
+  "2026-10": "ok"
+ },
+ "https://feeds.arstechnica.com/arstechnica/index": {
+  "2026-10": "ok"
+ },
+ "https://feeds.bbci.co.uk/news/technology/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://feeds.content.dowjones.io/public/rss/RSSWSJD": {
+  "2026-10": "ok"
+ },
+ "https://feeds.feedburner.com/Clamav": {
+  "2026-10": "ok"
+ },
+ "https://feeds.feedburner.com/HaveIBeenPwnedLatestBreaches": {
+  "2026-10": "ok"
+ },
+ "https://feeds.feedburner.com/KorbensBlog-UpgradeYourMind": {
+  "2026-10": "ok"
+ },
+ "https://feeds.feedburner.com/TheHackersNews": {
+  "2026-10": "ok"
+ },
+ "https://feeds.feedburner.com/ZatazNews": {
+  "2026-10": "ok"
+ },
+ "https://feeds.feedburner.com/businessinsider/science": {
+  "2026-10": "ok"
+ },
+ "https://feeds.feedburner.com/tenable/qaXL": {
+  "2026-10": "ok"
+ },
+ "https://feeds.feedburner.com/theiphoneblog": {
+  "2026-10": "ok"
+ },
+ "https://feeds.feedburner.com/threatintelligence/pvexyqv7v0v": {
+  "2026-10": "ok"
+ },
+ "https://feeds.macrumors.com/MacRumors-All": {
+  "2026-10": "ok"
+ },
+ "https://feeds.macrumors.com/MacRumors-Front": {
+  "2026-10": "ok"
+ },
+ "https://feeds.megaphone.fm/cyberwire-daily-podcast": {
+  "2026-10": "ok"
+ },
+ "https://feeds.megaphone.fm/darknetdiaries": {
+  "2026-10": "ok"
+ },
+ "https://feeds2.feedburner.com/businessinsider": {
+  "2026-10": "ok"
+ },
+ "https://first.org/newsroom/news/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://genai.owasp.org/feed/": {
+  "2026-10": "ok"
+ },
+ "https://github.blog/feed/": {
+  "2026-10": "ok"
+ },
+ "https://github.com/NVIDIA/garak/releases.atom": {
+  "2026-10": "ok"
+ },
+ "https://github.com/mandiant/capa-rules/commits/master.atom": {
+  "2026-10": "ok"
+ },
+ "https://github.com/mandiant/capa/commits/master.atom": {
+  "2026-10": "ok"
+ },
+ "https://github.com/mitre-atlas/atlas-data/releases.atom": {
+  "2026-10": "ok"
+ },
+ "https://gizmodo.com/feed": {
+  "2026-10": "check"
+ },
+ "https://hackread.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://horizon3.ai/feed/": {
+  "2026-10": "ok"
+ },
+ "https://hshrzd.wordpress.com/feed/": {
+  "2026-10": "inactive"
+ },
+ "https://huggingface.co/blog/feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://ieeexplore.ieee.org/rss/TOC10206.XML": {
+  "2026-10": "ok"
+ },
+ "https://ieeexplore.ieee.org/rss/TOC32.XML": {
+  "2026-10": "ok"
+ },
+ "https://importai.substack.com/feed": {
+  "2026-10": "check"
+ },
+ "https://incidentdatabase.ai/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://infosec.exchange/@ossir.rss": {
+  "2026-10": "ok"
+ },
+ "https://interestingengineering.com/feed": {
+  "2026-10": "ok"
+ },
+ "https://ir.netflix.net/rss/pressrelease.aspx": {
+  "2026-10": "ok"
+ },
+ "https://isc.sans.edu/rssfeed.xml": {
+  "2026-10": "ok"
+ },
+ "https://javvadmalik.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://josephthacker.com/feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://kill-the-newsletter.com/feeds/kll2l1ge3jr4xhtc.xml": {
+  "2026-10": "ok"
+ },
+ "https://krebsonsecurity.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://krypt3ia.wordpress.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://labs.ripe.net/feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://labs.watchtowr.com/rss/": {
+  "2026-10": "ok"
+ },
+ "https://letsencrypt.org/feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://lifehacker.com/feed/rss": {
+  "2026-10": "ok"
+ },
+ "https://loopinsight.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://medium.com/feed/netflix-techblog": {
+  "2026-10": "ok"
+ },
+ "https://medium.com/feed/netflix-techblog/tagged/security": {
+  "2026-10": "ok"
+ },
+ "https://news.google.com/rss/search?hl=en-US&gl=US&q=Machine+Learning&ceid=US:en": {
+  "2026-10": "ok"
+ },
+ "https://news.google.com/rss/search?hl=en-US&gl=US&q=bitcoin+OR+blockchain+OR+cryptocurrency&ceid=US:en": {
+  "2026-10": "ok"
+ },
+ "https://news.google.com/rss/search?q=ISO+27001&&hl=fr&gl=FR&ceid=FR:fr": {
+  "2026-10": "ok"
+ },
+ "https://news.mit.edu/topic/mitcomputers-rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://news.sophos.com/feed/": {
+  "2026-10": "dead"
+ },
+ "https://news.ycombinator.com/rss": {
+  "2026-10": "check"
+ },
+ "https://objective-see.org/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://openai.com/news/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://osxdaily.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://portswigger.net/blog/rss": {
+  "2026-10": "ok"
+ },
+ "https://portswigger.net/research/rss": {
+  "2026-10": "ok"
+ },
+ "https://projectzero.google/feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://protonvpn.com/blog/feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://redcanary.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://rekt.news/rss/feed.xml": {
+  "2026-10": "inactive"
+ },
+ "https://reporterre.net/spip.php?page=backend-simple": {
+  "2026-10": "ok"
+ },
+ "https://research.checkpoint.com/feed": {
+  "2026-10": "ok"
+ },
+ "https://research.google/blog/rss/": {
+  "2026-10": "ok"
+ },
+ "https://research.openanalysis.net/feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://reverse.put.as/index.xml": {
+  "2026-10": "ok"
+ },
+ "https://rhinosecuritylabs.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://risky.biz/feeds/risky-business-news/": {
+  "2026-10": "ok"
+ },
+ "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml": {
+  "2026-10": "ok"
+ },
+ "https://rss.slashdot.org/Slashdot/slashdotMain": {
+  "2026-10": "ok"
+ },
+ "https://scadamag.infracritical.com/index.php/feed/": {
+  "2026-10": "ok"
+ },
+ "https://seclists.org/rss/dailydave.rss": {
+  "2026-10": "inactive"
+ },
+ "https://seclists.org/rss/fulldisclosure.rss": {
+  "2026-10": "ok"
+ },
+ "https://securelist.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://security.googleblog.com/feeds/posts/default": {
+  "2026-10": "inactive"
+ },
+ "https://securityaffairs.com/feed": {
+  "2026-10": "ok"
+ },
+ "https://securitylabs.datadoghq.com/rss/feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://sed-cms.broadcom.com/rss/v1/blogs/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://shostack.org/feed.xml": {
+  "2026-10": "check"
+ },
+ "https://siecledigital.fr/feed/": {
+  "2026-10": "ok"
+ },
+ "https://signal.org/blog/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://simonwillison.net/tags/prompt-injection.atom": {
+  "2026-10": "ok"
+ },
+ "https://singularityhub.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://socradar.io/feed/": {
+  "2026-10": "ok"
+ },
+ "https://sploitus.com/rss": {
+  "2026-10": "ok"
+ },
+ "https://spreadprivacy.com/rss/": {
+  "2026-10": "ok"
+ },
+ "https://taosecurity.blogspot.com/feeds/posts/default": {
+  "2026-10": "ok"
+ },
+ "https://techcrunch.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://techxplore.com/rss-feed/": {
+  "2026-10": "ok"
+ },
+ "https://techxplore.com/rss-feed/security-news/": {
+  "2026-10": "ok"
+ },
+ "https://thecyberwire.com/feeds/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://thedfirreport.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://theintercept.com/feed/?lang=en": {
+  "2026-10": "ok"
+ },
+ "https://thenextweb.com/feed": {
+  "2026-10": "ok"
+ },
+ "https://therecord.media/feed/": {
+  "2026-10": "ok"
+ },
+ "https://thisweekin4n6.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://tldrsec.com/feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://towardsdatascience.com/feed": {
+  "2026-10": "ok"
+ },
+ "https://ubuntu.com/blog/feed": {
+  "2026-10": "ok"
+ },
+ "https://ubuntu.com/security/notices/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://umbrella.cisco.com/blog/feed/": {
+  "2026-10": "ok"
+ },
+ "https://unit42.paloaltonetworks.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.404media.co/rss/": {
+  "2026-10": "ok"
+ },
+ "https://www.abetterinternet.org/index.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.apple.com/newsroom/rss-feed.rss": {
+  "2026-10": "ok"
+ },
+ "https://www.aquasec.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.bellingcat.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.bitsoffreedom.nl/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.bleepingcomputer.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.bloomberg.com/feeds/technology/news.rss": {
+  "2026-10": "ok"
+ },
+ "https://www.cert.si/en/category/news/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.chainalysis.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.ciodive.com/feeds/news/": {
+  "2026-10": "ok"
+ },
+ "https://www.cisa.gov/cybersecurity-advisories/all.xml": {
+  "2026-10": "check"
+ },
+ "https://www.cisa.gov/cybersecurity-advisories/cybersecurity-advisories.xml": {
+  "2026-10": "check"
+ },
+ "https://www.cisa.gov/cybersecurity-advisories/ics-advisories.xml": {
+  "2026-10": "check"
+ },
+ "https://www.clearskysec.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.clubic.com/feed/rss": {
+  "2026-10": "ok"
+ },
+ "https://www.cnbc.com/id/19854910/device/rss/rss.html": {
+  "2026-10": "ok"
+ },
+ "https://www.coindesk.com/arc/outboundfeeds/rss?outputType=xml": {
+  "2026-10": "ok"
+ },
+ "https://www.crowdstrike.com/en-us/blog/feed": {
+  "2026-10": "ok"
+ },
+ "https://www.cultofmac.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.cyber.gc.ca/api/cccs/atom/v1/get?feed=alerts_advisories&lang=en": {
+  "2026-10": "ok"
+ },
+ "https://www.cyber.gc.ca/api/cccs/atom/v1/get?feed=news_events_guidance&lang=en": {
+  "2026-10": "ok"
+ },
+ "https://www.cybermalveillance.gouv.fr/feed/atom-flux-actualites": {
+  "2026-10": "ok"
+ },
+ "https://www.cyberscoop.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.cyberthreatalliance.org/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.dalchecco.it/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.danielengberg.com/category/newsletter/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.darknet.org.uk/category/hacking-tools/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.darkreading.com/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.detectionengineering.net/feed": {
+  "2026-10": "ok"
+ },
+ "https://www.eff.org/rss/updates.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.egcert.eg/feed/": {
+  "2026-10": "check"
+ },
+ "https://www.elastic.co/security-labs/rss/feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.electrospaces.net/feeds/posts/default": {
+  "2026-10": "ok"
+ },
+ "https://www.engadget.com/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.ericconrad.com/feeds/posts/default?alt=rss": {
+  "2026-10": "ok"
+ },
+ "https://www.etoro.com/en-us/news-and-analysis/crypto/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.europol.europa.eu/cms/api/rss/news": {
+  "2026-10": "undated"
+ },
+ "https://www.exploit-db.com/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.fastcompany.com/technology/rss": {
+  "2026-10": "ok"
+ },
+ "https://www.financemagnates.com/cryptocurrency/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.forbes.com/innovation/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.forbes.com/sites/thomasbrewster/feed/": {
+  "2026-10": "check"
+ },
+ "https://www.forescout.com/feed/": {
+  "2026-10": "check"
+ },
+ "https://www.grahamcluley.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.greynoise.io/blog/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.hackmageddon.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.hkcert.org/getrss/security-bulletin": {
+  "2026-10": "ok"
+ },
+ "https://www.home-assistant.io/atom.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.homelandsecuritynewswire.com/rss.xml": {
+  "2026-10": "check"
+ },
+ "https://www.huntress.com/blog/rss.xml": {
+  "2026-10": "check"
+ },
+ "https://www.icij.org/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.iclarified.com/rss/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.imperialviolet.org/iv-rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.iot-tests.org/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.isac.bio/blog-feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.jpcert.or.jp/english/rss/jpcert-en.rdf": {
+  "2026-10": "ok"
+ },
+ "https://www.kernel.org/feeds/kdist.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.kyberturvallisuuskeskus.fi/feed/rss/en": {
+  "2026-10": "ok"
+ },
+ "https://www.kyberturvallisuuskeskus.fi/files/rss/news.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.kyberturvallisuuskeskus.fi/files/rss/vulns.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.lastweekinaws.com/feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.lemagit.fr/rss/ContentSyndication.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.lemondeinformatique.fr/flux-rss/thematique/securite/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.lesnumeriques.com/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.lightbluetouchpaper.org/feed/": {
+  "2026-10": "dead"
+ },
+ "https://www.macstories.net/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.makeuseof.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.malwarebytes.com/blog/feed/index.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.malwaretech.com/feed": {
+  "2026-10": "ok"
+ },
+ "https://www.microsoft.com/en-us/research/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.microsoft.com/en-us/security/blog/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.ncsc.gov.uk/api/1/services/v1/all-rss-feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.ncsc.gov.uk/api/1/services/v1/report-rss-feed.xml": {
+  "2026-10": "inactive"
+ },
+ "https://www.netskope.com/feed": {
+  "2026-10": "ok"
+ },
+ "https://www.numerama.com/cyberguerre/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.pentestpartners.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.propublica.org/feeds/propublica/main": {
+  "2026-10": "ok"
+ },
+ "https://www.ransomware.live/cyberattacks.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.ransomware.live/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.rapid7.com/blog/tag/detection-and-response/rss/": {
+  "2026-10": "ok"
+ },
+ "https://www.reddit.com/r/CryptoCurrencies/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/ITCareerQuestions/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/Information_Security/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/Malware/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/OSINT/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/ReverseEngineering/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/TOR/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/apple/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/blueteamsec/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/fulldisclosure/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/netsec/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/opensource/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/pwned/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/redteamsec/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/science/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/selfhosted/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/thehatedone/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/websec/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.reddit.com/r/zeroday/.rss": {
+  "2026-10": "check"
+ },
+ "https://www.ria.ee/en/rss-feeds/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.rtl-sdr.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.schneier.com/feed/atom/": {
+  "2026-10": "ok"
+ },
+ "https://www.secjuice.com/rss/": {
+  "2026-10": "check"
+ },
+ "https://www.securityweek.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.sentinelone.com/blog/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.sentinelone.com/labs/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.techmeme.com/feed.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.technologyreview.com/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.techrepublic.com/rssfeeds/topic/security/": {
+  "2026-10": "ok"
+ },
+ "https://www.ted.com/feeds/talks.rss": {
+  "2026-10": "ok"
+ },
+ "https://www.tenable.com/feed/news": {
+  "2026-10": "ok"
+ },
+ "https://www.theguardian.com/technology/artificialintelligenceai/rss": {
+  "2026-10": "ok"
+ },
+ "https://www.theregister.com/security/headlines.atom": {
+  "2026-10": "ok"
+ },
+ "https://www.theverge.com/rss/index.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.theverge.com/rss/science/index.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.thezdi.com/blog?format=rss": {
+  "2026-10": "ok"
+ },
+ "https://www.welivesecurity.com/en/rss/feed/": {
+  "2026-10": "ok"
+ },
+ "https://www.windowscentral.com/feeds.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.wired.com/feed/category/backchannel/latest/rss": {
+  "2026-10": "ok"
+ },
+ "https://www.wired.com/feed/category/science/latest/rss": {
+  "2026-10": "ok"
+ },
+ "https://www.wired.com/feed/category/security/latest/rss": {
+  "2026-10": "ok"
+ },
+ "https://www.wired.com/feed/rss": {
+  "2026-10": "ok"
+ },
+ "https://www.wiz.io/feed/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.xorlab.com/en/blog/rss.xml": {
+  "2026-10": "ok"
+ },
+ "https://www.youtube.com/feeds/videos.xml?channel_id=UCefQC4Y-X9MBRuYBKc2waiQ": {
+  "2026-10": "ok"
+ },
+ "https://www.youtube.com/feeds/videos.xml?channel_id=UCqeXB2WsPdzcdCdP-bUc52g": {
+  "2026-10": "ok"
+ },
+ "https://www.zerodayinitiative.com/rss/upcoming/": {
+  "2026-10": "ok"
+ },
+ "https://zetter.substack.com/feed": {
+  "2026-10": "check"
+ }
+}
