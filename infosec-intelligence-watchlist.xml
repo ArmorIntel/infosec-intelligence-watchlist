@@ -145,6 +145,7 @@
         <outline text="CISA ICS Advisories" title="CISA ICS Advisories" type="rss" xmlUrl="https://www.cisa.gov/cybersecurity-advisories/ics-advisories.xml" htmlUrl="https://ics-cert.us-cert.gov/advisories/advisories.xml" />
         <outline text="Full Disclosure" title="Full Disclosure" type="rss" xmlUrl="https://seclists.org/rss/fulldisclosure.rss" htmlUrl="https://seclists.org/#fulldisclosure" />
         <outline text="GitLab Security Releases" title="GitLab Security Releases" type="rss" xmlUrl="https://docs.gitlab.com/releases/patch-releases.xml" htmlUrl="https://about.gitlab.com/blog/categories/releases/" />
+        <outline text="ICHI Internet Cyber Health Index" title="ICHI Internet Cyber Health Index" type="rss" xmlUrl="https://ichi.global/api/alerts" htmlUrl="https://ichi.global/" />
         <outline text="NCSC UK - Reports" title="NCSC UK - Reports" type="rss" xmlUrl="https://www.ncsc.gov.uk/api/1/services/v1/report-rss-feed.xml" htmlUrl="https://www.ncsc.gov.uk/" />
         <outline text="Ransomware.live - Cyberattacks" title="Ransomware.live - Cyberattacks" type="rss" xmlUrl="https://www.ransomware.live/cyberattacks.xml" htmlUrl="https://www.ransomware.live/cyberattacks.xml" />
         <outline text="Ransomware.live - Victims" title="Ransomware.live - Victims" type="rss" xmlUrl="https://www.ransomware.live/rss.xml" htmlUrl="https://www.ransomware.live/rss.xml" />
