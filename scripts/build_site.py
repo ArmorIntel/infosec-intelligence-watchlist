@@ -26,6 +26,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import build_category_opml
 import feed_items
 import site_changes
 import site_data
@@ -33,7 +34,6 @@ import site_render
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "infosec-intelligence-watchlist.xml"
-OPML_DIR = ROOT / "opml"
 DESCRIPTIONS = ROOT / "site" / "descriptions.json"
 STRINGS = ROOT / "site" / "strings.json"
 
@@ -113,12 +113,14 @@ def load_changes(now):
     return []
 
 
-def copy_downloads(out):
-    shutil.copy2(SOURCE, out / SOURCE.name)
-    target = out / "opml"
-    if target.exists():
-        shutil.rmtree(target)
-    shutil.copytree(OPML_DIR, target)
+def write_downloads(out, source):
+    """The watchlist and its category OPML files, generated from `source` itself.
+
+    Not copied from the repository's opml/: on a watchlist push this build runs
+    alongside the workflow that regenerates it, and would publish stale files.
+    """
+    shutil.copy2(source, out / SOURCE.name)
+    build_category_opml.write_category_files(source, out / "opml")
 
 
 def main(argv=None):
@@ -167,7 +169,7 @@ def main(argv=None):
     site_render.render_site(watchlist, descriptions, state, strings, out, now, changes=load_changes(now))
     (out / "data.json").write_text(
         json.dumps({"generated": now.isoformat(), "feeds": state}, ensure_ascii=False), encoding="utf-8")
-    copy_downloads(out)
+    write_downloads(out, args.opml)
     (out / ".nojekyll").write_text("", encoding="utf-8")
     return 0
 

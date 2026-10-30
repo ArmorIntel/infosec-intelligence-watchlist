@@ -179,6 +179,31 @@ class BuildTest(unittest.TestCase):
         self.assertIn("::warning::", out)
         self.assertIn("unexpected error", out)
 
+    def test_category_opml_generated_from_the_xml(self):
+        xml = OPML.replace('<outline text="Threat Intelligence" title="Threat Intelligence">',
+                           '<outline text="Zeta Only" title="Zeta Only"><outline text="Brand New" title="Brand New">'
+                           '<outline type="rss" text="Z" title="Z" xmlUrl="https://z.com/feed" htmlUrl="https://z.com"/>'
+                           '</outline></outline>\n  <outline text="Threat Intelligence" title="Threat Intelligence">')
+        repo_opml = sorted(p.relative_to(build_site.ROOT).as_posix() for p in (build_site.ROOT / "opml").rglob("*"))
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "w.xml"
+            src.write_text(xml, encoding="utf-8")
+            out = Path(tmp) / "out"
+            (out / "opml" / "stale").mkdir(parents=True)
+            (out / "opml" / "stale" / "old.opml").write_text("old", encoding="utf-8")
+            self.assertEqual(self.run_main("--offline", "--opml", str(src), "--out", str(out)), 0)
+            new = (out / "opml" / "zeta-only" / "brand-new.opml").read_text(encoding="utf-8")
+            self.assertIn('xmlUrl="https://z.com/feed"', new)
+            self.assertTrue((out / "opml" / "threat-intelligence" / "security-news.opml").exists())
+            self.assertFalse((out / "opml" / "stale").exists())
+            self.assertEqual(sorted(p.name for p in (out / "opml").rglob("*.opml")),
+                             ["brand-new.opml", "security-news.opml"])
+            self.assertEqual((out / "infosec-intelligence-watchlist.xml").read_text(encoding="utf-8"), xml)
+            self.assertIn('href="../opml/zeta-only/brand-new.opml"', (out / "catalogue" / "index.html").read_text(encoding="utf-8"))
+        # the repository's own opml/ is never written by the site build
+        self.assertEqual(sorted(p.relative_to(build_site.ROOT).as_posix() for p in (build_site.ROOT / "opml").rglob("*")),
+                         repo_opml)
+
     def test_build_fetches_all_feeds(self):
         code, data = self.build(lambda url, timeout: {"status": "ok", "items": []})
         self.assertEqual(code, 0)
