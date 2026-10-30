@@ -5,11 +5,29 @@
   var lang = document.documentElement.lang || "en";
 
   function all(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
-  function hashId() { return decodeURIComponent(location.hash.replace(/^#/, "")); }
+  function hashId() {
+    var raw = location.hash.replace(/^#/, "");
+    try { return decodeURIComponent(raw); } catch (err) { return raw; } // malformed, e.g. "#%"
+  }
+  function byId(sections, id) { return sections.filter(function (s) { return s.id === id; })[0]; }
+
+  // On user navigation: react only to hashes naming one of `sections` (or no
+  // hash), so other anchors such as the "Skip to content" link (#content) keep
+  // the current view; then scroll the shown section into view, so a tap on a
+  // category or tab visibly does something on small screens.
+  function onHashChange(sections, show) {
+    window.addEventListener("hashchange", function () {
+      var id = hashId();
+      if (id && !byId(sections, id)) return;
+      show();
+      var target = id && byId(sections, id);
+      if (target && !target.hidden) target.scrollIntoView({ block: "start" });
+    });
+  }
 
   // Show one section among `sections`, mark the matching link as current.
   function showOnly(sections, links, id) {
-    var target = sections.filter(function (s) { return s.id === id; })[0] || sections[0];
+    var target = byId(sections, id) || sections[0];
     sections.forEach(function (s) { s.hidden = s !== target; });
     links.forEach(function (a) {
       if (a.getAttribute("href") === "#" + (target && target.id)) a.setAttribute("aria-current", "true");
@@ -50,7 +68,7 @@
       box.hidden = false;
       input.addEventListener("input", filter);
     }
-    window.addEventListener("hashchange", function () {
+    onHashChange(sections, function () {
       if (input && input.value) { input.value = ""; filter(); } else byHash();
     });
     byHash();
@@ -61,7 +79,7 @@
     var tabs = all("section.tab");
     var tabLinks = all(".tabs a");
     var showTab = function () { showOnly(tabs, tabLinks, hashId() || "all"); };
-    window.addEventListener("hashchange", showTab);
+    onHashChange(tabs, showTab);
     showTab();
   }
 
