@@ -115,7 +115,12 @@ def parse_feed(body):
     return best, len(items)
 
 
-def fetch(url, timeout):
+def download(url, timeout):
+    """Fetch url with curl; return (result dict, body).
+
+    The dict holds url and final_url, plus status ("dead" or "check") and error
+    when the download failed (curl error or HTTP error code).
+    """
     res = {"url": url}
     cmd = ["curl", "-sS", "-L", "--compressed", "--http1.1", "--max-time", str(timeout), "--max-filesize", "20000000",
            "-A", UA, "-H", "Accept: application/rss+xml, application/atom+xml, application/xml;q=0.9, */*;q=0.8",
@@ -131,12 +136,21 @@ def fetch(url, timeout):
         bad_encoding = p.returncode == 61 or (p.returncode == 56 and "encoding" in err)
         res["status"] = "check" if incomplete_chain or bad_encoding else "dead"
         res["error"] = err[:160]
-        return res
+        return res, b""
     code = int(code) if code.isdigit() else 0
     if code >= 400:
         res["status"] = "check" if code in CHECK_CODES else "dead"
         res["error"] = f"HTTP {code}"
+        return res, body
+    res["_code"] = code
+    return res, body
+
+
+def fetch(url, timeout):
+    res, body = download(url, timeout)
+    if "status" in res:
         return res
+    code = res.pop("_code", 200)  # HTTP code, only used in the empty-body message
     if not body.strip():
         res["status"], res["error"] = "check", f"empty response (HTTP {code})"
         return res
