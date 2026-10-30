@@ -97,12 +97,20 @@ def report(missing, failures, total):
 
 
 def load_changes(now):
-    """Feed changes of the last 12 months; [] with a warning when git history is unavailable."""
+    """Feed changes of the last 12 months; [] with a warning when they can't be read.
+
+    The build never fails because of the Changes page. The warning is also
+    printed as a GitHub Actions annotation, so it shows on the run page.
+    """
     try:
         return site_changes.collect_changes(ROOT, now - timedelta(days=365))
-    except Exception as e:  # never fail the build for the Changes page
-        print(f"Warning: Changes page left empty, git history unavailable: {e}", file=sys.stderr)
-        return []
+    except (site_changes.HistoryUnavailable, ValueError) as e:  # no or malformed history
+        message = f"Changes page left empty, git history unavailable: {e}"
+    except Exception as e:  # a bug: say so, don't pass it off as missing history
+        message = f"Changes page left empty, unexpected error: {type(e).__name__}: {e}"
+    print(f"Warning: {message}", file=sys.stderr)
+    print(f"::warning::{message}")
+    return []
 
 
 def copy_downloads(out):

@@ -53,13 +53,12 @@ class CollectChangesTest(unittest.TestCase):
     def test_collect_changes(self):
         got = site_changes.collect_changes(self.repo, datetime(2025, 1, 1, tzinfo=timezone.utc))
         s1, s2, s3 = self.shas
+        # s1 introduced the watchlist: it is the baseline, not a change
         self.assertEqual([(c["kind"], c["title"], c["commit"]) for c in got], [
             ("moved", "Alpha", s3),
             ("added", "Gamma <g>", s2),
-            ("added", "Alpha", s1),
-            ("added", "Beta", s1),
         ])
-        moved, gamma, alpha, beta = got
+        moved, gamma = got
         self.assertEqual(moved["folder"], "Cat > Two")
         self.assertEqual(moved["previous_folder"], "Cat > One")
         self.assertEqual(moved["reason"], "Move Alpha to Two")
@@ -71,7 +70,6 @@ class CollectChangesTest(unittest.TestCase):
         self.assertIsNone(gamma["previous_folder"])
         self.assertEqual(gamma["folder"], "Cat > One")
         self.assertEqual(datetime.fromisoformat(gamma["date"]), datetime(2026, 3, 5, 10, tzinfo=timezone.utc))
-        self.assertEqual(alpha["reason"], "Initial watchlist")
 
     def test_since_filter(self):
         got = site_changes.collect_changes(self.repo, datetime(2026, 3, 1, tzinfo=timezone.utc))
@@ -80,6 +78,38 @@ class CollectChangesTest(unittest.TestCase):
     def test_not_a_repo(self):
         with tempfile.TemporaryDirectory() as d, self.assertRaises(site_changes.HistoryUnavailable):
             site_changes.collect_changes(Path(d), datetime(2025, 1, 1, tzinfo=timezone.utc))
+
+
+class BaselineTest(unittest.TestCase):
+    def test_only_the_commit_introducing_the_file_is_the_baseline(self):
+        with tempfile.TemporaryDirectory() as d:
+            s1, s2, s3 = git_repo(Path(d), [
+                (V1, "Initial watchlist", "2026-01-10T09:00:00Z"),
+                (None, "Delete the watchlist", "2026-02-10T09:00:00Z"),
+                (V1, "Restore the watchlist", "2026-03-10T09:00:00Z"),
+            ])
+            got = site_changes.collect_changes(Path(d), datetime(2025, 1, 1, tzinfo=timezone.utc))
+        self.assertEqual([(c["kind"], c["title"], c["commit"]) for c in got], [
+            ("added", "Alpha", s3), ("added", "Beta", s3),
+            ("removed", "Alpha", s2), ("removed", "Beta", s2),
+        ])
+
+
+class MalformedMessageTest(unittest.TestCase):
+    def test_separator_characters_in_a_message(self):
+        msg = "Add Gamma \x1e odd\x1f bytes\n\n- https://gamma.com/feed: kept \x1e here\n"
+        with tempfile.TemporaryDirectory() as d:
+            _, s2, s3 = git_repo(Path(d), [
+                (V1, "Initial watchlist", "2026-01-10T09:00:00Z"),
+                (V2, msg, "2026-03-05T10:00:00Z"),
+                (V3, "Move Alpha to Two", "2026-04-01T08:30:00Z"),
+            ])
+            got = site_changes.collect_changes(Path(d), datetime(2025, 1, 1, tzinfo=timezone.utc))
+        self.assertEqual([(c["kind"], c["title"], c["commit"]) for c in got], [
+            ("moved", "Alpha", s3), ("added", "Gamma <g>", s2),
+        ])
+        self.assertEqual(got[1]["reason"], "kept \x1e here")
+        self.assertEqual(got[1]["subject"], "Add Gamma \x1e odd\x1f bytes")
 
 
 class ChangesFromDiffTest(unittest.TestCase):

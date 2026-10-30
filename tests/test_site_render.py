@@ -184,13 +184,30 @@ class RenderTest(unittest.TestCase):
         return fixture()[3]["en"]
 
     def test_format_rate(self):
-        self.assertEqual(site_render.format_rate(7.0, "en"), "~7 posts/week")
-        self.assertEqual(site_render.format_rate(0.5, "en"), "~2 posts/month")
-        self.assertEqual(site_render.format_rate(0.1, "en"), "Rarely updated")
-        self.assertEqual(site_render.format_rate(None, "en"), "")
-        self.assertEqual(site_render.format_rate(7.0, "fr"), "~7 articles/semaine")
-        self.assertEqual(site_render.format_rate(0.5, "fr"), "~2 articles/mois")
-        self.assertEqual(site_render.format_rate(0.1, "fr"), "Mises à jour rares")
+        en, fr = fixture()[3]["en"], fixture()[3]["fr"]
+        self.assertEqual(site_render.format_rate(7.0, en), "~7 posts/week")
+        self.assertEqual(site_render.format_rate(0.5, en), "~2 posts/month")
+        self.assertEqual(site_render.format_rate(0.1, en), "Rarely updated")
+        self.assertEqual(site_render.format_rate(None, en), "")
+        self.assertEqual(site_render.format_rate(7.0, fr), "~7 articles/semaine")
+        self.assertEqual(site_render.format_rate(0.5, fr), "~2 articles/mois")
+        self.assertEqual(site_render.format_rate(0.1, fr), "Mises à jour rares")
+
+    def test_format_rate_singular(self):
+        en, fr = fixture()[3]["en"], fixture()[3]["fr"]
+        self.assertEqual(site_render.format_rate(1.0, en), "~1 post/week")
+        self.assertEqual(site_render.format_rate(1.4, en), "~1 post/week")
+        self.assertEqual(site_render.format_rate(0.3, en), "~1 post/month")
+        self.assertEqual(site_render.format_rate(1.0, fr), "~1 article/semaine")
+        self.assertEqual(site_render.format_rate(0.3, fr), "~1 article/mois")
+        self.assertEqual(site_render.format_rate(1.6, en), "~2 posts/week")
+
+    def test_feed_count_singular(self):
+        en, fr = self.page("catalogue/index.html"), self.page("fr/catalogue/index.html")
+        self.assertIn('<span class="count">1 feed</span>', en)   # AI has one feed
+        self.assertIn('<span class="count">2 feeds</span>', en)  # Security News has two
+        self.assertIn('<span class="count">1 flux</span>', fr)
+        self.assertIn('<span class="count">2 flux</span>', fr)
 
     def test_credit_footer(self):
         for rel in ["index.html", "fr/news/index.html"]:
@@ -218,6 +235,32 @@ class RenderTest(unittest.TestCase):
         self.assertIn("Great &lt;script&gt;alert(1)&lt;/script&gt;", fr)  # reasons as written
         self.assertIn("Threat Intelligence &gt; Security News", fr)
         self.assertIn(">Modifications<", fr)
+
+    def render_changes(self, changes, rel="changes/index.html"):
+        wl, desc, state, strings = fixture()
+        with tempfile.TemporaryDirectory() as d:
+            site_render.render_site(wl, desc, state, strings, Path(d), NOW, changes=changes)
+            return (Path(d) / rel).read_text(encoding="utf-8")
+
+    def test_changes_sorted_newest_first_by_date(self):
+        html = self.render_changes([
+            change("added", 40, "https://c.com/feed", "Old one", "r"),
+            change("added", 5, "https://b.com/feed", "Recent one", "r"),
+            change("removed", 20, "https://gone.com/feed", "Middle one", "r"),
+        ])
+        self.assertLess(html.index("Recent one"), html.index("Middle one"))
+        self.assertLess(html.index("Middle one"), html.index("Old one"))
+        self.assertLess(html.index(iso(5)[:10]), html.index(iso(20)[:10]))
+
+    def test_changes_show_urls_of_updates_and_removals(self):
+        updated = change("updated", 3, "https://new.com/feed?a=1&b=2", "Upd", "moved host")
+        updated["previous_url"] = "https://old.com/<feed>"
+        html = self.render_changes([updated, change("removed", 4, "https://gone.com/feed", "Gone", "dead")])
+        self.assertIn("https://old.com/&lt;feed&gt;", html)
+        self.assertIn("https://new.com/feed?a=1&amp;b=2", html)
+        self.assertIn("https://gone.com/feed", html)
+        self.assertLess(html.index("https://old.com/"), html.index("https://new.com/"))
+        self.assertNotIn("<feed>", html)
 
     def test_changes_empty(self):
         wl, desc, state, strings = fixture()

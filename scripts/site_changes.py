@@ -15,6 +15,7 @@ from changelog import FILE, diff_feeds, norm, parse_feeds
 
 REASON_LINE = re.compile(r"^- (https?://\S+): (.+)$")
 KIND_ORDER = ("added", "removed", "moved", "updated")
+SHA = re.compile(r"^[0-9a-f]{40,64}$")
 
 
 class HistoryUnavailable(Exception):
@@ -24,7 +25,7 @@ class HistoryUnavailable(Exception):
 def parse_reasons(message):
     """{normalised url: reason} from the `- <feed URL>: <reason>` lines of a commit message."""
     reasons = {}
-    for line in message.splitlines():
+    for line in message.split("\n"):  # not splitlines(): it also splits on \x1c-\x1e
         m = REASON_LINE.match(line.rstrip())
         if m:
             reasons[norm(m.group(1))] = m.group(2).strip()
@@ -82,26 +83,45 @@ def _show(repo, rev):
     return p.stdout if p.returncode == 0 else None
 
 
+def _records(log):
+    """(sha, date, message) of every well-formed record of `git log -z --format=%H%x1f%cI%x1f%B`.
+
+    Records are NUL-separated (a commit message can't hold a NUL); a malformed
+    record is skipped, never fatal.
+    """
+    for record in log.decode("utf-8", "replace").split("\x00"):
+        parts = record.lstrip("\n").split("\x1f", 2)
+        if len(parts) != 3 or not SHA.match(parts[0]):
+            continue
+        try:
+            date = datetime.fromisoformat(parts[1])
+        except ValueError:
+            continue
+        yield parts[0], parts[1], date, parts[2]
+
+
 def collect_changes(repo: Path, since: datetime) -> list:
     """Every feed change committed since `since`, newest first.
 
+    The commit that introduced the watchlist (the oldest one touching it, with
+    no parent version) is the baseline: its feeds are not reported as added.
     Raises HistoryUnavailable when the history can't be read in full.
     """
     if _git(repo, "rev-parse", "--is-shallow-repository").stdout.strip() == b"true":
         raise HistoryUnavailable("shallow clone: fetch the full history (fetch-depth: 0)")
-    log = _git(repo, "log", "--no-merges", "--format=%H%x00%cI%x00%B%x1e", "--", FILE).stdout
+    log = _git(repo, "log", "-z", "--no-merges", "--format=%H%x1f%cI%x1f%B", "--", FILE).stdout
+    records = list(_records(log))
     changes = []
-    for record in log.decode("utf-8", "replace").split("\x1e"):
-        record = record.lstrip("\n")
-        if not record:
+    for i, (sha, date_text, date, message) in enumerate(records):
+        if date < since:
             continue
-        sha, date, message = record.split("\x00", 2)
-        if datetime.fromisoformat(date) < since:
-            continue
-        subject = (message.strip().splitlines() or [""])[0]
+        previous = _show(repo, f"{sha}^")
+        if previous is None and i == len(records) - 1:
+            continue  # baseline: the commit that introduced the watchlist
+        subject = message.strip().split("\n")[0].rstrip("\r")
         try:
-            rows = changes_between(_show(repo, f"{sha}^"), _show(repo, sha), parse_reasons(message),
-                                   {"commit": sha, "date": date, "subject": subject})
+            rows = changes_between(previous, _show(repo, sha), parse_reasons(message),
+                                   {"commit": sha, "date": date_text, "subject": subject})
         except ET.ParseError:
             continue  # an unreadable version can't be compared
         changes += rows

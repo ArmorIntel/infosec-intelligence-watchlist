@@ -160,6 +160,7 @@ h3 { font-size: 1.05rem; margin: 0 0 0.4rem; }
 .change .what { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
 .change .kind { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent); }
 .change .kind-removed { color: var(--muted); }
-.change .folder, .change .from { color: var(--muted); font-size: 0.9rem; }
+.change .folder, .change .from, .change .urls { color: var(--muted); font-size: 0.9rem; }
+.change .urls { flex-basis: 100%; overflow-wrap: anywhere; }
 .change .reason { margin-top: 4px; }
 .change .commit { margin-left: 8px; font-size: 0.85rem; white-space: nowrap; }

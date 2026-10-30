@@ -24,11 +24,6 @@ LANGS = ("en", "fr")
 LANG_PREFIX = {"en": "", "fr": "fr/"}
 NEW_DAYS = 30  # feeds added more recently than this get a "New" badge
 
-RATE_TEXT = {
-    "en": ("~{n} posts/week", "~{n} posts/month", "Rarely updated"),
-    "fr": ("~{n} articles/semaine", "~{n} articles/mois", "Mises à jour rares"),
-}
-
 
 def e(value):
     """Escape text for element content and quoted attribute values."""
@@ -46,17 +41,21 @@ def safe_url(url):
     return str(url).strip() if scheme in ("http", "https") else None
 
 
-def format_rate(rate, lang):
-    """Rate is in posts per week, as computed by feed_items.posting_rate."""
+def plural(s, key, n):
+    """The `key` string of `s` for count `n`: `key_one` when n is 1, else `key` with {n} filled in."""
+    return s[key + "_one"] if n == 1 else s[key].replace("{n}", str(n))
+
+
+def format_rate(rate, s):
+    """Rate is in posts per week, as computed by feed_items.posting_rate; `s`: strings of one language."""
     if rate is None:
         return ""
-    week, month, rare = RATE_TEXT[lang]
     if rate >= 1:
-        return week.format(n=round(rate))
+        return plural(s, "rate_week", round(rate))
     per_month = rate * 30 / 7
     if per_month >= 1:
-        return month.format(n=round(per_month))
-    return rare
+        return plural(s, "rate_month", round(per_month))
+    return s["rate_rare"]
 
 
 def load_strings(path):
@@ -149,7 +148,7 @@ def _card(feed, cat, sub, ctx):
         when = _time(latest.get("date"))
         parts.append(f'<p class="latest"><span class="label">{e(s["latest"])}</span> '
                      f'{_link(latest.get("link"), latest["title"])}{" " + when if when else ""}</p>')
-    rate = format_rate(st.get("rate"), lang)
+    rate = format_rate(st.get("rate"), s)
     if rate:
         parts.append(f'<p class="rate">{e(rate)}</p>')
     parts.append(f'<p class="url"><code>{e(url)}</code></p>')
@@ -170,7 +169,7 @@ def page_catalogue(ctx):
     for cat in ctx["watchlist"]:
         links = "".join(
             f'<li><a href="#{e(sub["slug"])}">{e(sub["name"])} '
-            f'<span class="count">{e(s["feeds_count"].replace("{n}", str(len(sub["feeds"]))))}</span></a></li>'
+            f'<span class="count">{e(plural(s, "feeds_count", len(sub["feeds"])))}</span></a></li>'
             for sub in cat["subcategories"])
         side.append(f'<h3>{e(cat["name"])}</h3>\n<ul>{links}</ul>')
         for sub in cat["subcategories"]:
@@ -235,7 +234,9 @@ def page_news(ctx):
 def page_changes(ctx):
     s = ctx["s"]
     days = {}
-    for c in ctx["changes"]:
+    oldest = datetime.min.replace(tzinfo=timezone.utc)
+    # newest first by date (stable: a commit's rows keep their order), undated last
+    for c in sorted(ctx["changes"], key=lambda c: site_data._parse(c.get("date")) or oldest, reverse=True):
         dt = site_data._parse(c.get("date"))
         days.setdefault(dt.astimezone(timezone.utc).strftime("%Y-%m-%d") if dt else "", []).append(c)
     sections = []
@@ -248,6 +249,10 @@ def page_changes(ctx):
                      f'<span class="folder">{e(c.get("folder"))}</span>']
             if c.get("previous_folder"):
                 parts.append(f'<span class="from">{e(s["changes_from"].replace("{folder}", c["previous_folder"]))}</span>')
+            if kind == "updated" and c.get("previous_url"):
+                parts.append(f'<span class="urls"><code>{e(c["previous_url"])}</code> → <code>{e(c.get("url"))}</code></span>')
+            elif kind == "removed" and c.get("url"):
+                parts.append(f'<span class="urls"><code>{e(c["url"])}</code></span>')
             commit = str(c.get("commit") or "")
             link = (f' <a class="commit" href="{e(REPO_URL)}/commit/{e(quote(commit))}" rel="noopener">'
                     f'{e(s["changes_commit"])} <code>{e(commit[:7])}</code></a>') if commit else ""

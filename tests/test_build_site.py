@@ -148,6 +148,37 @@ class BuildTest(unittest.TestCase):
             self.assertTrue((out / "changes" / "index.html").exists())
         self.assertIn("shallow clone", err.getvalue())
 
+    def changes_failure(self, error):
+        out, err = io.StringIO(), io.StringIO()
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch.object(site_changes, "collect_changes", side_effect=error), \
+                contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = build_site.main(["--offline", "--out", str(Path(tmp) / "out")])
+            page = (Path(tmp) / "out" / "changes" / "index.html").exists()
+        return code, page, out.getvalue(), err.getvalue()
+
+    def test_changes_history_unavailable_warns(self):
+        code, page, out, err = self.changes_failure(site_changes.HistoryUnavailable("shallow clone"))
+        self.assertEqual((code, page), (0, True))
+        self.assertIn("git history unavailable: shallow clone", err)
+        self.assertIn("::warning::", out)
+        self.assertIn("shallow clone", out)
+
+    def test_changes_malformed_history_warns(self):
+        code, page, out, err = self.changes_failure(ValueError("bad date"))
+        self.assertEqual((code, page), (0, True))
+        self.assertIn("git history unavailable: bad date", err)
+        self.assertIn("::warning::", out)
+
+    def test_changes_unexpected_error_is_not_masked(self):
+        code, page, out, err = self.changes_failure(KeyError("boom"))
+        self.assertEqual((code, page), (0, True))
+        self.assertIn("unexpected error", err)
+        self.assertIn("KeyError", err)
+        self.assertNotIn("git history unavailable", err)
+        self.assertIn("::warning::", out)
+        self.assertIn("unexpected error", out)
+
     def test_build_fetches_all_feeds(self):
         code, data = self.build(lambda url, timeout: {"status": "ok", "items": []})
         self.assertEqual(code, 0)
