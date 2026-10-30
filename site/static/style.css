@@ -8,6 +8,11 @@
   --accent: #1f5fbf;
   --accent-text: #ffffff;
   --focus: #e08a00;
+  --ok: #2f9e5b;
+  --fail: #c93a3a;
+  --inactive: #8a929e;
+  --collect: #8a63d2;
+  --none: #e6e9ee;
   --radius: 6px;
   --gutter: 24px;
   color-scheme: light dark;
@@ -24,6 +29,11 @@
     --accent: #6ea8ff;
     --accent-text: #0d1117;
     --focus: #ffb547;
+    --ok: #3fb070;
+    --fail: #f06a6a;
+    --inactive: #78808c;
+    --collect: #a585ec;
+    --none: #2a2f38;
   }
 }
 
@@ -164,3 +174,41 @@ h3 { font-size: 1.05rem; margin: 0 0 0.4rem; }
 .change .urls { flex-basis: 100%; overflow-wrap: anywhere; }
 .change .reason { margin-top: 4px; }
 .change .commit { margin-left: 8px; font-size: 0.85rem; white-space: nowrap; }
+
+/* Health */
+.badge.unstable { background: var(--fail); color: #ffffff; text-decoration: none; }
+.since { color: var(--muted); }
+.legend { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.9rem; }
+.legend i { display: inline-block; width: 10px; height: 14px; border-radius: 2px; vertical-align: -2px; margin-right: 4px; }
+.health-filter select { font: inherit; padding: 4px 8px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); }
+.health-group { margin: 24px 0; }
+.health-group > summary { cursor: pointer; font-weight: 600; font-size: 1.05rem; }
+.health-scroll { overflow-x: auto; }
+.health { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+.health th, .health td { text-align: left; vertical-align: top; padding: 8px 10px 8px 0; border-bottom: 1px solid var(--border); }
+.health thead th { color: var(--muted); font-weight: 600; font-size: 0.8rem; }
+.health tbody th { font-weight: 400; min-width: 200px; }
+.health tbody th a { font-weight: 600; }
+.health .folder, .clean .folder { color: var(--muted); font-size: 0.85rem; }
+.health .error { margin: 4px 0 0; color: var(--muted); font-size: 0.8rem; overflow-wrap: anywhere; }
+.health .avail { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.health .tag { color: var(--collect); font-weight: 600; font-size: 0.8rem; }
+.health tr:target th { background: var(--bg-soft); }
+.cells { display: flex; gap: 1px; padding-top: 3px; }
+.cells i, .legend i { background: var(--none); }
+.cells i { flex: none; width: 4px; height: 16px; border-radius: 1px; }
+i.d-o { background: var(--ok); }
+i.d-f { background: var(--fail); }
+i.d-i { background: var(--inactive); }
+i.d-c { background: var(--collect); }
+.clean { columns: 2 280px; padding-left: 18px; font-size: 0.9rem; }
+.clean li { break-inside: avoid; margin: 2px 0; }
+.health tr[hidden] { display: none; }
+@media (max-width: 767px) {
+  .health thead { display: none; }
+  .health tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .health th, .health td { border: 0; padding: 0; }
+  .health tbody th { min-width: 0; }
+  .health td:nth-child(2) { grid-column: 1 / -1; grid-row: 2; }
+  .cells i { flex: 1 1 0; width: auto; }
+}

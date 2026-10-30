@@ -90,6 +90,7 @@ class RenderTest(unittest.TestCase):
     def test_pages_exist(self):
         for rel in ["index.html", "catalogue/index.html", "news/index.html", "changes/index.html",
                     "fr/index.html", "fr/catalogue/index.html", "fr/news/index.html", "fr/changes/index.html",
+                    "health/index.html", "fr/health/index.html",
                     "static/app.js", "static/style.css"]:
             self.assertTrue((self.out / rel).is_file(), rel)
 
@@ -289,6 +290,80 @@ class RenderTest(unittest.TestCase):
         html = self.page("index.html")
         self.assertIn(">3<", html)  # feeds
         self.assertIn(">2<", html)  # subcategories
+
+
+A_URL = "https://a.com/feed?x=1&y=2"
+HEALTH = {
+    "start": (NOW.date() - timedelta(days=89)).isoformat(),
+    "since": "2026-08-01",
+    "feeds": {
+        A_URL: "o" * 80 + "ffffoofffo",              # unstable: 4/10 over the last days
+        "https://b.com/feed": "o" * 85 + "ccccc",    # collection issues only
+        "https://c.com/feed": "o" * 88 + "fo",       # one failure, still stable
+    },
+    "errors": {A_URL: {"date": iso(1), "error": "HTTP 500 " + XSS}},
+}
+
+
+class HealthRenderTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.out = Path(cls.tmp.name)
+        wl, desc, state, strings = fixture()
+        cls.strings = strings
+        site_render.render_site(wl, desc, state, strings, cls.out, NOW, health=HEALTH)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def page(self, rel):
+        return (self.out / rel).read_text(encoding="utf-8")
+
+    def test_pages_and_nav(self):
+        html = self.page("health/index.html")
+        self.assertIn('href="../health/" aria-current="page"', html)
+        self.assertIn('hreflang="fr" href="../fr/health/"', html)
+        self.assertIn(">Santé des flux<", self.page("fr/health/index.html"))
+        self.assertIn(">Health<", self.page("index.html"))
+
+    def test_groups_and_order(self):
+        html = self.page("health/index.html")
+        incidents = html[:html.index("<details")]
+        self.assertLess(incidents.index("&lt;script&gt;"), incidents.index("Feed C"))  # least available first
+        self.assertNotIn("Feed B", incidents)
+        self.assertIn("1 feed with collection issues only", html)
+        self.assertIn(">Collection issue<", html[html.index("<details"):])
+        self.assertIn(">92%<", incidents)  # 83 of 90 days
+        self.assertIn(">99%<", incidents)
+
+    def test_cells_and_escaping(self):
+        html = self.page("health/index.html")
+        anchor = site_render.feed_anchor(A_URL)
+        row = html[html.index(f'id="{anchor}"'):]
+        row = row[:row.index("</tr>")]
+        self.assertEqual(row.count("<i "), 90)
+        self.assertIn(f'title="{iso(9)[:10]} · Failing"', row)
+        self.assertIn("HTTP 500 &lt;script&gt;", row)
+        self.assertNotIn(XSS, html)
+        self.assertIn("2026-08-01", html)
+
+    def test_unstable_badge(self):
+        anchor = site_render.feed_anchor(A_URL)
+        cat = self.page("catalogue/index.html")
+        self.assertIn(f'href="../health/#{anchor}"', cat)
+        self.assertEqual(cat.count("badge unstable"), 1)
+        self.assertIn(">Instable<", self.page("fr/catalogue/index.html"))
+
+    def test_empty_history(self):
+        wl, desc, state, strings = fixture()
+        with tempfile.TemporaryDirectory() as d:
+            site_render.render_site(wl, desc, state, strings, Path(d), NOW)
+            html = (Path(d) / "health/index.html").read_text(encoding="utf-8")
+            cat = (Path(d) / "catalogue/index.html").read_text(encoding="utf-8")
+        self.assertIn(strings["en"]["health_empty"], html)
+        self.assertNotIn("badge unstable", cat)
 
 
 if __name__ == "__main__":
