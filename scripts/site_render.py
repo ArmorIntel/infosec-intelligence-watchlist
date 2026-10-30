@@ -343,8 +343,10 @@ def new_feeds(changes, now):
     return out
 
 
-def render_site(watchlist, descriptions, state, strings, out_dir: Path, now: datetime, changes=None) -> None:
-    """`changes`: feed changes, newest first, as returned by site_changes.collect_changes."""
+def render_site(watchlist, descriptions, state, strings, out_dir: Path, now: datetime, changes=None,
+                health=None) -> None:
+    """`changes`: feed changes, newest first, as returned by site_changes.collect_changes.
+    `health`: feed health history, as returned by site_health.record."""
     out_dir = Path(out_dir)
     changes = changes or []
     fresh = new_feeds(changes, now)
@@ -357,6 +359,7 @@ def render_site(watchlist, descriptions, state, strings, out_dir: Path, now: dat
                 "lang_root": (root + LANG_PREFIX[lang]) or "./",
                 "watchlist": watchlist, "descriptions": descriptions,
                 "state": state, "now": now, "changes": changes, "new_feeds": fresh,
+                "health": health or {},
             }
             target = out_dir / LANG_PREFIX[lang] / path / "index.html"
             target.parent.mkdir(parents=True, exist_ok=True)

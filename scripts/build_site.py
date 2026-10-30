@@ -2,7 +2,8 @@
 """Build the static website from the watchlist.
 
 Every feed is fetched (items are kept for the news pages), merged with the
-state of the previous deploy, and the pages are rendered into --out. The
+state of the previous deploy, and the pages are rendered into --out. Each
+online run also adds its result to the feed health history (Health page). The
 Changes page comes from the git history of the watchlist (last 12 months); without
 a full history it is rendered empty, with a warning. If more
 than --max-failure-ratio of the feeds fail, nothing is written and the exit
@@ -27,9 +28,11 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import build_category_opml
+import check_feeds
 import feed_items
 import site_changes
 import site_data
+import site_health
 import site_render
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -39,7 +42,7 @@ STRINGS = ROOT / "site" / "strings.json"
 
 
 def load_previous(url, path):
-    """Return the `feeds` state of the previous deploy; {} on first deploy.
+    """Return the previous deploy's data.json document; {} on first deploy.
 
     HTTP 404 means the first deploy. Any other error exits with 1, so a flaky
     network never makes the site forget its history.
@@ -53,7 +56,9 @@ def load_previous(url, path):
             req = urllib.request.Request(url, headers={"User-Agent": "infosec-watchlist-site"})
             with urllib.request.urlopen(req, timeout=30) as resp:
                 text = resp.read().decode("utf-8")
-        return json.loads(text)["feeds"]
+        data = json.loads(text)
+        data["feeds"]  # a document without feed state is not a previous deploy
+        return data
     except urllib.error.HTTPError as e:
         e.close()
         if e.code == 404:
@@ -147,7 +152,9 @@ def main(argv=None):
         report(missing, {}, 0)
         return 1 if missing else 0
 
-    previous = load_previous(args.previous_url, args.previous_file)
+    previous_doc = load_previous(args.previous_url, args.previous_file)
+    previous = previous_doc.get("feeds", {})
+    health = previous_doc.get("health") or {}
     urls = [f["url"] for cat in watchlist for sub in cat["subcategories"] for f in sub["feeds"]]
     fresh = {}
     if not args.offline:
@@ -159,6 +166,9 @@ def main(argv=None):
         if ratio > args.max_failure_ratio:
             print(f"Failure ratio above {args.max_failure_ratio:.0%}: nothing written.", file=sys.stderr)
             return 1
+        exceptions = check_feeds.load_exceptions(check_feeds.EXCEPTIONS)
+        states = site_health.run_states(fresh, now, exceptions)
+        health = site_health.record(health, fresh, states, urls, now)
     else:
         report(missing, {}, 0)
 
@@ -166,9 +176,10 @@ def main(argv=None):
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     strings = json.loads(STRINGS.read_text(encoding="utf-8"))
-    site_render.render_site(watchlist, descriptions, state, strings, out, now, changes=load_changes(now))
+    site_render.render_site(watchlist, descriptions, state, strings, out, now,
+                            changes=load_changes(now), health=health)
     (out / "data.json").write_text(
-        json.dumps({"generated": now.isoformat(), "feeds": state}, ensure_ascii=False), encoding="utf-8")
+        json.dumps({"generated": now.isoformat(), "feeds": state, "health": health}, ensure_ascii=False), encoding="utf-8")
     write_downloads(out, args.opml)
     (out / ".nojekyll").write_text("", encoding="utf-8")
     return 0

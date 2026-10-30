@@ -69,7 +69,8 @@ class LoadPreviousTest(unittest.TestCase):
         self.assertEqual(cm.exception.code, 1)
 
     def test_previous_ok(self):
-        self.assertEqual(build_site.load_previous(self.base + "/ok", None), {"u": {"latest": None}})
+        self.assertEqual(build_site.load_previous(self.base + "/ok", None),
+                         {"generated": "x", "feeds": {"u": {"latest": None}}})
 
     def test_previous_none(self):
         self.assertEqual(build_site.load_previous(None, None), {})
@@ -109,7 +110,7 @@ class BuildTest(unittest.TestCase):
             self.assertTrue((out / "infosec-intelligence-watchlist.xml").exists())
             self.assertTrue(any((out / "opml").rglob("*.opml")))
 
-    def build(self, fake, *extra, previous=None):
+    def build(self, fake, *extra, previous=None, health=None):
         with tempfile.TemporaryDirectory() as tmp:
             opml = Path(tmp) / "w.xml"
             opml.write_text(OPML, encoding="utf-8")
@@ -117,7 +118,10 @@ class BuildTest(unittest.TestCase):
             args = ["--opml", str(opml), "--out", str(out), "--retry-delay", "0", *extra]
             if previous is not None:
                 prev = Path(tmp) / "prev.json"
-                prev.write_text(json.dumps({"generated": "x", "feeds": previous}), encoding="utf-8")
+                doc = {"generated": "x", "feeds": previous}
+                if health is not None:
+                    doc["health"] = health
+                prev.write_text(json.dumps(doc), encoding="utf-8")
                 args += ["--previous-file", str(prev)]
             with mock.patch.object(feed_items, "fetch_items", fake):
                 code = self.run_main(*args)
@@ -255,6 +259,28 @@ class BuildTest(unittest.TestCase):
         code, data = self.build(fake, previous={"https://b.com/feed": prev_state})
         self.assertEqual(code, 0)
         self.assertEqual(data["feeds"]["https://b.com/feed"], prev_state)
+
+    def test_health_recorded(self):
+        def fake(url, timeout):
+            if url.startswith("https://b.com"):
+                return {"status": "dead", "error": "HTTP 500"}
+            if url.startswith("https://c.com"):
+                return {"status": "check", "error": "HTTP 403"}
+            return {"status": "ok", "items": []}
+
+        code, data = self.build(fake, previous={})  # an older data.json, without history
+        self.assertEqual(code, 0)
+        today = {u: days[-1] for u, days in data["health"]["feeds"].items()}
+        self.assertEqual(today, {"https://a.com/feed": "o", "https://b.com/feed": "f",
+                                 "https://c.com/feed": "c", "https://d.com/feed": "o"})
+        self.assertEqual(data["health"]["errors"]["https://b.com/feed"]["error"], "HTTP 500")
+
+    def test_offline_keeps_health(self):
+        health = {"start": "2026-08-01", "since": "2026-08-01", "feeds": {"https://a.com/feed": "o" * 90},
+                  "errors": {}}
+        code, data = self.build(None, "--offline", previous={}, health=health)
+        self.assertEqual(code, 0)
+        self.assertEqual(data["health"], health)
 
 
 if __name__ == "__main__":
