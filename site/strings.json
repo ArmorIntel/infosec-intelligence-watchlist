@@ -116,7 +116,9 @@
     "tools_automation": "Automation",
     "tools_automation_text": "They take feed URLs rather than OPML files: copy the RSS URL of each feed you need from the catalogue.",
     "tools_docs": "Official documentation",
-    "tools_credits": "Names and logos are trademarks of their owners, shown only to identify the tools. Logos from Simple Icons (CC0)."
+    "tools_credits": "Names and logos are trademarks of their owners, shown only to identify the tools. Logos from Simple Icons (CC0).",
+    "footer_star_text": "Is the watchlist useful to your watch? A star on GitHub helps other teams find it and supports its upkeep.",
+    "footer_star": "Star on GitHub"
   },
   "fr": {
     "skip": "Aller au contenu",
@@ -235,6 +237,8 @@
     "tools_automation": "Automatisation",
     "tools_automation_text": "Ils prennent des URL de flux plutôt que des fichiers OPML : copiez depuis le catalogue l'URL RSS de chaque flux utile.",
     "tools_docs": "Documentation officielle",
-    "tools_credits": "Les noms et logos sont des marques de leurs propriétaires, présentés uniquement pour identifier les outils. Logos issus de Simple Icons (CC0)."
+    "tools_credits": "Les noms et logos sont des marques de leurs propriétaires, présentés uniquement pour identifier les outils. Logos issus de Simple Icons (CC0).",
+    "footer_star_text": "La watchlist est utile à votre veille ? Une étoile sur GitHub aide d'autres équipes à la trouver et soutient son suivi.",
+    "footer_star": "Mettre une étoile sur GitHub"
   }
 }

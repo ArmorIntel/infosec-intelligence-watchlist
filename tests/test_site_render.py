@@ -226,6 +226,7 @@ class RenderTest(unittest.TestCase):
             self.assertIn('href="https://github.com/ArmorIntel"', footer)
             self.assertIn('href="https://github.com/ArmorIntel/infosec-intelligence-watchlist"', footer)
             self.assertIn(f'<time datetime="{NOW.isoformat()}"', footer)
+            self.assertIn('class="star-btn" href="https://github.com/ArmorIntel/infosec-intelligence-watchlist"', footer)
         self.assertIn("Created and maintained by", self.page("index.html"))
 
     def test_changes_page(self):

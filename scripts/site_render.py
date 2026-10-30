@@ -553,6 +553,10 @@ def _layout(ctx, key, path, title_key, body):
 </main>
 <footer class="site-footer">
   <div class="wrap">
+    <div class="star">
+      <p>{e(s["footer_star_text"])}</p>
+      <a class="star-btn" href="{REPO_URL}" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>{e(s["footer_star"])}</a>
+    </div>
     <p>{e(s["footer_credit"])} <a href="{CREDIT_URL}" rel="noopener">ArmorIntel</a>
     · <a href="{REPO_URL}" rel="noopener">{e(s["footer_repo"])}</a></p>
     <p>{e(s["footer_built"])} <time datetime="{e(built)}">{e(_short(built))}</time></p>

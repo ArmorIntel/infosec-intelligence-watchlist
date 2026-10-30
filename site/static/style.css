@@ -105,6 +105,23 @@ h3 { font-size: 1.05rem; margin: 0 0 0.4rem; }
 }
 .site-footer::before { top: 0; }
 .site-footer p { margin: 4px 0; }
+.star {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px;
+  margin: 8px 0 20px; padding: 16px 20px; border-radius: 12px;
+  background: linear-gradient(90deg, rgba(34, 227, 255, 0.08), rgba(124, 92, 255, 0.14));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.star p { margin: 0; max-width: 62ch; font-size: 0.95rem; color: #e6ecf7; }
+.site-footer .star-btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 999px; flex: none;
+  background: #ffffff; color: #05070d; font-weight: 600; text-decoration: none;
+  box-shadow: 0 8px 30px rgba(124, 92, 255, 0.35); transition: transform 0.2s, box-shadow 0.2s;
+}
+.site-footer .star-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 40px rgba(255, 196, 0, 0.4); }
+.star-btn svg { width: 18px; height: 18px; fill: #f5b400; animation: star-twinkle 3s ease-in-out infinite; }
+.star-btn:hover svg { animation-duration: 0.8s; }
+@keyframes star-twinkle { 50% { transform: scale(1.18) rotate(12deg); } }
+@media (prefers-reduced-motion: reduce) { .star-btn svg { animation: none; } }
 
 /* Buttons */
 .btn {
