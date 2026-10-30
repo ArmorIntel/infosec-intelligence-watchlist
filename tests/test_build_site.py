@@ -107,19 +107,72 @@ class BuildTest(unittest.TestCase):
             self.assertTrue((out / "infosec-intelligence-watchlist.xml").exists())
             self.assertTrue(any((out / "opml").rglob("*.opml")))
 
-    def test_build_fetches_and_keeps_previous_on_failure(self):
-        def fake(url, timeout):
-            return {"status": "ok", "items": []}
-
+    def build(self, fake, *extra, previous=None):
         with tempfile.TemporaryDirectory() as tmp:
             opml = Path(tmp) / "w.xml"
             opml.write_text(OPML, encoding="utf-8")
             out = Path(tmp) / "out"
+            args = ["--opml", str(opml), "--out", str(out), "--retry-delay", "0", *extra]
+            if previous is not None:
+                prev = Path(tmp) / "prev.json"
+                prev.write_text(json.dumps({"generated": "x", "feeds": previous}), encoding="utf-8")
+                args += ["--previous-file", str(prev)]
             with mock.patch.object(feed_items, "fetch_items", fake):
-                code = self.run_main("--opml", str(opml), "--out", str(out), "--retry-delay", "0")
-            self.assertEqual(code, 0)
-            feeds = json.loads((out / "data.json").read_text(encoding="utf-8"))["feeds"]
-            self.assertEqual(len(feeds), 4)
+                code = self.run_main(*args)
+            data = json.loads((out / "data.json").read_text(encoding="utf-8")) if (out / "data.json").exists() else None
+            return code, data
+
+    def test_build_fetches_all_feeds(self):
+        code, data = self.build(lambda url, timeout: {"status": "ok", "items": []})
+        self.assertEqual(code, 0)
+        self.assertEqual(len(data["feeds"]), 4)
+
+    def test_retry_recovers_failed_feed(self):
+        calls = {}
+
+        def fake(url, timeout):
+            calls[url] = calls.get(url, 0) + 1
+            if url.startswith("https://b.com") and calls[url] == 1:
+                return {"status": "dead", "error": "HTTP 500"}
+            return {"status": "ok", "items": [{"title": "T", "link": "https://b.com/1",
+                                               "date": "2020-01-01T00:00:00+00:00"}]}
+
+        code, data = self.build(fake)
+        self.assertEqual(code, 0)
+        self.assertEqual(calls["https://b.com/feed"], 2)
+        self.assertEqual(calls["https://a.com/feed"], 1)
+        self.assertIsNotNone(data["feeds"]["https://b.com/feed"]["latest"])
+
+    def test_retry_keeps_first_check_result(self):
+        calls = {}
+
+        def fake(url, timeout):
+            calls[url] = calls.get(url, 0) + 1
+            if url.startswith("https://b.com"):
+                return {"status": "check" if calls[url] == 1 else "dead", "error": "x"}
+            return {"status": "ok", "items": []}
+
+        failures = []
+        real = build_site.fetch_all
+        with mock.patch.object(build_site, "fetch_all",
+                               lambda *a: failures.append(real(*a)) or failures[-1]):
+            code, _ = self.build(fake)
+        self.assertEqual(code, 0)
+        self.assertEqual(calls["https://b.com/feed"], 2)
+        self.assertEqual(failures[0]["https://b.com/feed"]["status"], "check")
+
+    def test_failing_feed_keeps_previous_state(self):
+        prev_state = {"latest": {"title": "Old", "link": "https://b.com/old", "date": "2020-01-01T00:00:00+00:00"},
+                      "items": [], "rate": 1.5, "fetched": "2020-01-02T00:00:00+00:00"}
+
+        def fake(url, timeout):
+            if url.startswith("https://b.com"):
+                return {"status": "dead", "error": "HTTP 500"}
+            return {"status": "ok", "items": []}
+
+        code, data = self.build(fake, previous={"https://b.com/feed": prev_state})
+        self.assertEqual(code, 0)
+        self.assertEqual(data["feeds"]["https://b.com/feed"], prev_state)
 
 
 if __name__ == "__main__":
