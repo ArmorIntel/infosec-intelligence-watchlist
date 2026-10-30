@@ -49,16 +49,24 @@ def run_states(fresh, now, exceptions=()):
 def record(previous, fresh, states, urls, now):
     """The history `previous` with this run's `states` merged into today's cell.
 
-    Only the feeds in `urls` are kept; new ones start with "-" days.
+    Only the feeds in `urls` are kept; new ones start with "-" days. Anything
+    malformed in `previous` is dropped rather than failing the build. A
+    previous window ahead of `now` (clock gone backwards) is kept unchanged.
     """
+    if not isinstance(previous, dict):
+        previous = {}
     today = now.astimezone(timezone.utc).date()
     start = today - timedelta(days=WINDOW_DAYS - 1)
     old_start = _day(previous.get("start"))
-    old_feeds = previous.get("feeds") or {}
+    if old_start and old_start > start:
+        return previous
+    old_feeds = previous.get("feeds")
+    old_feeds = old_feeds if isinstance(old_feeds, dict) else {}
     shift = (start - old_start).days if old_start else None
     feeds = {}
     for url in urls:
-        old = old_feeds.get(url) or ""
+        old = old_feeds.get(url)
+        old = old if isinstance(old, str) else ""
         days = [
             old[i + shift] if shift is not None and 0 <= i + shift < len(old) and old[i + shift] in RANK else "-"
             for i in range(WINDOW_DAYS)
@@ -69,8 +77,11 @@ def record(previous, fresh, states, urls, now):
         feeds[url] = "".join(days)
 
     errors = {}
-    for url, err in (previous.get("errors") or {}).items():
-        when = site_data._parse(err.get("date"))
+    old_errors = previous.get("errors")
+    for url, err in (old_errors if isinstance(old_errors, dict) else {}).items():
+        if not isinstance(err, dict):
+            continue
+        when = site_data._parse(err.get("date") if isinstance(err.get("date"), str) else None)
         if url in feeds and when and when.date() >= start:
             errors[url] = err
     for url in urls:
@@ -78,7 +89,10 @@ def record(previous, fresh, states, urls, now):
         if r and r.get("status") != "ok":
             errors[url] = {"date": now.isoformat(), "error": r.get("error") or r.get("status") or ""}
 
+    # first day ever recorded; when lost, the oldest day still in the window
     since = previous.get("since") if _day(previous.get("since")) else None
+    if since is None and old_start and any(set(d) - {"-"} for d in feeds.values()):
+        since = max(old_start, start).isoformat()
     return {"start": start.isoformat(), "since": since or today.isoformat(), "feeds": feeds, "errors": errors}
 
 

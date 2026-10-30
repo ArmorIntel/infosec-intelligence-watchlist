@@ -93,6 +93,11 @@
         all("[data-cat]").forEach(function (row) {
           row.hidden = !!cat && row.getAttribute("data-cat") !== cat;
         });
+        // A group left without any row for this category is hidden too.
+        all(".health-group").forEach(function (group) {
+          var rows = all("[data-cat]", group);
+          group.hidden = rows.length > 0 && rows.every(function (r) { return r.hidden; });
+        });
       });
     }
   }

@@ -88,6 +88,19 @@ class Record(unittest.TestCase):
         h = site_health.record({"start": "nope", "feeds": {"u": "zz"}}, {}, {"u": "o"}, ["u"], NOW)
         self.assertEqual(h["feeds"]["u"], "-" * (WINDOW_DAYS - 1) + "o")
 
+    def test_malformed_values_are_dropped(self):
+        prev = {"start": START, "since": None, "feeds": {"u": 123, "v": "o" * WINDOW_DAYS},
+                "errors": {"u": None, "v": "str", "w": {"date": 5}}}
+        h = site_health.record(prev, {}, {"u": "o"}, ["u", "v", "w"], NOW)
+        self.assertEqual(h["feeds"]["u"], "-" * (WINDOW_DAYS - 1) + "o")
+        self.assertEqual(h["errors"], {})
+        self.assertEqual(h["since"], START)  # lost: oldest day still in the window
+        self.assertEqual(site_health.record(["x"], {}, {"u": "o"}, ["u"], NOW)["since"], "2026-10-30")
+
+    def test_clock_behind_keeps_history(self):
+        future = {"start": "2027-01-01", "since": "2026-12-01", "feeds": {"u": "o" * WINDOW_DAYS}, "errors": {}}
+        self.assertEqual(site_health.record(future, {}, {"u": "f"}, ["u"], NOW), future)
+
 
 class Availability(unittest.TestCase):
     def test_collection_days_left_out(self):

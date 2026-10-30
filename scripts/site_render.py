@@ -285,10 +285,8 @@ def _percent(ratio):
 
 def _health_row(row, dates, s, tag=""):
     feed, sub, days, error = row["feed"], row["sub"], row["days"], row["error"]
-    cells = "".join(
-        '<i class="d-o"></i>' if c == "o"
-        else f'<i class="d-{e(c)}" title="{e(d.isoformat())} · {e(s["health_state_" + c])}"></i>'
-        for c, d in zip(days, dates))
+    cells = "".join(f'<i class="d-{e(c)}" title="{e(d.isoformat())} · {e(s["health_state_" + c])}"></i>'
+                    for c, d in zip(days, dates))
     err = ""
     if error:
         when = _time(error.get("date"))
