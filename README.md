@@ -47,6 +47,7 @@ The goal is to help professionals, researchers, and enthusiasts stay up to date 
   - `build_site.py` &mdash; builds the static website (English and French) from the watchlist and the latest articles of its feeds
   - `feed_items.py` &mdash; fetches and parses the latest articles of a feed (RSS/Atom) for the website
   - `site_data.py` &mdash; loads the watchlist and the feed descriptions, merges feed state with the previous build and selects recent news
+  - `site_changes.py` &mdash; lists the feed changes and their reason from the git history, for the website's Changes page
   - `site_render.py` &mdash; renders the website pages from the data
 - `site/` &mdash; website content: `descriptions.json` (a short English and French description for every feed), `strings.json` (interface texts) and `static/` (styles and scripts)
 - `tests/` &mdash; unit tests of the scripts (`python3 -m unittest discover -s tests`)
@@ -166,6 +167,7 @@ If you want to add new feeds or suggest improvements:
 - Update the xml file (`infosec-intelligence-watchlist.xml` is the only file to edit): keep two folder levels and feeds sorted alphabetically
 - Don't edit the `opml/` files or the generated parts of this README: they are regenerated automatically once your change is merged
 - For a new feed, also add its English and French descriptions to `site/descriptions.json` (the website build lists the feeds that are missing)
+- In the commit message, give the reason for each feed you add, remove, move or fix with one line per feed, `- <feed URL>: <reason>` (e.g. `- https://example.com/feed: dead feed, replaced by https://example.com/rss`). The website's Changes page shows it next to the change; without such a line it shows the commit's subject line
 - Submit a pull request with a description
 
 Maintained by [ArmorIntel](https://github.com/ArmorIntel/).

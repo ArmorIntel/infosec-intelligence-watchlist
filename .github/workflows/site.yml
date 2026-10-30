@@ -19,6 +19,7 @@ on:
       - "scripts/site_*.py"
       - "scripts/feed_items.py"
       - "scripts/check_feeds.py"
+      - "scripts/changelog.py"
   workflow_dispatch:
 
 permissions:
@@ -36,6 +37,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # full history, for the Changes page
 
       - uses: actions/setup-python@v7
         with:

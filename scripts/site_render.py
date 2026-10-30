@@ -8,12 +8,13 @@ All internal links are relative, so the site works under any sub-path.
 import html
 import json
 import shutil
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import quote, urlsplit
 
 import site_data
 from build_category_opml import RAW_BASE
+from changelog import norm
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "site" / "static"
 WATCHLIST_FILE = "infosec-intelligence-watchlist.xml"
@@ -21,6 +22,7 @@ REPO_URL = "https://github.com/ArmorIntel/infosec-intelligence-watchlist"
 CREDIT_URL = "https://github.com/ArmorIntel"
 LANGS = ("en", "fr")
 LANG_PREFIX = {"en": "", "fr": "fr/"}
+NEW_DAYS = 30  # feeds added more recently than this get a "New" badge
 
 RATE_TEXT = {
     "en": ("~{n} posts/week", "~{n} posts/month", "Rarely updated"),
@@ -137,7 +139,8 @@ def _card(feed, cat, sub, ctx):
     search = " ".join(filter(None, [feed["title"], entry.get("en"), entry.get("fr"),
                                     cat["name"], sub["name"]])).lower()
     st = ctx["state"].get(url) or site_data.EMPTY_STATE
-    parts = [f'<h3>{_link(feed["html"], feed["title"])}</h3>']
+    badge = f' <span class="badge">{e(s["badge_new"])}</span>' if norm(url) in ctx["new_feeds"] else ""
+    parts = [f'<h3>{_link(feed["html"], feed["title"])}{badge}</h3>']
     text = entry.get(lang) or ""
     if text:
         parts.append(f'<p class="desc">{e(text)}</p>')
@@ -229,6 +232,38 @@ def page_news(ctx):
 """
 
 
+def page_changes(ctx):
+    s = ctx["s"]
+    days = {}
+    for c in ctx["changes"]:
+        dt = site_data._parse(c.get("date"))
+        days.setdefault(dt.astimezone(timezone.utc).strftime("%Y-%m-%d") if dt else "", []).append(c)
+    sections = []
+    for day, rows in days.items():
+        lis = []
+        for c in rows:
+            kind = c.get("kind")
+            parts = [f'<span class="kind kind-{e(kind)}">{e(s.get("change_" + str(kind), kind))}</span>',
+                     f'<strong class="title">{e(c.get("title"))}</strong>',
+                     f'<span class="folder">{e(c.get("folder"))}</span>']
+            if c.get("previous_folder"):
+                parts.append(f'<span class="from">{e(s["changes_from"].replace("{folder}", c["previous_folder"]))}</span>')
+            commit = str(c.get("commit") or "")
+            link = (f' <a class="commit" href="{e(REPO_URL)}/commit/{e(quote(commit))}" rel="noopener">'
+                    f'{e(s["changes_commit"])} <code>{e(commit[:7])}</code></a>') if commit else ""
+            lis.append(f'    <li class="change">\n      <p class="what">{" ".join(parts)}</p>\n'
+                       f'      <p class="reason">{e(c.get("reason"))}{link}</p>\n    </li>')
+        heading = f'<time datetime="{e(day)}">{e(day)}</time>' if day else e(s["changes_undated"])
+        sections.append(f'<section class="day">\n  <h2>{heading}</h2>\n  <ul class="changes">\n'
+                        + "\n".join(lis) + "\n  </ul>\n</section>")
+    body = "\n".join(sections) if sections else f'<p class="empty">{e(s["changes_empty"])}</p>'
+    return f"""
+<h1>{e(s["title_changes"])}</h1>
+<p class="lead">{e(s["changes_intro"])}</p>
+{body}
+"""
+
+
 def _short(value):
     dt = site_data._parse(value)
     return dt.strftime("%Y-%m-%d %H:%M UTC") if dt else None
@@ -240,6 +275,7 @@ PAGES = [
     ("home", "", "title_home", page_home),
     ("catalogue", "catalogue/", "title_catalogue", page_catalogue),
     ("news", "news/", "title_news", page_news),
+    ("changes", "changes/", "title_changes", page_changes),
 ]
 
 
@@ -292,8 +328,21 @@ def _layout(ctx, key, path, title_key, body):
 """
 
 
-def render_site(watchlist, descriptions, state, strings, out_dir: Path, now: datetime) -> None:
+def new_feeds(changes, now):
+    """Normalised URLs of the feeds added in the last NEW_DAYS days."""
+    out = set()
+    for c in changes:
+        dt = site_data._parse(c.get("date"))
+        if c.get("kind") == "added" and dt and now - dt <= timedelta(days=NEW_DAYS):
+            out.add(norm(c["url"]))
+    return out
+
+
+def render_site(watchlist, descriptions, state, strings, out_dir: Path, now: datetime, changes=None) -> None:
+    """`changes`: feed changes, newest first, as returned by site_changes.collect_changes."""
     out_dir = Path(out_dir)
+    changes = changes or []
+    fresh = new_feeds(changes, now)
     for lang in LANGS:
         for key, path, title_key, render in PAGES:
             depth = (LANG_PREFIX[lang] + path).count("/")
@@ -302,7 +351,7 @@ def render_site(watchlist, descriptions, state, strings, out_dir: Path, now: dat
                 "lang": lang, "s": strings[lang], "root": root,
                 "lang_root": (root + LANG_PREFIX[lang]) or "./",
                 "watchlist": watchlist, "descriptions": descriptions,
-                "state": state, "now": now,
+                "state": state, "now": now, "changes": changes, "new_feeds": fresh,
             }
             target = out_dir / LANG_PREFIX[lang] / path / "index.html"
             target.parent.mkdir(parents=True, exist_ok=True)

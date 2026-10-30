@@ -2,7 +2,9 @@
 """Build the static website from the watchlist.
 
 Every feed is fetched (items are kept for the news pages), merged with the
-state of the previous deploy, and the pages are rendered into --out. If more
+state of the previous deploy, and the pages are rendered into --out. The
+Changes page comes from the git history of the watchlist (last 12 months); without
+a full history it is rendered empty, with a warning. If more
 than --max-failure-ratio of the feeds fail, nothing is written and the exit
 code is 1, so a broken run never replaces a good deploy.
 
@@ -21,10 +23,11 @@ import time
 import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import feed_items
+import site_changes
 import site_data
 import site_render
 
@@ -93,6 +96,15 @@ def report(missing, failures, total):
             f.write(text + "\n")
 
 
+def load_changes(now):
+    """Feed changes of the last 12 months; [] with a warning when git history is unavailable."""
+    try:
+        return site_changes.collect_changes(ROOT, now - timedelta(days=365))
+    except Exception as e:  # never fail the build for the Changes page
+        print(f"Warning: Changes page left empty, git history unavailable: {e}", file=sys.stderr)
+        return []
+
+
 def copy_downloads(out):
     shutil.copy2(SOURCE, out / SOURCE.name)
     target = out / "opml"
@@ -144,7 +156,7 @@ def main(argv=None):
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     strings = json.loads(STRINGS.read_text(encoding="utf-8"))
-    site_render.render_site(watchlist, descriptions, state, strings, out, now)
+    site_render.render_site(watchlist, descriptions, state, strings, out, now, changes=load_changes(now))
     (out / "data.json").write_text(
         json.dumps({"generated": now.isoformat(), "feeds": state}, ensure_ascii=False), encoding="utf-8")
     copy_downloads(out)

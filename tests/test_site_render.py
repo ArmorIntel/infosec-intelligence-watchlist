@@ -58,13 +58,27 @@ def fixture():
     return wl, descriptions, state, strings
 
 
+def change(kind, days_ago, url, title, reason, folder="Threat Intelligence > Security News", previous=None):
+    return {"date": iso(days_ago), "commit": "0123456789abcdef", "subject": "Subject", "kind": kind,
+            "title": title, "folder": folder, "previous_folder": previous, "url": url, "reason": reason}
+
+
+CHANGES = [
+    change("added", 10, "https://www.B.com/feed/", "Feed B", "Great " + XSS),
+    change("moved", 10, "https://a.com/feed?x=1&y=2", XSS, "Better folder",
+           folder="Threat Intelligence > Security News", previous="Technology Intelligence > AI"),
+    change("added", 40, "https://c.com/feed", "Feed C", "Old addition"),
+    change("removed", 41, "https://gone.com/feed", "Gone feed", "nothing published for 25 months"),
+]
+
+
 class RenderTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tmp = tempfile.TemporaryDirectory()
         cls.out = Path(cls.tmp.name)
         wl, desc, state, strings = fixture()
-        site_render.render_site(wl, desc, state, strings, cls.out, NOW)
+        site_render.render_site(wl, desc, state, strings, cls.out, NOW, changes=CHANGES)
 
     @classmethod
     def tearDownClass(cls):
@@ -74,8 +88,8 @@ class RenderTest(unittest.TestCase):
         return (self.out / rel).read_text(encoding="utf-8")
 
     def test_pages_exist(self):
-        for rel in ["index.html", "catalogue/index.html", "news/index.html",
-                    "fr/index.html", "fr/catalogue/index.html", "fr/news/index.html",
+        for rel in ["index.html", "catalogue/index.html", "news/index.html", "changes/index.html",
+                    "fr/index.html", "fr/catalogue/index.html", "fr/news/index.html", "fr/changes/index.html",
                     "static/app.js", "static/style.css"]:
             self.assertTrue((self.out / rel).is_file(), rel)
 
@@ -89,6 +103,8 @@ class RenderTest(unittest.TestCase):
             "fr/index.html": 'hreflang="en" href="../"',
             "fr/catalogue/index.html": 'hreflang="en" href="../../catalogue/"',
             "fr/news/index.html": 'hreflang="en" href="../../news/"',
+            "changes/index.html": 'hreflang="fr" href="../fr/changes/"',
+            "fr/changes/index.html": 'hreflang="en" href="../../changes/"',
         }
         for rel, needle in cases.items():
             html = self.page(rel)
@@ -184,6 +200,47 @@ class RenderTest(unittest.TestCase):
             self.assertIn('href="https://github.com/ArmorIntel/infosec-intelligence-watchlist"', footer)
             self.assertIn(f'<time datetime="{NOW.isoformat()}"', footer)
         self.assertIn("Created and maintained by", self.page("index.html"))
+
+    def test_changes_page(self):
+        html = self.page("changes/index.html")
+        self.assertNotIn(XSS, html)
+        self.assertIn("Great &lt;script&gt;alert(1)&lt;/script&gt;", html)
+        self.assertIn('href="https://github.com/ArmorIntel/infosec-intelligence-watchlist/commit/0123456789abcdef"', html)
+        self.assertIn("Technology Intelligence &gt; AI", html)  # previous folder of the move
+        self.assertIn("nothing published for 25 months", html)
+        self.assertIn('aria-current="page">Changes<', html)
+        # grouped by date, newest first
+        d10, d40 = iso(10)[:10], iso(40)[:10]
+        self.assertEqual(html.count(f'<h2><time datetime="{d10}">'), 1)
+        self.assertLess(html.index(d10), html.index(d40))
+        fr = self.page("fr/changes/index.html")
+        self.assertIn('<html lang="fr">', fr)
+        self.assertIn("Great &lt;script&gt;alert(1)&lt;/script&gt;", fr)  # reasons as written
+        self.assertIn("Threat Intelligence &gt; Security News", fr)
+        self.assertIn(">Modifications<", fr)
+
+    def test_changes_empty(self):
+        wl, desc, state, strings = fixture()
+        with tempfile.TemporaryDirectory() as d:
+            site_render.render_site(wl, desc, state, strings, Path(d), NOW)
+            html = (Path(d) / "changes/index.html").read_text(encoding="utf-8")
+        self.assertIn(strings["en"]["changes_empty"], html)
+
+    def card(self, rel, needle):
+        html = self.page(rel)
+        start = html.rindex("<article", 0, html.index(needle))
+        return html[start:html.index("</article>", start)]
+
+    def test_new_badge(self):
+        self.assertIn('class="badge"', self.card("catalogue/index.html", "https://b.com/feed"))
+        self.assertIn(">New<", self.card("catalogue/index.html", "https://b.com/feed"))
+        self.assertIn(">Nouveau<", self.card("fr/catalogue/index.html", "https://b.com/feed"))
+        self.assertNotIn('class="badge"', self.card("catalogue/index.html", "https://c.com/feed"))
+        self.assertNotIn('class="badge"', self.card("catalogue/index.html", "https://a.com/feed?x=1&amp;y=2"))
+
+    def test_strings_keys_match(self):
+        strings = fixture()[3]
+        self.assertEqual(set(strings["en"]), set(strings["fr"]))
 
     def test_home_counts(self):
         html = self.page("index.html")

@@ -6,12 +6,14 @@ import tempfile
 import threading
 import unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
 import build_site  # noqa: E402
+import site_changes  # noqa: E402
 import feed_items  # noqa: E402
 
 OPML = """<?xml version="1.0"?>
@@ -121,6 +123,30 @@ class BuildTest(unittest.TestCase):
                 code = self.run_main(*args)
             data = json.loads((out / "data.json").read_text(encoding="utf-8")) if (out / "data.json").exists() else None
             return code, data
+
+    def test_build_passes_changes(self):
+        fake_changes = [{"date": "2026-10-29T10:00:00+00:00", "commit": "abc1234", "subject": "S", "kind": "added",
+                         "title": "Unique change title", "folder": "X > Y", "previous_folder": None,
+                         "url": "https://x.com/feed", "reason": "why"}]
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch.object(site_changes, "collect_changes", return_value=fake_changes) as collect:
+            out = Path(tmp) / "out"
+            self.assertEqual(self.run_main("--offline", "--out", str(out)), 0)
+            self.assertIn("Unique change title", (out / "changes" / "index.html").read_text(encoding="utf-8"))
+        repo, since = collect.call_args[0]
+        self.assertEqual(repo, build_site.ROOT)
+        self.assertAlmostEqual((datetime.now(timezone.utc) - since).days, 365, delta=1)
+
+    def test_build_without_git_history(self):
+        err = io.StringIO()
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch.object(site_changes, "collect_changes",
+                                  side_effect=site_changes.HistoryUnavailable("shallow clone")), \
+                contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+            out = Path(tmp) / "out"
+            self.assertEqual(build_site.main(["--offline", "--out", str(out)]), 0)
+            self.assertTrue((out / "changes" / "index.html").exists())
+        self.assertIn("shallow clone", err.getvalue())
 
     def test_build_fetches_all_feeds(self):
         code, data = self.build(lambda url, timeout: {"status": "ok", "items": []})

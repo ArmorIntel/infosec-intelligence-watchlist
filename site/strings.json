@@ -45,7 +45,19 @@
     "news_empty": "No article in the last 7 days.",
     "footer_credit": "Created and maintained by",
     "footer_repo": "Source on GitHub",
-    "footer_built": "Last build:"
+    "footer_built": "Last build:",
+    "nav_changes": "Changes",
+    "title_changes": "Changes",
+    "changes_intro": "Feeds added, removed, moved to another folder or given a new URL in the last 12 months, newest first, with the reason for each change.",
+    "changes_empty": "No change to the feeds in the last 12 months.",
+    "changes_undated": "Undated",
+    "change_added": "Added",
+    "change_removed": "Removed",
+    "change_moved": "Moved",
+    "change_updated": "URL updated",
+    "changes_from": "from {folder}",
+    "changes_commit": "Commit",
+    "badge_new": "New"
   },
   "fr": {
     "skip": "Aller au contenu",
@@ -93,6 +105,18 @@
     "news_empty": "Aucun article ces 7 derniers jours.",
     "footer_credit": "Créé et maintenu par",
     "footer_repo": "Code source sur GitHub",
-    "footer_built": "Dernière génération :"
+    "footer_built": "Dernière génération :",
+    "nav_changes": "Modifications",
+    "title_changes": "Modifications",
+    "changes_intro": "Flux ajoutés, retirés, déplacés dans un autre dossier ou dont l'URL a changé ces 12 derniers mois, du plus récent au plus ancien, avec la raison de chaque modification.",
+    "changes_empty": "Aucune modification des flux ces 12 derniers mois.",
+    "changes_undated": "Sans date",
+    "change_added": "Ajouté",
+    "change_removed": "Retiré",
+    "change_moved": "Déplacé",
+    "change_updated": "URL mise à jour",
+    "changes_from": "depuis {folder}",
+    "changes_commit": "Commit",
+    "badge_new": "Nouveau"
   }
 }

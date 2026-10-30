@@ -81,7 +81,7 @@ jobs:
       - name: Look for automatic fixes
         run: |
           python3 scripts/autofix_feeds.py --json results.json --pr-body pr.md \
-            --persist-months "$PERSIST_MONTHS"
+            --commit-message commit.txt --persist-months "$PERSIST_MONTHS"
 
       - name: Open or update the fix pull request
         env:
@@ -98,7 +98,7 @@ jobs:
           python3 scripts/validate_opml.py
           git switch -q -c "$FIX_BRANCH"
           git add infosec-intelligence-watchlist.xml scripts/feed-exceptions.txt
-          git commit -q -m "Fix dead and abandoned feeds (automatic, $(date -u +%Y-%m))"
+          git commit -q -F commit.txt
           git push -q -f origin "HEAD:refs/heads/$FIX_BRANCH"
           title="Feed fixes - $(date -u +%Y-%m)"
           if [ -n "$existing" ]; then

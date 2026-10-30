@@ -81,3 +81,58 @@ UNDATED_RSS = b"""<?xml version="1.0" encoding="UTF-8"?>
   <item><title>Undated</title><link>https://example.com/u</link></item>
 </channel></rss>
 """
+
+
+def git_repo(path, commits):
+    """Create a git repository at `path` with one commit per (xml, message, date).
+
+    The watchlist file is written with `xml` (None deletes it) before each commit.
+    Global and system git config are ignored so the user's settings never interfere.
+    """
+    import os
+    import subprocess
+    from pathlib import Path
+
+    path = Path(path)
+    env = {**os.environ, "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1",
+           "GIT_AUTHOR_NAME": "Test", "GIT_AUTHOR_EMAIL": "test@example.com",
+           "GIT_COMMITTER_NAME": "Test", "GIT_COMMITTER_EMAIL": "test@example.com"}
+
+    def git(*args, **extra):
+        return subprocess.run(["git", "-C", str(path), *args], check=True, capture_output=True,
+                              env={**env, **extra}).stdout.decode()
+
+    git("init", "-q", "-b", "main")
+    shas = []
+    for xml, message, date in commits:
+        target = path / "infosec-intelligence-watchlist.xml"
+        if xml is None:
+            target.unlink()
+        else:
+            target.write_text(xml, encoding="utf-8")
+        git("add", "-A")
+        git("commit", "-q", "--allow-empty", "-m", message, GIT_AUTHOR_DATE=date, GIT_COMMITTER_DATE=date)
+        shas.append(git("rev-parse", "HEAD").strip())
+    return shas
+
+
+def opml(folders):
+    """Watchlist XML from {"Cat > Sub": [(title, url), ...]}."""
+    from xml.sax.saxutils import quoteattr
+
+    cats = {}
+    for key, feeds in folders.items():
+        cat, sub = key.split(" > ")
+        cats.setdefault(cat, {})[sub] = feeds
+    out = ['<?xml version="1.0"?>', '<opml version="2.0"><head><title>t</title></head><body>']
+    for cat, subs in cats.items():
+        out.append(f"  <outline text={quoteattr(cat)} title={quoteattr(cat)}>")
+        for sub, feeds in subs.items():
+            out.append(f"    <outline text={quoteattr(sub)} title={quoteattr(sub)}>")
+            for title, url in feeds:
+                out.append(f'      <outline type="rss" text={quoteattr(title)} title={quoteattr(title)} '
+                           f'xmlUrl={quoteattr(url)} htmlUrl="https://example.com"/>')
+            out.append("    </outline>")
+        out.append("  </outline>")
+    out.append("</body></opml>")
+    return "\n".join(out) + "\n"
