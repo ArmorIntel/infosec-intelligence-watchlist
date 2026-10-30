@@ -19,7 +19,10 @@ import site_health
 from build_category_opml import RAW_BASE
 from changelog import norm
 
-STATIC_DIR = Path(__file__).resolve().parent.parent / "site" / "static"
+SITE_DIR = Path(__file__).resolve().parent.parent / "site"
+STATIC_DIR = SITE_DIR / "static"
+TOOLS_FILE = SITE_DIR / "tools.json"  # RSS readers and automation tools shown on the home page
+LOGO_DIR = SITE_DIR / "logos"  # their logos, from Simple Icons (CC0), inlined in the page
 WATCHLIST_FILE = "infosec-intelligence-watchlist.xml"
 REPO_URL = "https://github.com/ArmorIntel/infosec-intelligence-watchlist"
 CREDIT_URL = "https://github.com/ArmorIntel"
@@ -153,6 +156,58 @@ def _hero(ctx, feeds, subs):
 </section>"""
 
 
+def _rich(text):
+    """Escape `text`, then turn **menu names** into <strong>."""
+    return re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", e(text))
+
+
+def _logo(tool):
+    svg = (LOGO_DIR / f"{tool['id']}.svg").read_text(encoding="utf-8").strip()
+    return svg.replace("<svg ", f'<svg aria-hidden="true" focusable="false" fill="{e(tool["color"])}" ', 1)
+
+
+def _tool_card(tool, ctx):
+    s, lang = ctx["s"], ctx["lang"]
+    steps = "".join(f"<li>{_rich(step)}</li>" for step in tool["steps"][lang])
+    note = tool.get("note", {}).get(lang)
+    note = f'\n    <p class="note">{_rich(note)}</p>' if note else ""
+    return f"""  <article class="tool">
+    <header><span class="logo">{_logo(tool)}</span><div><h4>{e(tool["name"])}</h4><p class="kind">{e(tool["kind"][lang])}</p></div></header>
+    <ol>{steps}</ol>{note}
+    <p class="docs">{_link(tool["docs"], s["tools_docs"])} <span aria-hidden="true">↗</span></p>
+  </article>"""
+
+
+def _workflow(ctx):
+    s = ctx["s"]
+    points = "".join(f'<div><h3>{e(s[f"workflow_{i}_title"])}</h3><p>{e(s[f"workflow_{i}_text"])}</p></div>'
+                     for i in (1, 2, 3))
+    return f"""<section class="workflow" aria-labelledby="workflow">
+  <h2 id="workflow">{e(s["workflow_title"])}</h2>
+  <p class="lead">{e(s["workflow_intro"])}</p>
+  <div class="points">{points}</div>
+</section>"""
+
+
+def _tools(ctx):
+    s = ctx["s"]
+    tools = json.loads(TOOLS_FILE.read_text(encoding="utf-8"))
+    groups = []
+    for key in ("readers", "automation"):
+        cards = "\n".join(_tool_card(t, ctx) for t in tools[key])
+        groups.append(f"""<h3>{e(s[f"tools_{key}"])}</h3>
+<p class="group-intro">{e(s[f"tools_{key}_text"])}</p>
+<div class="tools">
+{cards}
+</div>""")
+    return f"""<section class="howto" aria-labelledby="tools">
+  <h2 id="tools">{e(s["tools_title"])}</h2>
+  <p class="lead">{e(s["tools_intro"])}</p>
+  {"".join(groups)}
+  <p class="credits">{e(s["tools_credits"])}</p>
+</section>"""
+
+
 def page_home(ctx):
     s, root = ctx["s"], ctx["root"]
     feeds = sum(len(sub["feeds"]) for cat in ctx["watchlist"] for sub in cat["subcategories"])
@@ -160,8 +215,9 @@ def page_home(ctx):
     raw = f"{RAW_BASE}/{WATCHLIST_FILE}"
     lang_root = ctx["lang_root"]
     return f"""{_hero(ctx, feeds, subs)}
+<p class="lead intro">{e(s["home_intro"])}</p>
+{_workflow(ctx)}
 <section aria-labelledby="subscribe">
-  <p class="lead intro">{e(s["home_intro"])}</p>
   <h2 id="subscribe">{e(s["home_subscribe"])}</h2>
   <div class="ways">
     <div class="way">
@@ -182,9 +238,9 @@ def page_home(ctx):
       <p class="actions"><a class="btn" href="{e(lang_root)}catalogue/">{e(s["home_browse"])}</a></p>
     </div>
   </div>
-  <p class="tip">{e(s["home_tip"])}</p>
-  <p><a href="{e(lang_root)}news/">{e(s["home_news"])}</a></p>
 </section>
+{_tools(ctx)}
+<p><a href="{e(lang_root)}news/">{e(s["home_news"])}</a></p>
 """
 
 

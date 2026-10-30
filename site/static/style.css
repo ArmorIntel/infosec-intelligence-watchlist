@@ -132,7 +132,30 @@ h3 { font-size: 1.05rem; margin: 0 0 0.4rem; }
 .ways { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 16px 0; }
 .way { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; background: var(--surface); }
 .way .url { color: var(--muted); }
-.tip { max-width: 70ch; padding: 12px 16px; border-left: 3px solid var(--accent); background: var(--bg-soft); }
+
+/* How the watchlist fits a watch process, and how to add it to common tools. */
+.workflow, .howto { margin: 48px 0; }
+.workflow .points { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 20px; counter-reset: point; }
+.workflow .points div { padding: 18px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.workflow .points div::before {
+  counter-increment: point; content: "0" counter(point); display: block; margin-bottom: 10px;
+  font: 600 12px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0.08em; color: var(--accent);
+}
+.workflow .points p { margin: 0; color: var(--muted); }
+.howto h3 { margin-top: 32px; }
+.group-intro { max-width: 70ch; margin: 0 0 14px; color: var(--muted); }
+.tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.tool { display: flex; flex-direction: column; padding: 16px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); transition: border-color 0.2s, box-shadow 0.2s; }
+.tool header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.tool .logo { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: 10px; background: #ffffff; box-shadow: 0 0 0 1px var(--border); }
+.tool .logo svg { width: 26px; height: 26px; }
+.tool h4 { margin: 0; font-size: 1.05rem; }
+.tool .kind { margin: 0; font-size: 0.8rem; color: var(--muted); }
+.tool ol { margin: 0 0 10px; padding-left: 20px; font-size: 0.92rem; }
+.tool li { margin: 5px 0; }
+.tool .note { margin: 0 0 10px; padding: 8px 10px; font-size: 0.85rem; border-left: 3px solid var(--accent); background: var(--bg-soft); }
+.tool .docs { margin: auto 0 0; padding-top: 6px; font-size: 0.9rem; font-weight: 600; }
+.credits { margin-top: 16px; font-size: 0.8rem; color: var(--muted); }
 
 /* Catalogue */
 .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 32px; align-items: start; }
@@ -154,7 +177,7 @@ h3 { font-size: 1.05rem; margin: 0 0 0.4rem; }
 .category > .desc { max-width: 70ch; }
 .cards { display: grid; gap: 12px; margin-top: 16px; }
 .card { border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; background: var(--surface); transition: border-color 0.2s, box-shadow 0.2s; }
-.card:hover, .way:hover, .change:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); box-shadow: 0 8px 28px color-mix(in srgb, var(--accent) 12%, transparent); }
+.card:hover, .way:hover, .change:hover, .tool:hover, .workflow .points div:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); box-shadow: 0 8px 28px color-mix(in srgb, var(--accent) 12%, transparent); }
 .card p { margin: 6px 0; }
 .card .latest, .card .rate, .card .url { font-size: 0.9rem; }
 .card .label, .card .rate, .card .url, .card time { color: var(--muted); }

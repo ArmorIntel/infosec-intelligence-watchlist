@@ -300,6 +300,27 @@ class RenderTest(unittest.TestCase):
         self.assertIn(">3<", html)  # feeds
         self.assertIn(">2<", html)  # subcategories
 
+    def test_home_tools(self):
+        html = self.page("index.html")
+        self.assertIn('<h2 id="workflow">Plug it into your watch</h2>', html)
+        tools = html[html.index('<section class="howto"'):]
+        self.assertIn("<h4>Inoreader</h4>", tools)
+        self.assertIn('<svg aria-hidden="true" focusable="false" fill="#1875F3"', tools)  # inlined logo
+        self.assertIn("<strong>Add feed › Import feeds</strong>", tools)
+        self.assertIn('href="https://docs.feedly.com/article/51-how-to-import-opml-into-feedly"', tools)
+        self.assertIn("Documentation officielle", self.page("fr/index.html"))
+
+    def test_tools_file_complete(self):
+        tools = json.loads(site_render.TOOLS_FILE.read_text(encoding="utf-8"))
+        for tool in tools["readers"] + tools["automation"]:
+            self.assertTrue((site_render.LOGO_DIR / f"{tool['id']}.svg").is_file(), tool["id"])
+            self.assertTrue(tool["docs"].startswith("https://"), tool["id"])
+            for lang in ("en", "fr"):
+                self.assertTrue(tool["kind"][lang] and tool["steps"][lang], (tool["id"], lang))
+            self.assertEqual(len(tool["steps"]["en"]), len(tool["steps"]["fr"]), tool["id"])
+            if "note" in tool:
+                self.assertEqual(set(tool["note"]), {"en", "fr"}, tool["id"])
+
     def test_home_hero(self):
         html = self.page("index.html")
         s = self.strings_en()

@@ -1,0 +1,149 @@
+{
+  "readers": [
+    {
+      "id": "inoreader",
+      "name": "Inoreader",
+      "color": "#1875F3",
+      "docs": "https://www.inoreader.com/blog/2014/05/opml-subscriptions.html",
+      "kind": {"en": "Web and mobile reader", "fr": "Lecteur web et mobile"},
+      "steps": {
+        "en": [
+          "To import once: **Add feed › Import feeds**, choose the OPML file, then **Import file**.",
+          "To stay in sync: **Automate › OPML subscriptions › New OPML subscription**, paste the OPML URL and pick **Full synchronization**."
+        ],
+        "fr": [
+          "Import ponctuel : **Add feed › Import feeds**, choisissez le fichier OPML, puis **Import file**.",
+          "Synchronisation : **Automate › OPML subscriptions › New OPML subscription**, collez l'URL de l'OPML et choisissez **Full synchronization**."
+        ]
+      },
+      "note": {
+        "en": "The free plan is limited to 150 feeds: import a category file instead of the whole list.",
+        "fr": "L'offre gratuite est limitée à 150 flux : importez plutôt le fichier d'une catégorie."
+      }
+    },
+    {
+      "id": "feedly",
+      "name": "Feedly",
+      "color": "#2BB24C",
+      "docs": "https://docs.feedly.com/article/51-how-to-import-opml-into-feedly",
+      "kind": {"en": "Web and mobile reader", "fr": "Lecteur web et mobile"},
+      "steps": {
+        "en": [
+          "Sign in on feedly.com: the import works in the web app only.",
+          "Open **feedly.com/i/cortex**.",
+          "Click **Choose OPML file** or drop the file: feeds and categories are added."
+        ],
+        "fr": [
+          "Connectez-vous sur feedly.com : l'import ne fonctionne que dans l'application web.",
+          "Ouvrez **feedly.com/i/cortex**.",
+          "Cliquez sur **Choose OPML file** ou déposez le fichier : les flux et les catégories sont ajoutés."
+        ]
+      },
+      "note": {
+        "en": "Feedly imports a copy: download the file again to pick up later changes to the list.",
+        "fr": "Feedly importe une copie : téléchargez à nouveau le fichier pour récupérer les évolutions de la liste."
+      }
+    },
+    {
+      "id": "thunderbird",
+      "name": "Thunderbird",
+      "color": "#0A84FF",
+      "docs": "https://support.mozilla.org/kb/how-subscribe-news-feeds-and-blogs",
+      "kind": {"en": "Desktop reader and email client", "fr": "Lecteur de bureau et client mail"},
+      "steps": {
+        "en": [
+          "If you have no feed account yet: **File › New › Feed Account**.",
+          "Select the feed account in the folder pane, then **Manage feed subscriptions**.",
+          "Click **Import** and choose the OPML file."
+        ],
+        "fr": [
+          "Si vous n'avez pas encore de compte de flux : **Fichier › Nouveau › Compte de flux**.",
+          "Sélectionnez ce compte dans le volet des dossiers, puis **Gérer les abonnements**.",
+          "Cliquez sur **Importer** et choisissez le fichier OPML."
+        ]
+      }
+    },
+    {
+      "id": "freshrss",
+      "name": "FreshRSS",
+      "color": "#0062BE",
+      "docs": "https://freshrss.github.io/FreshRSS/en/users/04_Subscriptions.html",
+      "kind": {"en": "Self-hosted reader", "fr": "Lecteur auto-hébergé"},
+      "steps": {
+        "en": [
+          "Open **Subscription management › Import / export**.",
+          "Click **Browse**, choose the OPML file, then **Import**.",
+          "To stay in sync, set the OPML URL as a category's **dynamic OPML** (FreshRSS 1.20 and later)."
+        ],
+        "fr": [
+          "Ouvrez **Gestion des abonnements › Importer / exporter**.",
+          "Cliquez sur **Parcourir**, choisissez le fichier OPML, puis **Importer**.",
+          "Pour rester synchronisé, indiquez l'URL de l'OPML comme **OPML dynamique** d'une catégorie (FreshRSS 1.20 et suivants)."
+        ]
+      }
+    }
+  ],
+  "automation": [
+    {
+      "id": "n8n",
+      "name": "n8n",
+      "color": "#EA4B71",
+      "docs": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.rssfeedreadtrigger/",
+      "kind": {"en": "Workflow automation, cloud or self-hosted", "fr": "Automatisation de workflows, cloud ou auto-hébergée"},
+      "steps": {
+        "en": [
+          "Add an **RSS Feed Trigger** node and paste a feed URL into **Feed URL**.",
+          "Connect it to the nodes of your process: Slack, Microsoft Teams, Jira, email…",
+          "Activate the workflow: each new article starts a run."
+        ],
+        "fr": [
+          "Ajoutez un nœud **RSS Feed Trigger** et collez l'URL d'un flux dans **Feed URL**.",
+          "Reliez-le aux nœuds de votre processus : Slack, Microsoft Teams, Jira, e-mail…",
+          "Activez le workflow : chaque nouvel article déclenche une exécution."
+        ]
+      }
+    },
+    {
+      "id": "zapier",
+      "name": "Zapier",
+      "color": "#FF4F00",
+      "docs": "https://help.zapier.com/hc/en-us/articles/8496279482125-Trigger-Zaps-from-new-RSS-feed-items",
+      "kind": {"en": "Workflow automation", "fr": "Automatisation de workflows"},
+      "steps": {
+        "en": [
+          "Create a Zap with **RSS by Zapier** as the trigger.",
+          "Pick **New Item in Feed** (or **New Items in Multiple Feeds**) and paste the feed URL.",
+          "Add the action your process needs: post to a channel, open a ticket, add a row…"
+        ],
+        "fr": [
+          "Créez un Zap avec **RSS by Zapier** comme déclencheur.",
+          "Choisissez **New Item in Feed** (ou **New Items in Multiple Feeds**) et collez l'URL du flux.",
+          "Ajoutez l'action dont votre processus a besoin : publier dans un canal, ouvrir un ticket, ajouter une ligne…"
+        ]
+      },
+      "note": {
+        "en": "Only articles published after the Zap is set up trigger it.",
+        "fr": "Seuls les articles publiés après la création du Zap le déclenchent."
+      }
+    },
+    {
+      "id": "make",
+      "name": "Make",
+      "color": "#6D00CC",
+      "docs": "https://apps.make.com/rss",
+      "kind": {"en": "Workflow automation", "fr": "Automatisation de workflows"},
+      "steps": {
+        "en": [
+          "Create a scenario starting with **RSS › Watch RSS Feed Items**.",
+          "Paste the feed URL into **URL** and set the maximum number of items per run.",
+          "Add the modules that send each article on to your tools."
+        ],
+        "fr": [
+          "Créez un scénario qui commence par **RSS › Watch RSS Feed Items**.",
+          "Collez l'URL du flux dans **URL** et fixez le nombre maximal d'articles par exécution.",
+          "Ajoutez les modules qui transmettent chaque article à vos outils."
+        ]
+      }
+    }
+  ]
+}
