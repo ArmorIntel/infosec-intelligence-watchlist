@@ -83,6 +83,20 @@
     showTab();
   }
 
+  // Health: filter the rows of every group by category.
+  if (page === "health") {
+    var picker = document.getElementById("health-cat");
+    if (picker) {
+      picker.parentNode.hidden = false;
+      picker.addEventListener("change", function () {
+        var cat = picker.value;
+        all("[data-cat]").forEach(function (row) {
+          row.hidden = !!cat && row.getAttribute("data-cat") !== cat;
+        });
+      });
+    }
+  }
+
   // Copy buttons.
   all("button.copy").forEach(function (btn) {
     var label = btn.textContent;

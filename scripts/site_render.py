@@ -5,6 +5,7 @@ the descriptions or the fetched feeds is escaped with `html.escape` at render
 time: titles may contain literal `<` or `&`, and must show as plain text.
 All internal links are relative, so the site works under any sub-path.
 """
+import hashlib
 import html
 import json
 import shutil
@@ -13,6 +14,7 @@ from pathlib import Path
 from urllib.parse import quote, urlsplit
 
 import site_data
+import site_health
 from build_category_opml import RAW_BASE
 from changelog import norm
 
@@ -139,6 +141,9 @@ def _card(feed, cat, sub, ctx):
                                     cat["name"], sub["name"]])).lower()
     st = ctx["state"].get(url) or site_data.EMPTY_STATE
     badge = f' <span class="badge">{e(s["badge_new"])}</span>' if norm(url) in ctx["new_feeds"] else ""
+    if site_health.unstable(ctx["health"].get("feeds", {}).get(url, "")):
+        badge += (f' <a class="badge unstable" href="{e(ctx["lang_root"])}health/#{feed_anchor(url)}"'
+                  f' title="{e(s["badge_unstable_title"])}">{e(s["badge_unstable"])}</a>')
     parts = [f'<h3>{_link(feed["html"], feed["title"])}{badge}</h3>']
     text = entry.get(lang) or ""
     if text:
@@ -269,6 +274,87 @@ def page_changes(ctx):
 """
 
 
+def feed_anchor(url):
+    """Stable id of a feed's row on the Health page."""
+    return "h-" + hashlib.sha1(url.encode("utf-8")).hexdigest()[:10]
+
+
+def _percent(ratio):
+    return "—" if ratio is None else f"{ratio * 100:.0f}%"
+
+
+def _health_row(row, dates, s, tag=""):
+    feed, sub, days, error = row["feed"], row["sub"], row["days"], row["error"]
+    cells = "".join(
+        '<i class="d-o"></i>' if c == "o"
+        else f'<i class="d-{e(c)}" title="{e(d.isoformat())} · {e(s["health_state_" + c])}"></i>'
+        for c, d in zip(days, dates))
+    err = ""
+    if error:
+        when = _time(error.get("date"))
+        err = (f'<p class="error"><span class="label">{e(s["health_last_error"])}</span> '
+               f'{e(error.get("error"))}{" (" + when + ")" if when else ""}</p>')
+    ratio = site_health.availability(days)[0]
+    cell = f'<span class="tag">{e(tag)}</span>' if tag else e(_percent(ratio))
+    return (f'    <tr id="{feed_anchor(feed["url"])}" data-cat="{e(sub["slug"])}">\n'
+            f'      <th scope="row">{_link(feed["html"] or feed["url"], feed["title"])}'
+            f' <span class="folder">{e(sub["name"])}</span>{err}</th>\n'
+            f'      <td><span class="cells" aria-hidden="true">{cells}</span></td>\n'
+            f'      <td class="avail">{cell}</td>\n    </tr>')
+
+
+def _health_table(rows, dates, s, tag=""):
+    body = "\n".join(_health_row(r, dates, s, tag) for r in rows)
+    return (f'<div class="health-scroll"><table class="health">\n  <thead><tr>'
+            f'<th scope="col">{e(s["health_col_feed"])}</th><th scope="col">{e(s["health_col_days"])}</th>'
+            f'<th scope="col">{e(s["health_col_availability"])}</th></tr></thead>\n'
+            f'  <tbody>\n{body}\n  </tbody>\n</table></div>')
+
+
+def page_health(ctx):
+    s, health = ctx["s"], ctx["health"]
+    dates = site_health.day_dates(health)
+    head = f'<h1>{e(s["title_health"])}</h1>\n<p class="lead">{e(s["health_intro"])}</p>\n'
+    if not dates or not health.get("feeds"):
+        return head + f'<p class="empty">{e(s["health_empty"])}</p>\n'
+    groups = {"incident": [], "collection": [], "clean": []}
+    for cat in ctx["watchlist"]:
+        for sub in cat["subcategories"]:
+            for feed in sub["feeds"]:
+                days = health["feeds"].get(feed["url"]) or "-" * len(dates)
+                group = site_health.summary(days)
+                row = {"feed": feed, "sub": sub, "days": days,
+                       "error": (health.get("errors") or {}).get(feed["url"])}
+                groups["clean" if group == "empty" else group].append(row)
+    groups["incident"].sort(key=lambda r: (site_health.availability(r["days"])[0], r["feed"]["title"].lower()))
+    for key in ("collection", "clean"):
+        groups[key].sort(key=lambda r: r["feed"]["title"].lower())
+
+    legend = "".join(f'<li><i class="d-{c}"></i> {e(s["health_state_" + c])}</li>' for c in "oifc-")
+    options = "".join(f'<option value="{e(sub["slug"])}">{e(sub["name"])}</option>'
+                      for cat in ctx["watchlist"] for sub in cat["subcategories"])
+    since = e(s["health_since"].replace("{date}", str(health.get("since") or "")))  # absolute on purpose
+    incidents = (_health_table(groups["incident"], dates, s) if groups["incident"]
+                 else f'<p class="empty">{e(s["health_incidents_none"])}</p>')
+    parts = [head, f'<p class="since">{since}</p>\n<ul class="legend">{legend}</ul>\n',
+             f'<p class="health-filter" hidden><label for="health-cat">{e(s["health_filter"])}</label> '
+             f'<select id="health-cat"><option value="">{e(s["health_filter_all"])}</option>{options}</select></p>\n',
+             f'<section class="health-group">\n<h2>{e(s["health_incidents"])}</h2>\n{incidents}\n</section>\n']
+    if groups["collection"]:
+        parts.append(f'<details class="health-group">\n<summary>'
+                     f'{e(plural(s, "health_collection", len(groups["collection"])))}</summary>\n'
+                     f'{_health_table(groups["collection"], dates, s, s["health_collection_tag"])}\n</details>\n')
+    if groups["clean"]:
+        lis = "\n".join(
+            f'  <li id="{feed_anchor(r["feed"]["url"])}" data-cat="{e(r["sub"]["slug"])}">'
+            f'{_link(r["feed"]["html"] or r["feed"]["url"], r["feed"]["title"])}'
+            f' <span class="folder">{e(r["sub"]["name"])}</span></li>' for r in groups["clean"])
+        parts.append(f'<details class="health-group">\n<summary>'
+                     f'{e(plural(s, "health_clean", len(groups["clean"])))}</summary>\n'
+                     f'<ul class="clean">\n{lis}\n</ul>\n</details>\n')
+    return "".join(parts)
+
+
 def _short(value):
     dt = site_data._parse(value)
     return dt.strftime("%Y-%m-%d %H:%M UTC") if dt else None
@@ -281,6 +367,7 @@ PAGES = [
     ("catalogue", "catalogue/", "title_catalogue", page_catalogue),
     ("news", "news/", "title_news", page_news),
     ("changes", "changes/", "title_changes", page_changes),
+    ("health", "health/", "title_health", page_health),
 ]
 
 
