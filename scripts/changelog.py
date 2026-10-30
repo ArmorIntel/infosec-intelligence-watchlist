@@ -28,6 +28,11 @@ def feeds_at(rev):
         data = subprocess.run(["git", "show", f"{rev}:{FILE}"], check=True, capture_output=True).stdout
     except subprocess.CalledProcessError:
         return {}
+    return parse_feeds(data)
+
+
+def parse_feeds(data):
+    """Return {normalised url: (title, folder)} for the watchlist XML `data`."""
     feeds = {}
 
     def walk(node, path):
@@ -40,6 +45,44 @@ def feeds_at(rev):
 
     walk(ET.fromstring(data).find("body"), [])
     return feeds
+
+
+def diff_feeds(old, new):
+    """Compare two `feeds_at` results.
+
+    Returns {"added": [new key], "removed": [old key], "moved": [(old key, new key)],
+    "updated": [(old key, new key)]}. A feed whose URL changed but kept its title (or,
+    failing that, the only old and new feed on the same host) is an URL update, not a
+    removal + addition; it is also "moved" when its folder changed.
+    """
+    gone, fresh = old.keys() - new.keys(), new.keys() - old.keys()
+    by_title = {}
+    # sorted iterations: the pairing must not depend on set order (hash seed)
+    for u in sorted(fresh):
+        by_title.setdefault(new[u][0].casefold(), []).append(u)
+    url_changed = {}
+    for u in sorted(gone):
+        candidates = by_title.get(old[u][0].casefold(), [])
+        if len(candidates) == 1:
+            url_changed[u] = candidates.pop()
+    gone -= url_changed.keys()
+    fresh -= set(url_changed.values())
+    # second pass: same website, only one candidate on each side
+    host = lambda u: u.split("/")[0]  # noqa: E731
+    for h in sorted({host(u) for u in gone}):
+        olds = [u for u in gone if host(u) == h]
+        news = [u for u in fresh if host(u) == h]
+        if len(olds) == 1 and len(news) == 1:
+            url_changed[olds[0]] = news[0]
+            gone.discard(olds[0])
+            fresh.discard(news[0])
+    pairs = [(u, u) for u in new.keys() & old.keys()] + list(url_changed.items())
+    return {
+        "added": sorted(fresh),
+        "removed": sorted(gone),
+        "moved": [(o, n) for o, n in pairs if old[o][1] != new[n][1]],
+        "updated": list(url_changed.items()),
+    }
 
 
 def section(title, rows):
@@ -64,33 +107,11 @@ def main():
     old, new = feeds_at(args.since), feeds_at(args.until)
     if not new:
         sys.exit(f"{FILE} not found at {args.until}")
-    gone, fresh = old.keys() - new.keys(), new.keys() - old.keys()
-    # a feed whose URL changed but kept its title is an update, not a removal + addition
-    by_title = {}
-    for u in fresh:
-        by_title.setdefault(new[u][0].casefold(), []).append(u)
-    url_changed = {}
-    for u in gone:
-        candidates = by_title.get(old[u][0].casefold(), [])
-        if len(candidates) == 1:
-            url_changed[u] = candidates.pop()
-    gone -= url_changed.keys()
-    fresh -= set(url_changed.values())
-    # second pass: same website, only one candidate on each side
-    host = lambda u: u.split("/")[0]  # noqa: E731
-    for h in {host(u) for u in gone}:
-        olds = [u for u in gone if host(u) == h]
-        news = [u for u in fresh if host(u) == h]
-        if len(olds) == 1 and len(news) == 1:
-            url_changed[olds[0]] = news[0]
-            gone.discard(olds[0])
-            fresh.discard(news[0])
-
-    added = [(new[u][1], new[u][0]) for u in fresh]
-    removed = [(old[u][1], old[u][0]) for u in gone]
-    pairs = [(u, u) for u in new.keys() & old.keys()] + list(url_changed.items())
-    moved = [(new[n][1], f"{new[n][0]} (from {old[o][1]})") for o, n in pairs if old[o][1] != new[n][1]]
-    updated = [(new[n][1], new[n][0]) for o, n in url_changed.items()]
+    d = diff_feeds(old, new)
+    added = [(new[u][1], new[u][0]) for u in d["added"]]
+    removed = [(old[u][1], old[u][0]) for u in d["removed"]]
+    moved = [(new[n][1], f"{new[n][0]} (from {old[o][1]})") for o, n in d["moved"]]
+    updated = [(new[n][1], new[n][0]) for o, n in d["updated"]]
 
     lines = [f"Watchlist changes since `{args.since}`: **{len(old)} → {len(new)} feeds** "
              f"({len(added)} added, {len(removed)} removed, {len(moved)} moved, {len(updated)} URL updates)."]

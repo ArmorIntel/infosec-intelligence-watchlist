@@ -9,11 +9,13 @@
 - abandoned feed (nothing published for more than 24 months): removed.
 
 The watchlist file is edited in place (one outline per line, so the diff stays
-minimal), the --json results are annotated with the fix of each feed, and a
-pull request description is written to --pr-body.
+minimal), the --json results are annotated with the fix of each feed, a
+pull request description is written to --pr-body and, with --commit-message, a
+commit message with one `- <feed URL>: <reason>` line per fix (shown on the
+website's Changes page).
 
 Usage:
-    python3 scripts/autofix_feeds.py --json results.json --pr-body pr.md
+    python3 scripts/autofix_feeds.py --json results.json --pr-body pr.md --commit-message commit.txt
 """
 import argparse
 import json
@@ -149,11 +151,28 @@ def drop_exceptions(path, urls):
         path.write_text("\n".join(kept), encoding="utf-8")
 
 
+def replaced_reason(new_url):
+    return f"dead feed, replaced by {new_url}"
+
+
+def abandoned_reason(latest, now):
+    months = (now - datetime.fromisoformat(latest)).days // 30
+    return f"nothing published for {months} months"
+
+
+def commit_message(fixes, now):
+    """Commit message for the fixes, a list of (feed URL, reason)."""
+    lines = [f"Fix dead and abandoned feeds (automatic, {now:%Y-%m})", ""]
+    lines += [f"- {url}: {reason}" for url, reason in fixes]
+    return "\n".join(lines) + "\n"
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--json", required=True, help="results of check_feeds.py --json (annotated in place)")
     p.add_argument("--opml", default=str(SOURCE))
     p.add_argument("--pr-body", required=True, help="where to write the pull request description")
+    p.add_argument("--commit-message", help="where to write the commit message of the fixes")
     p.add_argument("--max-age-days", type=int, default=183)
     p.add_argument("--timeout", type=int, default=20)
     p.add_argument("--persist-months", type=int, default=3,
@@ -163,7 +182,8 @@ def main():
     results = json.loads(Path(args.json).read_text(encoding="utf-8"))
     exceptions = load_exceptions(EXCEPTIONS)
     known = {norm(r["url"]) for r in results}
-    replacements, removals, body = {}, set(), []
+    replacements, removals, body, fixes = {}, set(), [], []
+    now = datetime.now(timezone.utc)
 
     for r in results:
         if r["url"] in exceptions and r["class"] != "abandoned":
@@ -175,6 +195,7 @@ def main():
                 replacements[r["url"]] = new_url
                 known.add(norm(new_url))
                 r["fix"] = f"URL replaced by {new_url}"
+                fixes.append((r["url"], replaced_reason(new_url)))
                 body.append(f"- **{r['title']}** ({r['folder']}): `{r['url']}` → `{new_url}` "
                             f"({r.get('error', 'dead')}; replacement has {res['items']} items, last on {res['latest'][:10]})")
                 print(f"replace {r['url']} -> {new_url}")
@@ -183,12 +204,15 @@ def main():
         elif r["class"] == "abandoned":
             removals.add(r["url"])
             r["fix"] = "Removed (abandoned)"
+            fixes.append((r["url"], abandoned_reason(r["latest"], now)))
             body.append(f"- **{r['title']}** ({r['folder']}): removed, last item on {r['latest'][:10]}")
             print(f"remove {r['url']}")
 
     Path(args.json).write_text(json.dumps(results, indent=1, ensure_ascii=False), encoding="utf-8")
     if not body:
         Path(args.pr_body).write_text("")
+        if args.commit_message:
+            Path(args.commit_message).write_text("")
         print("Nothing to fix automatically.")
         return 0
 
@@ -202,6 +226,8 @@ def main():
         "Check the replacements before merging: the new feed should be the same source. "
         "Close the pull request to reject the fixes; the next run proposes them again if the problem remains.",
     ]) + "\n", encoding="utf-8")
+    if args.commit_message:
+        Path(args.commit_message).write_text(commit_message(fixes, now), encoding="utf-8")
     print(f"{len(replacements)} replacement(s), {len(removals)} removal(s)")
     return 0
 

@@ -53,19 +53,20 @@ def render(title, date_modified, category, subcategory, feeds):
     return "\n".join(lines)
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--table", action="store_true", help="print the README subscription table")
-    parser.add_argument("--readme", action="store_true", help="rewrite the generated blocks of the README")
-    args = parser.parse_args()
+def write_category_files(source, out_dir):
+    """Write one OPML file per subcategory of the watchlist `source` under `out_dir`.
 
-    tree = ET.parse(SOURCE)
+    `out_dir` is emptied first. Returns (category, subcategory, feed count, path)
+    for every file written.
+    """
+    tree = ET.parse(source)
     head = tree.getroot().find("head")
     base_title = head.findtext("title", "Infosec intelligence watchlist")
     date_modified = head.findtext("dateModified")
 
-    if OUT_DIR.exists():
-        shutil.rmtree(OUT_DIR)
+    out_dir = Path(out_dir)
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
 
     rows = []
     for category in tree.getroot().find("body").findall("outline"):
@@ -75,11 +76,22 @@ def main():
             feeds = [o for o in sub.findall("outline") if o.get("xmlUrl")]
             if not feeds:
                 continue
-            path = OUT_DIR / slugify(cat_name) / f"{slugify(sub_name)}.opml"
+            path = out_dir / slugify(cat_name) / f"{slugify(sub_name)}.opml"
             path.parent.mkdir(parents=True, exist_ok=True)
             title = f"{base_title} - {cat_name} - {sub_name}"
             path.write_text(render(title, date_modified, cat_name, sub_name, feeds), encoding="utf-8")
-            rows.append((cat_name, sub_name, len(feeds), path.relative_to(ROOT).as_posix()))
+            rows.append((cat_name, sub_name, len(feeds), path))
+    return rows
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--table", action="store_true", help="print the README subscription table")
+    parser.add_argument("--readme", action="store_true", help="rewrite the generated blocks of the README")
+    args = parser.parse_args()
+
+    rows = [(cat, sub, count, path.relative_to(ROOT).as_posix())
+            for cat, sub, count, path in write_category_files(SOURCE, OUT_DIR)]
 
     print(f"Generated {len(rows)} files in {OUT_DIR.relative_to(ROOT)}/")
     table = render_table(rows)
