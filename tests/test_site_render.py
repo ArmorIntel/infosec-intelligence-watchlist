@@ -291,6 +291,17 @@ class RenderTest(unittest.TestCase):
         self.assertIn(">3<", html)  # feeds
         self.assertIn(">2<", html)  # subcategories
 
+    def test_home_hero(self):
+        html = self.page("index.html")
+        s = self.strings_en()
+        self.assertIn("<dt>Articles in 7 days</dt><dd>1</dd>", html)
+        self.assertNotIn(s["stat_up"], html)  # no health history in this fixture
+        ticker = html[html.index('class="intel-ticker"'):]
+        self.assertEqual(ticker.count('href="https://a.com/1"'), 2)  # list, then its copy for the loop
+        self.assertIn('<ul aria-hidden="true"><li><a tabindex="-1" href="https://a.com/1"', ticker)
+        self.assertNotIn("<script>alert", ticker)
+        self.assertIn(">Transformez le bruit<", self.page("fr/index.html"))
+
 
 A_URL = "https://a.com/feed?x=1&y=2"
 HEALTH = {
@@ -327,6 +338,10 @@ class HealthRenderTest(unittest.TestCase):
         self.assertIn('hreflang="fr" href="../fr/health/"', html)
         self.assertIn(">Santé des flux<", self.page("fr/health/index.html"))
         self.assertIn(">Health<", self.page("index.html"))
+
+    def test_home_up_share(self):
+        # Feeds A and C worked at the last build; B's collection issue is left out.
+        self.assertIn("<dt>Feeds up at last check</dt><dd>100%</dd>", self.page("index.html"))
 
     def test_groups_and_order(self):
         html = self.page("health/index.html")

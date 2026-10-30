@@ -4,6 +4,7 @@ Standard library only. `infosec-intelligence-watchlist.xml` stays the single
 source of truth; slugs and OPML paths match the ones generated in `opml/`.
 """
 import json
+import re
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -145,3 +146,41 @@ def news(watchlist, state, now):
             everything.extend(cands)
     result["all"] = _select(everything, NEWS_ALL, now)
     return result
+
+
+# The home page ticker shows cyber news only (AI Security included), in the
+# page's language. General AI press and automated alert feeds are left out:
+# they read as noise in a one-line headline ticker.
+TICKER_CATEGORY = "threat-intelligence"
+TICKER_EXCLUDED = {"alerts-and-monitoring"}
+TICKER_PER_FEED = 2  # so one busy feed can't fill the ticker
+
+_FR_WORDS = set("le la les des du une un pour est et dans sur avec par au aux pas qui que ses son sa ce cette plus".split())
+_EN_WORDS = set("the of and to for in on with is are from by how what new your this at".split())
+
+
+def feed_language(items):
+    """"fr" or "en", guessed from the item titles (feeds don't declare it reliably)."""
+    fr = en = 0
+    for it in items:
+        title = (it.get("title") or "").lower()
+        words = re.findall(r"[a-zà-ÿ]+", title)
+        fr += sum(w in _FR_WORDS for w in words) + 2 * len(re.findall(r"[éèêàçù]", title))
+        en += sum(w in _EN_WORDS for w in words)
+    return "fr" if fr > en else "en"
+
+
+def ticker(watchlist, state, now, lang, cap):
+    """The newest articles of the cyber feeds written in `lang`, at most
+    TICKER_PER_FEED per feed, newest first."""
+    cands = []
+    for cat in watchlist:
+        for sub in cat["subcategories"]:
+            if cat["slug"] != TICKER_CATEGORY or sub["slug"] in TICKER_EXCLUDED:
+                continue
+            for feed in sub["feeds"]:
+                items = state.get(feed["url"], EMPTY_STATE)["items"]
+                if items and feed_language(items) == lang:
+                    newest = _select(items, TICKER_PER_FEED, now)
+                    cands.extend({**it, "source": feed["title"], "source_url": feed["html"]} for it in newest)
+    return _select(cands, cap, now)

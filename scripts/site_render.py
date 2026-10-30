@@ -8,6 +8,7 @@ All internal links are relative, so the site works under any sub-path.
 import hashlib
 import html
 import json
+import re
 import shutil
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -92,21 +93,75 @@ def _desc(descriptions, group, key, lang):
 
 # --- pages ---------------------------------------------------------------
 
+HERO_CHIPS = ("CVE", "APT", "IOC", "CERT", "LLM", "0-day")  # decorative tags around the globe
+HERO_TICKER = 12  # latest articles in the hero's news ticker
+
+
+def _recent_articles(ctx, days=7):
+    """Number of articles of the watchlist's feeds published in the last `days` days."""
+    since = ctx["now"] - timedelta(days=days)
+    n = 0
+    for cat in ctx["watchlist"]:
+        for sub in cat["subcategories"]:
+            for feed in sub["feeds"]:
+                for it in (ctx["state"].get(feed["url"]) or site_data.EMPTY_STATE)["items"]:
+                    dt = site_data._parse(it.get("date"))
+                    n += bool(dt and since <= dt <= ctx["now"])
+    return n
+
+
+def _up_share(health):
+    """Share of the feeds checked at the last build that worked, as a percentage; None without data."""
+    last = [days[-1] for days in health.get("feeds", {}).values() if days and days[-1] in "oif"]
+    return round(100 * sum(c != "f" for c in last) / len(last)) if last else None
+
+
+def _hero(ctx, feeds, subs):
+    s, lang_root = ctx["s"], ctx["lang_root"]
+    lead = e(s["hero_lead"]).replace("{feeds}", str(feeds)).replace("{categories}", str(subs))
+    stats = [(feeds, s["stat_feeds"]), (subs, s["stat_categories"]),
+             (_recent_articles(ctx), s["stat_articles"])]
+    up = _up_share(ctx["health"])
+    if up is not None:
+        stats.append((f"{up}%", s["stat_up"]))
+    stat_html = "".join(f'<div><dt>{e(label)}</dt><dd>{e(value)}</dd></div>' for value, label in stats)
+    chips = "".join(f"<li>{e(c)}</li>" for c in HERO_CHIPS)
+    ticker = ""
+    rows = site_data.ticker(ctx["watchlist"], ctx["state"], ctx["now"], ctx["lang"], HERO_TICKER)
+    if rows:
+        lis = "".join(f'<li>{_link(it.get("link"), it.get("title") or it.get("link"))}'
+                      f' <span class="src">{e(it["source"])}</span></li>' for it in rows)
+        ticker = f"""
+  <div class="intel-ticker">
+    <a class="label" href="{e(lang_root)}news/"><span class="pulse"></span>{e(s["hero_ticker"])}</a>
+    <div class="track"><ul>{lis}</ul><ul aria-hidden="true">{lis.replace("<a ", '<a tabindex="-1" ')}</ul></div>
+  </div>"""
+    built = ctx["now"].isoformat()
+    return f"""
+<section class="intel" aria-labelledby="intel-title">
+  <div class="intel-sky" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <canvas class="intel-globe" aria-hidden="true"></canvas>
+  <ul class="intel-chips" aria-hidden="true">{chips}</ul>
+  <div class="intel-copy">
+    <p class="intel-pill"><span class="pulse"></span>{e(s["hero_pill"])} <time datetime="{e(built)}">{e(_short(built))}</time></p>
+    <h1 id="intel-title"><span>{e(s["hero_title_1"])}</span> <span>{e(s["hero_title_2"])}</span></h1>
+    <p class="intel-lead">{lead}</p>
+    <p class="intel-cta"><a class="cta primary" href="{e(lang_root)}catalogue/">{e(s["hero_cta"])} <span aria-hidden="true">→</span></a>
+    <a class="cta ghost" href="{e(lang_root)}news/">{e(s["hero_signals"])}</a></p>
+    <dl class="intel-stats">{stat_html}</dl>
+  </div>{ticker}
+</section>"""
+
+
 def page_home(ctx):
     s, root = ctx["s"], ctx["root"]
     feeds = sum(len(sub["feeds"]) for cat in ctx["watchlist"] for sub in cat["subcategories"])
     subs = sum(len(cat["subcategories"]) for cat in ctx["watchlist"])
-    counts = e(s["home_counts"]).replace("{feeds}", f"<strong>{feeds}</strong>").replace(
-        "{categories}", f"<strong>{subs}</strong>")
     raw = f"{RAW_BASE}/{WATCHLIST_FILE}"
     lang_root = ctx["lang_root"]
-    return f"""
-<section class="hero">
-  <h1>{e(s["title_home"])}</h1>
-  <p class="lead">{e(s["home_intro"])}</p>
-  <p class="counts">{counts}</p>
-</section>
+    return f"""{_hero(ctx, feeds, subs)}
 <section aria-labelledby="subscribe">
+  <p class="lead intro">{e(s["home_intro"])}</p>
   <h2 id="subscribe">{e(s["home_subscribe"])}</h2>
   <div class="ways">
     <div class="way">
@@ -369,6 +424,17 @@ PAGES = [
 ]
 
 
+# The logo mark: a small globe whose meridians turn, with one live signal.
+MARK = ('<svg class="mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">'
+        '<defs><linearGradient id="mark-tint" x1="0" x2="1">'
+        '<stop offset="0" stop-color="#22e3ff"/><stop offset="1" stop-color="#9d7bff"/></linearGradient></defs>'
+        '<g fill="none" stroke="url(#mark-tint)" stroke-width="1.6">'
+        '<circle cx="16" cy="16" r="13"/><ellipse cx="16" cy="16" rx="13" ry="4.5"/>'
+        '<ellipse class="meridian" cx="16" cy="16" rx="13" ry="13"/>'
+        '<ellipse class="meridian late" cx="16" cy="16" rx="13" ry="13"/></g>'
+        '<circle class="signal" cx="23" cy="9" r="2.2" fill="#ff3d71"/></svg>')
+
+
 def _layout(ctx, key, path, title_key, body):
     s, lang, root = ctx["s"], ctx["lang"], ctx["root"]
     other = "fr" if lang == "en" else "en"
@@ -380,6 +446,20 @@ def _layout(ctx, key, path, title_key, body):
     first, second = (s["site_name"], s[title_key]) if key == "home" else (s[title_key], s["site_name"])
     title = f"{first} · {second}"
     built = ctx["now"].isoformat()
+    # Every page but home opens on a night band with a slice of the home globe,
+    # carrying the page's own <h1> (moved out of the body).
+    band = ""
+    heading = re.match(r"\s*<h1>.*?</h1>", body, re.S)
+    if key != "home" and heading:
+        body = body[heading.end():]
+        band = f"""<div class="band">
+  <canvas class="band-globe" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <p class="intel-pill"><span class="pulse"></span>{e(s["hero_pill"])} <time datetime="{e(built)}">{e(_short(built))}</time></p>
+    {heading.group().strip()}
+  </div>
+</div>
+"""
     return f"""<!doctype html>
 <html lang="{lang}">
 <head>
@@ -395,7 +475,7 @@ def _layout(ctx, key, path, title_key, body):
 <a class="skip" href="#content">{e(s["skip"])}</a>
 <header class="site-header">
   <div class="wrap">
-    <a class="brand" href="{e(ctx["lang_root"])}">{e(s["site_name"])}</a>
+    <a class="brand" href="{e(ctx["lang_root"])}">{MARK}{e(s["site_name"])}</a>
     <nav aria-label="{e(s["nav_label"])}"><ul>{nav}</ul></nav>
     <div class="extra">
       <a lang="{other}" hreflang="{other}" href="{e(switch)}">{e(s["lang_switch"])}</a>
@@ -403,8 +483,10 @@ def _layout(ctx, key, path, title_key, body):
     </div>
   </div>
 </header>
-<main id="content" class="wrap">
+<main id="content">
+{band}<div class="wrap">
 {body}
+</div>
 </main>
 <footer class="site-footer">
   <div class="wrap">

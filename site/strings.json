@@ -13,7 +13,6 @@
     "title_news": "News",
     "meta_description": "A curated list of RSS feeds for a cyber, technology and AI watch, ready to import into any RSS reader.",
     "home_intro": "A curated list of RSS feeds covering threat intelligence, security news, technology and AI, sorted into categories. It is meant for security engineers, CISOs and anyone who wants a solid cyber and tech watch set up in minutes, without hunting for sources. Import it into the RSS reader you already use.",
-    "home_counts": "{feeds} feeds in {categories} categories",
     "home_subscribe": "Three ways to subscribe",
     "home_all_title": "Import everything",
     "home_all_text": "Every feed in one OPML file, grouped by category.",
@@ -88,7 +87,18 @@
     "health_filter_all": "All categories",
     "badge_unstable": "Unstable",
     "badge_unstable_title": "Worked on less than 80% of the days checked over the last 30 days",
-    "health_collection_tag": "Collection issue"
+    "health_collection_tag": "Collection issue",
+    "hero_pill": "Live watch · last sweep",
+    "hero_title_1": "Turn the noise into",
+    "hero_title_2": "cyber & AI intelligence",
+    "hero_lead": "{feeds} RSS feeds across {categories} categories, from CERT bulletins and threat research to AI security. Collected, checked and sorted at every build, ready for your RSS reader.",
+    "hero_cta": "Explore the feeds",
+    "hero_signals": "Latest signals",
+    "hero_ticker": "Incoming",
+    "stat_feeds": "Feeds monitored",
+    "stat_categories": "Categories",
+    "stat_articles": "Articles in 7 days",
+    "stat_up": "Feeds up at last check"
   },
   "fr": {
     "skip": "Aller au contenu",
@@ -104,7 +114,6 @@
     "title_news": "Actualités",
     "meta_description": "Une liste de flux RSS sélectionnés pour une veille cyber, technologie et IA, prête à importer dans n'importe quel lecteur RSS.",
     "home_intro": "Une liste de flux RSS sélectionnés sur la threat intelligence, l'actualité de la sécurité, la technologie et l'IA, classés par catégorie. Elle s'adresse aux ingénieurs sécurité, aux RSSI et à toute personne qui veut une veille cyber et tech solide en quelques minutes, sans chercher ses sources. Importez-la dans le lecteur RSS que vous utilisez déjà.",
-    "home_counts": "{feeds} flux dans {categories} catégories",
     "home_subscribe": "Trois façons de s'abonner",
     "home_all_title": "Tout importer",
     "home_all_text": "Tous les flux dans un seul fichier OPML, classés par catégorie.",
@@ -179,6 +188,17 @@
     "health_filter_all": "Toutes les catégories",
     "badge_unstable": "Instable",
     "badge_unstable_title": "A fonctionné moins de 80 % des jours vérifiés sur les 30 derniers jours",
-    "health_collection_tag": "Problème de récolte"
+    "health_collection_tag": "Problème de récolte",
+    "hero_pill": "Veille active · dernier passage",
+    "hero_title_1": "Transformez le bruit",
+    "hero_title_2": "en renseignement cyber & IA",
+    "hero_lead": "{feeds} flux RSS dans {categories} catégories, des bulletins des CERT à la recherche sur les menaces et la sécurité de l'IA. Collectés, vérifiés et classés à chaque build, prêts pour votre lecteur RSS.",
+    "hero_cta": "Explorer les flux",
+    "hero_signals": "Derniers signaux",
+    "hero_ticker": "En direct",
+    "stat_feeds": "Flux surveillés",
+    "stat_categories": "Catégories",
+    "stat_articles": "Articles en 7 jours",
+    "stat_up": "Flux opérationnels au dernier contrôle"
   }
 }
