@@ -1,0 +1,65 @@
+name: Publish the website
+
+# Builds the static website (English and French) from the watchlist and the
+# latest articles of its feeds, then deploys it to GitHub Pages. It runs every
+# 6 hours, and when the watchlist, the site content or the build scripts change.
+# Feeds that fail temporarily keep the articles of the previous published
+# version (read from the live data.json), so one outage never empties a page.
+# One-time setup: Settings > Pages > Source: GitHub Actions.
+
+on:
+  schedule:
+    - cron: "17 */6 * * *" # every 6 hours
+  push:
+    branches: [main]
+    paths:
+      - "infosec-intelligence-watchlist.xml"
+      - "site/**"
+      - "scripts/build_site.py"
+      - "scripts/site_*.py"
+      - "scripts/feed_items.py"
+      - "scripts/check_feeds.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Run the unit tests
+        run: python3 -m unittest discover -s tests
+
+      - name: Build the website
+        run: |
+          python3 scripts/build_site.py --out _site \
+            --previous-url https://armorintel.github.io/infosec-intelligence-watchlist/data.json
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

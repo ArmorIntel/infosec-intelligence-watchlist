@@ -8,6 +8,8 @@ on:
     paths:
       - "infosec-intelligence-watchlist.xml"
       - "scripts/**"
+      - "site/**"
+      - "tests/**"
       - ".github/workflows/validate-pr.yml"
   push:
     branches: [main]
@@ -42,6 +44,9 @@ jobs:
           fi
           git show "$base:infosec-intelligence-watchlist.xml" > base.xml 2>/dev/null || : > base.xml
           echo "Comparing with $base"
+
+      - name: Run the unit tests
+        run: python3 -m unittest discover -s tests
 
       - name: Validate OPML structure
         run: python3 scripts/validate_opml.py --base base.xml --new-urls new-urls.txt

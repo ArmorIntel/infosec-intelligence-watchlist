@@ -4,6 +4,8 @@ This repository contains a curated list of RSS feeds related to Cyber Threat Int
 It consolidates high-signal RSS sources used for security monitoring, threat intelligence production, and **ongoing situational awareness**.
 The list is curated for practitioners who need rapid access to advisories, research, vendor updates, and wider technology context without too much noise.
 
+**Website**: <https://armorintel.github.io/infosec-intelligence-watchlist/>
+
 The goal is to help professionals, researchers, and enthusiasts stay up to date with the latest news, research, and discoveries in the cybersecurity landscape.
 
 ## Repository contents
@@ -42,6 +44,12 @@ The goal is to help professionals, researchers, and enthusiasts stay up to date 
   - `feed-exceptions.txt` &mdash; low-frequency high-value sources and known quirks the health check should not flag
   - `validate_opml.py` &mdash; validates the OPML structure (two folder levels, no duplicate, sorted feeds)
   - `changelog.py` &mdash; lists the feeds added, removed and moved between two versions
+  - `build_site.py` &mdash; builds the static website (English and French) from the watchlist and the latest articles of its feeds
+  - `feed_items.py` &mdash; fetches and parses the latest articles of a feed (RSS/Atom) for the website
+  - `site_data.py` &mdash; loads the watchlist and the feed descriptions, merges feed state with the previous build and selects recent news
+  - `site_render.py` &mdash; renders the website pages from the data
+- `site/` &mdash; website content: `descriptions.json` (a short English and French description for every feed), `strings.json` (interface texts) and `static/` (styles and scripts)
+- `tests/` &mdash; unit tests of the scripts (`python3 -m unittest discover -s tests`)
 
 Last review: **October 2026**.
 
@@ -130,6 +138,7 @@ The repository is maintained with GitHub Actions:
 | [Monthly feed health check](.github/workflows/feed-health.yml) | 1st of each month, or manually | Checks every feed, opens a pull request with automatic fixes (replacement URL found on the same website for dead feeds, removal of abandoned feeds) and keeps a single [`feed-health`](../../issues?q=label%3Afeed-health) issue with what is left to review |
 | [Validate watchlist](.github/workflows/validate-pr.yml) | Pull requests and pushes changing the watchlist | Validates the OPML structure, rejects duplicates, and checks that every added feed answers, is valid RSS/Atom and published within the last 6 months |
 | [Sync generated files](.github/workflows/sync-generated.yml) | Pushes to `main` changing the watchlist | Regenerates the per-category OPML files and the generated parts of this README (category list, feed count, subscription table) and commits them |
+| [Publish the website](.github/workflows/site.yml) | Every 6 hours, pushes to `main` changing the watchlist, the site or its scripts, or manually | Runs the unit tests, builds the website with the latest articles of every feed (a feed that fails keeps its articles from the previous version) and deploys it to GitHub Pages |
 | [Release a reviewed watchlist](.github/workflows/release.yml) | Manually, after a review | Creates a dated release (e.g. `2026.10`) with the list of feeds added, removed and moved since the previous one, and the OPML files attached |
 
 How the monthly check limits manual work:
@@ -139,6 +148,8 @@ How the monthly check limits manual work:
 - The issue is closed automatically once nothing is left to review
 
 For the workflow to open the fix pull request itself, enable *Settings > Actions > General > Allow GitHub Actions to create and approve pull requests*. Otherwise the issue links to the branch so the pull request can be opened in one click.
+
+One-time setup for the website: enable *Settings > Pages > Source: GitHub Actions*, then run the workflow once manually. GitHub disables scheduled workflows after 60 days without repository activity; if the website stops updating, open the *Actions* tab, select the workflow and click *Enable workflow*.
 
 To run the checks locally (Python 3.10+ and curl, no dependency):
 
@@ -154,6 +165,7 @@ If you want to add new feeds or suggest improvements:
 - Fork this repository
 - Update the xml file (`infosec-intelligence-watchlist.xml` is the only file to edit): keep two folder levels and feeds sorted alphabetically
 - Don't edit the `opml/` files or the generated parts of this README: they are regenerated automatically once your change is merged
+- For a new feed, also add its English and French descriptions to `site/descriptions.json` (the website build lists the feeds that are missing)
 - Submit a pull request with a description
 
 Maintained by [ArmorIntel](https://github.com/ArmorIntel/).
