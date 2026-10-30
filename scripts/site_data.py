@@ -64,3 +64,84 @@ def missing_descriptions(watchlist, descriptions):
                 if not _complete(feeds.get(feed["url"])):
                     missing.append(f"{feed['title']} ({feed['url']})")
     return sorted(set(missing))
+
+
+NEWS_DAYS = 7
+NEWS_PER_CATEGORY = 50
+NEWS_ALL = 100
+
+EMPTY_STATE = {"latest": None, "items": [], "rate": None, "fetched": None}
+
+
+def _parse(value):
+    if not value:
+        return None
+    try:
+        dt = datetime.fromisoformat(value)
+    except ValueError:
+        return None
+    return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+
+
+def merge_state(watchlist, fresh, previous, now):
+    cutoff = now - timedelta(days=NEWS_DAYS)
+    state = {}
+    for cat in watchlist:
+        for sub in cat["subcategories"]:
+            for feed in sub["feeds"]:
+                url = feed["url"]
+                result = fresh.get(url)
+                if result and result.get("status") == "ok":
+                    dated = [(d, i) for i in result.get("items", []) if (d := _parse(i.get("date")))]
+                    items = result.get("items", [])
+                    latest = max(dated, key=lambda p: p[0])[1] if dated else (items[0] if items else None)
+                    state[url] = {
+                        "latest": latest,
+                        "items": [i for d, i in dated if d >= cutoff],
+                        "rate": feed_items.posting_rate([d for d, _ in dated if d <= now], now),
+                        "fetched": now.isoformat(),
+                    }
+                elif url in previous:
+                    state[url] = previous[url]
+                else:
+                    state[url] = {**EMPTY_STATE, "items": []}
+    return state
+
+
+def failure_ratio(fresh):
+    if not fresh:
+        return 0.0
+    return sum(1 for r in fresh.values() if r.get("status") != "ok") / len(fresh)
+
+
+def _select(candidates, cap, now):
+    cutoff = now - timedelta(days=NEWS_DAYS)
+    dated = []
+    for it in candidates:
+        d = _parse(it.get("date"))
+        if d and cutoff <= d <= now:
+            dated.append((d, it))
+    dated.sort(key=lambda p: p[0], reverse=True)
+    seen, out = set(), []
+    for _, it in dated:
+        if it["link"] in seen:
+            continue
+        seen.add(it["link"])
+        out.append(it)
+        if len(out) == cap:
+            break
+    return out
+
+
+def news(watchlist, state, now):
+    result, everything = {}, []
+    for cat in watchlist:
+        for sub in cat["subcategories"]:
+            cands = []
+            for feed in sub["feeds"]:
+                for it in state.get(feed["url"], EMPTY_STATE)["items"]:
+                    cands.append({**it, "source": feed["title"], "source_url": feed["html"]})
+            result[sub["slug"]] = _select(cands, NEWS_PER_CATEGORY, now)
+            everything.extend(cands)
+    result["all"] = _select(everything, NEWS_ALL, now)
+    return result
