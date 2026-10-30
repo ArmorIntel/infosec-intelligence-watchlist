@@ -146,6 +146,20 @@ def download(url, timeout):
     return res, body
 
 
+def classify_failure(body, e):
+    """Return (status, error) for a body that could not be parsed as a feed."""
+    # anti-bot challenge pages are HTML served with a 200
+    challenge = re.search(rb"(?i)incapsula|cloudflare|captcha|challenge-platform", body[:5000])
+    # slightly malformed feeds are usually tolerated by RSS readers
+    looks_like_feed = re.search(rb"<(rss|feed|rdf:RDF)[\s>]", body[:2000])
+    status = "check" if challenge or looks_like_feed else "dead"
+    if challenge:
+        return status, "anti-bot challenge page"
+    if looks_like_feed:
+        return status, f"malformed XML, readers usually tolerate it: {e}"[:160]
+    return status, f"invalid feed: {e}"[:160]
+
+
 def fetch(url, timeout):
     res, body = download(url, timeout)
     if "status" in res:
@@ -157,17 +171,7 @@ def fetch(url, timeout):
     try:
         latest, count = parse_feed(body)
     except Exception as e:
-        # anti-bot challenge pages are HTML served with a 200
-        challenge = re.search(rb"(?i)incapsula|cloudflare|captcha|challenge-platform", body[:5000])
-        # slightly malformed feeds are usually tolerated by RSS readers
-        looks_like_feed = re.search(rb"<(rss|feed|rdf:RDF)[\s>]", body[:2000])
-        res["status"] = "check" if challenge or looks_like_feed else "dead"
-        if challenge:
-            res["error"] = "anti-bot challenge page"
-        elif looks_like_feed:
-            res["error"] = f"malformed XML, readers usually tolerate it: {e}"[:160]
-        else:
-            res["error"] = f"invalid feed: {e}"[:160]
+        res["status"], res["error"] = classify_failure(body, e)
         return res
     res["status"] = "ok"
     res["items"] = count
