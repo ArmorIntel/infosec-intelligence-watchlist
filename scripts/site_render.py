@@ -275,18 +275,25 @@ def page_news(ctx):
         rows = items.get(slug) or []
         if rows:
             lis = "\n".join(
-                f'    <li>{_link(it.get("link"), it.get("title") or it.get("link"), "title")}'
+                f'    <li lang="{e(it["lang"])}">{_link(it.get("link"), it.get("title") or it.get("link"), "title")}'
                 f' <span class="meta">{_link(it.get("source_url"), it["source"], "source")}'
                 f' {_time(it.get("date"), _short(it.get("date")))}</span></li>'
                 for it in rows)
-            body = f'<ul class="news">\n{lis}\n  </ul>'
+            body = (f'<ul class="news">\n{lis}\n  </ul>\n'
+                    f'  <p class="empty lang-empty" hidden>{e(s["news_lang_empty"])}</p>')
         else:
             body = f'<p class="empty">{e(s["news_empty"])}</p>'
         sections.append(f'<section id="{e(slug)}" class="tab">\n  <h2>{e(name)}</h2>\n  {body}\n</section>')
     return f"""
 <h1>{e(s["title_news"])}</h1>
 <p class="lead">{e(s["news_intro"])}</p>
-<nav class="tabs" aria-label="{e(s["news_tabs"])}"><ul>{bar}</ul></nav>
+<fieldset class="lang-filter" hidden>
+  <legend>{e(s["news_lang"])}</legend>
+  <label><input type="radio" name="news-lang" value="" checked> {e(s["news_lang_all"])}</label>
+  <label lang="fr"><input type="radio" name="news-lang" value="fr"> Français</label>
+  <label lang="en"><input type="radio" name="news-lang" value="en"> English</label>
+</fieldset>
+<nav class="tabs" aria-labelledby="news-tabs-label"><span class="filter-label" id="news-tabs-label">{e(s["news_tabs"])}</span><ul>{bar}</ul></nav>
 {"".join(sections)}
 """
 

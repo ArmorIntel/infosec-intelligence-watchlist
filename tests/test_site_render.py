@@ -181,6 +181,15 @@ class RenderTest(unittest.TestCase):
         self.assertIn(self.strings_en()["news_empty"], ai)
         self.assertIn('href="https://a.com/1"', html)
 
+    def test_news_language_filter(self):
+        html = self.page("news/index.html")
+        self.assertIn('<fieldset class="lang-filter" hidden>', html)  # shown by app.js
+        self.assertIn('<input type="radio" name="news-lang" value="" checked> Both', html)
+        self.assertIn('<li lang="en"><a class="title" href="https://a.com/1"', html)
+        self.assertIn(self.strings_en()["news_lang_empty"], html)
+        self.assertIn("> Les deux</label>", self.page("fr/news/index.html"))
+        self.assertIn('<span class="filter-label" id="news-tabs-label">Categories</span>', html)
+
     def strings_en(self):
         return fixture()[3]["en"]
 

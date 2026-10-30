@@ -160,10 +160,22 @@ h3 { font-size: 1.05rem; margin: 0 0 0.4rem; }
 .card .label, .card .rate, .card .url, .card time { color: var(--muted); }
 
 /* News */
-.tabs ul { list-style: none; margin: 0 0 24px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.tabs { margin: 0 0 24px; }
+.tabs ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .tabs a { display: block; padding: 4px 10px; border: 1px solid var(--border); border-radius: 999px; color: var(--text); text-decoration: none; font-size: 0.9rem; }
 .tabs a[aria-current="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
 .tab { margin-bottom: 32px; }
+.lang-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 0 0 16px; padding: 0; border: 0; }
+/* Both filters: a small title above their pills. */
+.lang-filter legend, .filter-label { display: block; width: 100%; margin: 0 0 6px; padding: 0; font-size: 0.9rem; color: var(--muted); }
+.lang-filter label {
+  position: relative; padding: 4px 12px; border: 1px solid var(--border); border-radius: 999px;
+  font-size: 0.9rem; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+}
+.lang-filter label:hover { border-color: var(--accent); }
+.lang-filter input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.lang-filter label:has(input:checked) { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+.lang-filter label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
 .news { list-style: none; margin: 0; padding: 0; max-width: 80ch; }
 .news li { padding: 10px 0; border-bottom: 1px solid var(--border); }
 .news .title { font-weight: 600; }

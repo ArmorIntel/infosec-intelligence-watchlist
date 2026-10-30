@@ -98,7 +98,10 @@
     "stat_feeds": "Feeds monitored",
     "stat_categories": "Categories",
     "stat_articles": "Articles in 7 days",
-    "stat_up": "Feeds up at last check"
+    "stat_up": "Feeds up at last check",
+    "news_lang": "Language",
+    "news_lang_all": "Both",
+    "news_lang_empty": "No article in this language in the last 7 days."
   },
   "fr": {
     "skip": "Aller au contenu",
@@ -199,6 +202,9 @@
     "stat_feeds": "Flux surveillés",
     "stat_categories": "Catégories",
     "stat_articles": "Articles en 7 jours",
-    "stat_up": "Flux opérationnels au dernier contrôle"
+    "stat_up": "Flux opérationnels au dernier contrôle",
+    "news_lang": "Langue",
+    "news_lang_all": "Les deux",
+    "news_lang_empty": "Aucun article dans cette langue ces 7 derniers jours."
   }
 }

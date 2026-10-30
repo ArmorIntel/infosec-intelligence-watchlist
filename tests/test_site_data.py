@@ -172,6 +172,19 @@ class NewsTest(unittest.TestCase):
         self.assertEqual(len(out["all"]), 1)
 
 
+    def test_news_language_and_cap_per_language(self):
+        a = [item(i, 0.001 * i + 0.5) for i in range(60)]  # English titles ("t0"...)
+        c = [item(1000 + i, 2 + 0.001 * i, "Une faille dans le pare-feu est exploitée") for i in range(3)]
+        out = site_data.news(self.wl, self.state(a, c), NOW)
+        self.assertEqual({i["lang"] for i in out["vendors"]}, {"en"})
+        self.assertEqual({i["lang"] for i in out["media-and-blogs"]}, {"fr"})
+        self.assertEqual(len([i for i in out["vendors"] if i["lang"] == "en"]), 50)
+        # The 3 older French articles stay in "all" although 60 English ones are newer.
+        self.assertEqual(len(out["all"]), 63)
+        dates = [i["date"] for i in out["all"]]
+        self.assertEqual(dates, sorted(dates, reverse=True))
+
+
 class TickerTest(unittest.TestCase):
     def setUp(self):
         self.wl = watchlist_fixture()

@@ -134,17 +134,30 @@ def _select(candidates, cap, now):
     return out
 
 
+def _select_by_lang(candidates, cap, now):
+    """Like _select, but the cap applies to each language, so filtering the
+    News page on the less common one still shows its full week."""
+    merged = []
+    for lang in sorted({it["lang"] for it in candidates}):
+        merged += _select([it for it in candidates if it["lang"] == lang], cap, now)
+    return _select(merged, len(merged), now)
+
+
 def news(watchlist, state, now):
+    """Recent articles per subcategory slug, and for "all"; each one carries
+    its feed's title, homepage and language ("fr" or "en")."""
     result, everything = {}, []
     for cat in watchlist:
         for sub in cat["subcategories"]:
             cands = []
             for feed in sub["feeds"]:
-                for it in state.get(feed["url"], EMPTY_STATE)["items"]:
-                    cands.append({**it, "source": feed["title"], "source_url": feed["html"]})
-            result[sub["slug"]] = _select(cands, NEWS_PER_CATEGORY, now)
+                items = state.get(feed["url"], EMPTY_STATE)["items"]
+                lang = feed_language(items)
+                for it in items:
+                    cands.append({**it, "source": feed["title"], "source_url": feed["html"], "lang": lang})
+            result[sub["slug"]] = _select_by_lang(cands, NEWS_PER_CATEGORY, now)
             everything.extend(cands)
-    result["all"] = _select(everything, NEWS_ALL, now)
+    result["all"] = _select_by_lang(everything, NEWS_ALL, now)
     return result
 
 

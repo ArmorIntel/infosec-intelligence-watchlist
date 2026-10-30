@@ -81,6 +81,30 @@
     var showTab = function () { showOnly(tabs, tabLinks, hashId() || "all"); };
     onHashChange(tabs, showTab);
     showTab();
+
+    // Language filter, remembered on this device: French, English or both.
+    var langBox = document.querySelector(".lang-filter");
+    if (langBox) {
+      var radios = all("input[name='news-lang']", langBox);
+      var showLang = function (want) {
+        all("ul.news > li").forEach(function (li) { li.hidden = !!want && li.getAttribute("lang") !== want; });
+        all(".lang-empty").forEach(function (note) {
+          note.hidden = all("ul.news > li", note.parentNode).some(function (li) { return !li.hidden; });
+        });
+      };
+      var saved = "";
+      try { saved = localStorage.getItem("news-lang") || ""; } catch (err) { /* storage blocked */ }
+      if (saved !== "fr" && saved !== "en") saved = "";
+      radios.forEach(function (r) {
+        r.checked = r.value === saved;
+        r.addEventListener("change", function () {
+          try { localStorage.setItem("news-lang", r.value); } catch (err) { /* storage blocked */ }
+          showLang(r.value);
+        });
+      });
+      langBox.hidden = false;
+      showLang(saved);
+    }
   }
 
   // Health: filter the rows of every group by category.
