@@ -137,7 +137,7 @@ The repository is maintained with GitHub Actions:
 | Workflow | Trigger | What it does |
 |---|---|---|
 | [Monthly feed health check](.github/workflows/feed-health.yml) | 1st of each month, or manually | Checks every feed, opens a pull request with automatic fixes (replacement URL found on the same website for dead feeds, removal of abandoned feeds) and keeps a single [`feed-health`](../../issues?q=label%3Afeed-health) issue with what is left to review |
-| [Validate watchlist](.github/workflows/validate-pr.yml) | Pull requests and pushes changing the watchlist | Validates the OPML structure, rejects duplicates, and checks that every added feed answers, is valid RSS/Atom and published within the last 6 months |
+| [Validate watchlist](.github/workflows/validate-pr.yml) | Pull requests changing the watchlist, the scripts, the site or the tests, and pushes to `main` changing the watchlist | Runs the unit tests, validates the OPML structure, rejects duplicates, and checks that every added feed answers, is valid RSS/Atom and published within the last 6 months |
 | [Sync generated files](.github/workflows/sync-generated.yml) | Pushes to `main` changing the watchlist | Regenerates the per-category OPML files and the generated parts of this README (category list, feed count, subscription table) and commits them |
 | [Publish the website](.github/workflows/site.yml) | Every 6 hours, pushes to `main` changing the watchlist, the site or its scripts, or manually | Runs the unit tests, builds the website with the latest articles of every feed (a feed that fails keeps its articles from the previous version) and deploys it to GitHub Pages |
 | [Release a reviewed watchlist](.github/workflows/release.yml) | Manually, after a review | Creates a dated release (e.g. `2026.10`) with the list of feeds added, removed and moved since the previous one, and the OPML files attached |
@@ -145,6 +145,7 @@ The repository is maintained with GitHub Actions:
 How the monthly check limits manual work:
 - **History**: each feed's status is kept month by month on the `feed-health-history` branch. A dead or unreachable feed is only reported after failing **3 months in a row**; until then it is listed as "under watch" in a collapsed section. Temporary outages and anti-bot blocks of GitHub servers therefore need no action
 - **Automatic fixes**: for a dead feed, or one unreachable for 3 months, the workflow looks for a replacement on the same website (feed autodiscovery links, then common feed paths) and keeps it only if it is a valid feed that published within 6 months. Abandoned feeds (nothing for 24 months) are removed. The fixes are proposed in a single `feed-health/autofix` pull request to review and merge
+- **Merging the fix pull request**: use a merge commit (or keep the commit body when squashing), so the per-feed `- <feed URL>: <reason>` lines reach the website's Changes page
 - **Exceptions**: feeds that work in RSS readers but not for the checker, or agreed low-frequency high-value sources, go in [`scripts/feed-exceptions.txt`](scripts/feed-exceptions.txt) and are never flagged again (unless abandoned)
 - The issue is closed automatically once nothing is left to review
 

@@ -20,12 +20,11 @@ on:
       - "scripts/feed_items.py"
       - "scripts/check_feeds.py"
       - "scripts/changelog.py"
+      - "scripts/build_category_opml.py"
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
@@ -60,6 +59,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
