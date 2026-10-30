@@ -136,7 +136,7 @@
     },
     "https://9to5mac.com/feed/": {
       "en": "9to5Mac, a news site on Apple products, software and rumours, including iOS and macOS releases. Some deal posts.",
-      "fr": "9to5Mac, site d'actualité sur les produits, logiciels et rumeurs Apple, dont les versions d'iOS et macOS. Couverture rapide et volumineuse, avec quelques bons plans."
+      "fr": "9to5Mac, site d'actualité sur les produits, logiciels et rumeurs Apple, dont les versions d'iOS et macOS. Quelques bons plans."
     },
     "https://about.gitlab.com/atom.xml": {
       "en": "GitLab's company blog: product features, DevSecOps practices and AI announcements. Vendor content, with some security-relevant posts.",
@@ -235,8 +235,8 @@
       "fr": "Réseau de blogs de Cisco : produits, culture d'entreprise et technologies, avec la sécurité parmi de nombreux sujets. Large et centré sur l'éditeur."
     },
     "https://blogs.jpcert.or.jp/en/atom.xml": {
-      "en": "JPCERT/CC's English technical blog: analyses of attack campaigns, malware and tools observed in Japan. Valuable for hands-on incident analysis and detection ideas.",
-      "fr": "Le blog technique en anglais du JPCERT/CC : analyses de campagnes, malwares et outils observés au Japon. Précieux pour l'analyse d'incidents concrète et des idées de détection."
+      "en": "JPCERT/CC's English technical blog: analyses of attack campaigns, malware and tools observed in Japan, with incident analysis and detection ideas.",
+      "fr": "Le blog technique en anglais du JPCERT/CC : analyses de campagnes, malwares et outils observés au Japon, avec analyse d'incidents et idées de détection."
     },
     "https://blogs.microsoft.com/on-the-issues/feed/": {
       "en": "Microsoft's policy blog covering regulation, responsible AI, privacy, cybersecurity policy and digital society. Corporate viewpoint; useful to follow a major vendor's stance.",
@@ -247,8 +247,8 @@
       "fr": "Boing Boing, blog culturel généraliste de longue date : tech, culture internet, droits numériques et curiosités. Contenu varié, avec parfois des sujets de vie privée et de sécurité."
     },
     "https://cert.at/cert-at.en.blog.rss_2.0.xml": {
-      "en": "The blog of CERT.at, Austria's national CERT: occasional short posts on incident handling, coordination and national practice. Low volume, practitioner-oriented.",
-      "fr": "Le blog de CERT.at, le CERT national autrichien : billets courts sur la gestion d'incidents, la coordination et les pratiques nationales. Faible volume, orienté praticiens."
+      "en": "The blog of CERT.at, Austria's national CERT: short posts on incident handling, coordination and national practice, for practitioners.",
+      "fr": "Le blog de CERT.at, le CERT national autrichien : billets courts sur la gestion d'incidents, la coordination et les pratiques nationales, pour les praticiens."
     },
     "https://cert.cyber.gouv.fr/feed/": {
       "en": "CERT-FR, France's government CERT: security advisories, alerts and news bulletins, published in French. Covers vendor vulnerabilities and French threat context.",
@@ -263,8 +263,8 @@
       "fr": "Flux anglais du CERT Polska : vulnérabilités qu'il coordonne, analyses de malwares et actualité des incidents nationaux. Utile pour des CVE sur des produits moins connus."
     },
     "https://citizenlab.ca/feed": {
-      "en": "The Citizen Lab: University of Toronto research group investigating spyware, surveillance and censorship against civil society. Key source for mercenary spyware reporting.",
-      "fr": "Le Citizen Lab : groupe de recherche de l'Université de Toronto enquêtant sur les logiciels espions, la surveillance et la censure visant la société civile. Source clé sur les spywares mercenaires."
+      "en": "The Citizen Lab: University of Toronto research group investigating spyware, surveillance and censorship against civil society, including mercenary spyware.",
+      "fr": "Le Citizen Lab : groupe de recherche de l'Université de Toronto enquêtant sur les logiciels espions, la surveillance et la censure visant la société civile, dont les spywares mercenaires."
     },
     "https://cloudseclist.com/feed.xml": {
       "en": "Curated newsletter of cloud security links and articles, numbered by issue. Good for cloud security engineers who want a filtered reading list.",
@@ -391,8 +391,8 @@
       "fr": "Flux de la rubrique gadgets et matériel d'Ars Technica : tests d'appareils, tech grand public et actualité des plateformes. Surtout utile pour la veille matériel et grand public."
     },
     "https://feeds.arstechnica.com/arstechnica/index": {
-      "en": "Main feed of Ars Technica, a tech news site with in-depth reporting on technology, security, science and policy. Strong on security and tech policy coverage.",
-      "fr": "Flux principal d'Ars Technica, site d'actualité tech avec des articles de fond sur la technologie, la sécurité, la science et la politique. Bonne couverture de la sécurité."
+      "en": "Main feed of Ars Technica, a tech news site with in-depth reporting on technology, security, science and policy, including tech policy.",
+      "fr": "Flux principal d'Ars Technica, site d'actualité tech avec des articles de fond sur la technologie, la sécurité, la science et la politique, dont la politique numérique."
     },
     "https://feeds.bbci.co.uk/news/technology/rss.xml": {
       "en": "Technology section of BBC News: mainstream coverage of tech companies, AI, cybercrime and digital policy. Useful for the general-audience view of tech stories.",
@@ -412,7 +412,7 @@
     },
     "https://feeds.feedburner.com/KorbensBlog-UpgradeYourMind": {
       "en": "Korben, a French blog on tech, tools, software and the web, with occasional security and privacy topics. Useful for French-language tool discovery.",
-      "fr": "Korben, blog français très suivi sur la tech, les outils, les logiciels et le web, avec parfois des sujets de sécurité et de vie privée. Pratique pour découvrir des outils en français."
+      "fr": "Korben, blog français sur la tech, les outils, les logiciels et le web, avec parfois des sujets de sécurité et de vie privée. Pratique pour découvrir des outils en français."
     },
     "https://feeds.feedburner.com/TheHackersNews": {
       "en": "News site on vulnerabilities, malware, breaches and threat actors, with quick coverage of new campaigns.",
@@ -439,8 +439,8 @@
       "fr": "Renseignement sur les menaces de Google Threat Intelligence Group et Mandiant : acteurs suivis, campagnes d'intrusion et enseignements de réponse à incident."
     },
     "https://feeds.macrumors.com/MacRumors-All": {
-      "en": "MacRumors, a news site on Apple rumours and releases. This feed carries all stories, including minor posts and deals, so it is high volume.",
-      "fr": "MacRumors, site d'actualité sur les rumeurs et sorties Apple. Ce flux contient tous les articles, y compris les brèves et bons plans : volume élevé."
+      "en": "MacRumors, a news site on Apple rumours and releases. This feed carries all stories, including minor posts and deals.",
+      "fr": "MacRumors, site d'actualité sur les rumeurs et sorties Apple. Ce flux contient tous les articles, y compris les brèves et bons plans."
     },
     "https://feeds.macrumors.com/MacRumors-Front": {
       "en": "MacRumors' front-page feed: the main Apple news and rumour stories, a lighter selection than the all-stories feed.",
@@ -583,7 +583,7 @@
       "fr": "Netflix TechBlog sur Medium : articles d'ingénierie sur l'infrastructure de streaming, la data, le ML et la fiabilité, écrits par les ingénieurs de Netflix. Utile pour l'architecture à grande échelle."
     },
     "https://medium.com/feed/netflix-techblog/tagged/security": {
-      "en": "Security-tagged posts from the Netflix TechBlog: identity, workload authentication and security engineering at scale. A filtered, lower-volume subset of the main blog.",
+      "en": "Security-tagged posts from the Netflix TechBlog: identity, workload authentication and security engineering at scale. A filtered subset of the main blog.",
       "fr": "Articles de la balise sécurité du Netflix TechBlog : identité, authentification des workloads et ingénierie de sécurité à grande échelle. Sous-ensemble filtré du blog principal."
     },
     "https://news.google.com/rss/search?hl=en-US&gl=US&q=Machine+Learning&ceid=US:en": {
@@ -600,7 +600,7 @@
     },
     "https://news.mit.edu/topic/mitcomputers-rss.xml": {
       "en": "MIT News stories on computer science and AI, mostly CSAIL research. Institutional news from a university lab, covering new systems and results.",
-      "fr": "Actualités du MIT sur l'informatique et l'IA, surtout les recherches du CSAIL. Communication institutionnelle d'un grand laboratoire : nouveaux systèmes et résultats."
+      "fr": "Actualités du MIT sur l'informatique et l'IA, surtout les recherches du CSAIL. Communication institutionnelle d'un laboratoire universitaire : nouveaux systèmes et résultats."
     },
     "https://news.sophos.com/feed/": {
       "en": "Sophos News: the vendor's hub for threat research, incident response reports and security news, including Sophos X-Ops work. Good for ransomware and endpoint threat analysis.",
@@ -643,8 +643,8 @@
       "fr": "Le blog de Red Canary : ingénierie de détection, comportements adverses et synthèses des tendances issues de son MDR. Utile pour des idées de détection alignées ATT&CK."
     },
     "https://rekt.news/rss/feed.xml": {
-      "en": "Rekt, a publication analysing DeFi hacks and exploits with write-ups of how each attack worked. Valuable for smart-contract security and incident learning.",
-      "fr": "Rekt, publication qui analyse les piratages et exploits DeFi en détaillant le fonctionnement de chaque attaque. Précieux pour la sécurité des smart contracts et le retour d'expérience."
+      "en": "Rekt, a publication analysing DeFi hacks and exploits with write-ups of how each attack worked, for smart-contract security and incident learning.",
+      "fr": "Rekt, publication qui analyse les piratages et exploits DeFi en détaillant le fonctionnement de chaque attaque, pour la sécurité des smart contracts et le retour d'expérience."
     },
     "https://reporterre.net/spip.php?page=backend-simple": {
       "en": "Reporterre, a French independent news outlet on ecology and the environment. Not a security source; useful for environmental and societal context in French.",
@@ -751,8 +751,8 @@
       "fr": "Blog de Richard Bejtlich, praticien de la supervision réseau et de la réponse à incident. Stratégie de sécurité, histoire du domaine et commentaires sur l'industrie."
     },
     "https://techcrunch.com/feed/": {
-      "en": "TechCrunch, a news site on startups, funding, big tech and AI, with regular security and breach reporting. Useful for industry news and funding trends.",
-      "fr": "TechCrunch, site d'actualité sur les startups, les levées de fonds, les géants de la tech et l'IA, avec une couverture régulière de la sécurité et des fuites. Utile pour l'industrie et les levées."
+      "en": "TechCrunch, a news site on startups, funding, big tech and AI, with security and breach reporting. Useful for industry news and funding trends.",
+      "fr": "TechCrunch, site d'actualité sur les startups, les levées de fonds, les géants de la tech et l'IA, avec des sujets de sécurité et de fuites. Utile pour l'industrie et les levées."
     },
     "https://techxplore.com/rss-feed/": {
       "en": "Tech Xplore, a site that summarises university and lab research on engineering, robotics, computing and technology. Useful for spotting emerging research.",
@@ -767,8 +767,8 @@
       "fr": "Actualités et briefings de CyberWire, qui résument les sujets de sécurité : menaces, politique et industrie."
     },
     "https://thedfirreport.com/feed/": {
-      "en": "Detailed intrusion case studies from real incidents, with timelines, TTPs and detection ideas. Valuable for defenders and DFIR analysts.",
-      "fr": "Études détaillées d'intrusions réelles, avec chronologies, TTP et pistes de détection. Précieux pour les défenseurs et analystes DFIR."
+      "en": "Detailed intrusion case studies from real incidents, with timelines, TTPs and detection ideas, for defenders and DFIR analysts.",
+      "fr": "Études détaillées d'intrusions réelles, avec chronologies, TTP et pistes de détection, pour les défenseurs et analystes DFIR."
     },
     "https://theintercept.com/feed/?lang=en": {
       "en": "The Intercept: investigative news outlet covering national security, surveillance and politics. Broader than infosec, relevant for privacy and state-power reporting.",
@@ -787,7 +787,7 @@
       "fr": "Résumé du forensique numérique et de la réponse à incident : nouveaux outils, articles, recherches et formations. Utile aux analystes DFIR pour suivre le domaine."
     },
     "https://tldrsec.com/feed.xml": {
-      "en": "Security newsletter by Clint Gibler with curated links on AppSec, cloud security, tools and AI. A one-stop digest for security engineers.",
+      "en": "Security newsletter by Clint Gibler with curated links on AppSec, cloud security, tools and AI. A digest for security engineers.",
       "fr": "Newsletter sécurité de Clint Gibler, avec des liens sélectionnés sur l'AppSec, le cloud, les outils et l'IA. Un condensé pour les ingénieurs sécurité."
     },
     "https://towardsdatascience.com/feed": {
@@ -811,8 +811,8 @@
       "fr": "Unit 42 de Palo Alto Networks : synthèses de menaces, analyses de malwares et d'acteurs, retours de réponse à incident, avec indicateurs et mesures."
     },
     "https://www.404media.co/rss/": {
-      "en": "404 Media: independent, journalist-owned outlet covering technology, surveillance, hacking and internet culture. Broader than security, strong on investigations.",
-      "fr": "404 Media : média indépendant détenu par ses journalistes, sur la technologie, la surveillance, le piratage et la culture internet. Plus large que la sécurité, fort en enquêtes."
+      "en": "404 Media: independent, journalist-owned outlet covering technology, surveillance, hacking and internet culture. Broader than security, with investigations.",
+      "fr": "404 Media : média indépendant détenu par ses journalistes, sur la technologie, la surveillance, le piratage et la culture internet. Plus large que la sécurité, avec des enquêtes."
     },
     "https://www.abetterinternet.org/index.xml": {
       "en": "News from ISRG, the non-profit running Let's Encrypt and other security projects such as Prossimo. Announcements on TLS, memory safety and internet security.",
@@ -856,10 +856,10 @@
     },
     "https://www.cisa.gov/cybersecurity-advisories/all.xml": {
       "en": "CISA's combined feed of all advisories: alerts, KEV catalog additions, ICS advisories and joint guidance. Broad; a single US government source.",
-      "fr": "Flux combiné de tous les avis de la CISA : alertes, ajouts au catalogue KEV, avis ICS et guides conjoints. Large et volumineux ; une source unique pour le gouvernement américain."
+      "fr": "Flux combiné de tous les avis de la CISA : alertes, ajouts au catalogue KEV, avis ICS et guides conjoints. Large ; une source unique pour le gouvernement américain."
     },
     "https://www.cisa.gov/cybersecurity-advisories/cybersecurity-advisories.xml": {
-      "en": "CISA's alerts and advisories feed: joint advisories, #StopRansomware reports, KEV additions and alerts. Authoritative for US government warnings about active threats.",
+      "en": "CISA's alerts and advisories feed: joint advisories, #StopRansomware reports, KEV additions and alerts. US government warnings about active threats.",
       "fr": "Flux des alertes et avis de la CISA : avis conjoints, rapports #StopRansomware, ajouts KEV et alertes. Source pour les mises en garde du gouvernement américain sur les menaces actives."
     },
     "https://www.cisa.gov/cybersecurity-advisories/ics-advisories.xml": {
@@ -931,8 +931,8 @@
       "fr": "Newsletter sur le detection engineering : règles de détection, méthodes de threat hunting, outils et recherches. Pour les équipes SOC et detection engineers."
     },
     "https://www.eff.org/rss/updates.xml": {
-      "en": "Deeplinks, the Electronic Frontier Foundation's blog on digital rights, privacy, surveillance and tech law. Advocacy-oriented, with solid legal and technical analysis.",
-      "fr": "Deeplinks, le blog de l'Electronic Frontier Foundation sur les droits numériques, la vie privée, la surveillance et le droit. Engagé, avec des analyses juridiques et techniques solides."
+      "en": "Deeplinks, the Electronic Frontier Foundation's blog on digital rights, privacy, surveillance and tech law. Advocacy-oriented, with legal and technical analysis.",
+      "fr": "Deeplinks, le blog de l'Electronic Frontier Foundation sur les droits numériques, la vie privée, la surveillance et le droit. Engagé, avec des analyses juridiques et techniques."
     },
     "https://www.egcert.eg/feed/": {
       "en": "Feed of Egypt's national CERT (EG-CERT): announcements and security advisories from the organization.",
@@ -1052,31 +1052,31 @@
     },
     "https://www.kyberturvallisuuskeskus.fi/files/rss/vulns.xml": {
       "en": "Vulnerability notices from Finland's NCSC-FI, mostly vendor product advisories (Cisco and others). Useful for tracking newly published product flaws.",
-      "fr": "Avis de vulnérabilités du NCSC-FI finlandais, surtout des avis produits d'éditeurs (Cisco et autres). Un flux régulier pour suivre les failles nouvellement publiées."
+      "fr": "Avis de vulnérabilités du NCSC-FI finlandais, surtout des avis produits d'éditeurs (Cisco et autres). Utile pour suivre les failles nouvellement publiées."
     },
     "https://www.lastweekinaws.com/feed.xml": {
       "en": "Newsletter and blog about AWS news with a sharp, opinionated tone, covering services, pricing and announcements. Useful for cloud engineers tracking AWS changes.",
       "fr": "Newsletter et blog sur l'actualité AWS, au ton incisif et personnel : services, tarifs et annonces. Utile aux ingénieurs cloud qui suivent les évolutions d'AWS."
     },
     "https://www.lemagit.fr/rss/ContentSyndication.xml": {
-      "en": "French enterprise IT news site, strong on infrastructure, cloud, AI and cybersecurity, with in-depth reporting.",
-      "fr": "Site français d'actualité IT pour l'entreprise, centré sur l'infrastructure, le cloud, l'IA et la cybersécurité, avec des enquêtes approfondies."
+      "en": "French enterprise IT news site on infrastructure, cloud, AI and cybersecurity, with in-depth reporting.",
+      "fr": "Site français d'actualité IT pour l'entreprise, sur l'infrastructure, le cloud, l'IA et la cybersécurité, avec des enquêtes approfondies."
     },
     "https://www.lemondeinformatique.fr/flux-rss/thematique/securite/rss.xml": {
       "en": "Security section of the French IT trade publication: breaches, vulnerabilities, vendors and CISO topics for French-speaking enterprises.",
       "fr": "Rubrique sécurité du magazine IT français : cyberattaques, vulnérabilités, éditeurs et sujets RSSI pour les entreprises francophones."
     },
     "https://www.lesnumeriques.com/rss.xml": {
-      "en": "Les Numériques, a French consumer tech site known for product tests and buying guides, plus tech news. Mostly hardware, little security content.",
-      "fr": "Les Numériques, site français de tech grand public réputé pour ses tests et guides d'achat, avec aussi de l'actualité. Surtout du matériel, peu de sécurité."
+      "en": "Les Numériques, a French consumer tech site with product tests and buying guides, plus tech news. Mostly hardware, little security content.",
+      "fr": "Les Numériques, site français de tech grand public avec des tests et guides d'achat, ainsi que de l'actualité. Surtout du matériel, peu de sécurité."
     },
     "https://www.lightbluetouchpaper.org/feed/": {
       "en": "Blog of the Security Group at the University of Cambridge Computer Laboratory: academic commentary on security engineering and privacy.",
       "fr": "Blog du groupe sécurité du laboratoire d'informatique de l'université de Cambridge : réflexions académiques sur l'ingénierie de la sécurité et la vie privée."
     },
     "https://www.macstories.net/feed/": {
-      "en": "MacStories, an independent site with in-depth coverage and reviews of Apple platforms, apps and automation. Strong for power users and workflow tooling.",
-      "fr": "MacStories, site indépendant avec analyses et tests approfondis des plateformes Apple, apps et automatisation. Solide pour les utilisateurs avancés et les workflows."
+      "en": "MacStories, an independent site with in-depth coverage and reviews of Apple platforms, apps and automation, aimed at power users and workflow tooling.",
+      "fr": "MacStories, site indépendant avec analyses et tests approfondis des plateformes Apple, apps et automatisation, pour les utilisateurs avancés et les workflows."
     },
     "https://www.makeuseof.com/feed/": {
       "en": "MakeUseOf, a consumer tech site with how-tos, app and gadget guides and explainers. Occasional security and privacy basics aimed at general users.",
@@ -1103,7 +1103,7 @@
       "fr": "Toutes les publications du NCSC britannique : guides, billets, avis et rapports. Un flux large de recommandations du gouvernement britannique, utile pour les bonnes pratiques."
     },
     "https://www.ncsc.gov.uk/api/1/services/v1/report-rss-feed.xml": {
-      "en": "Reports from the UK NCSC, such as threat assessments and technical analyses. Authoritative longer-form publications, useful for strategic threat outlooks.",
+      "en": "Reports from the UK NCSC, such as threat assessments and technical analyses. Longer-form publications, useful for strategic threat outlooks.",
       "fr": "Rapports du NCSC britannique, comme des évaluations de la menace et des analyses techniques. Publications longues, utiles pour les perspectives stratégiques."
     },
     "https://www.netskope.com/feed": {
@@ -1263,8 +1263,8 @@
       "fr": "Rubrique IA du Guardian : journalisme généraliste sur les impacts sociétaux, politiques et économiques de l'IA. Pour le débat public, pas pour la technique."
     },
     "https://www.theregister.com/security/headlines.atom": {
-      "en": "Security section of The Register, a UK tech outlet known for a sardonic tone and solid coverage of vulnerabilities and breaches.",
-      "fr": "Rubrique sécurité de The Register, média tech britannique au ton caustique et à la couverture solide des vulnérabilités et des fuites."
+      "en": "Security section of The Register, a UK tech outlet with a sardonic tone, covering vulnerabilities and breaches.",
+      "fr": "Rubrique sécurité de The Register, média tech britannique au ton caustique, sur les vulnérabilités et les fuites."
     },
     "https://www.theverge.com/rss/index.xml": {
       "en": "Main feed of The Verge, a tech news site on gadgets, AI, platforms and policy. Useful for consumer-facing tech news and big-platform stories.",
