@@ -4,9 +4,10 @@ name: Feed suggestion
 # (label feed-suggestion): finds the site's feed from the pasted link, checks
 # that it is new, valid and active (scripts/suggest_feed.py), then answers on
 # the issue with a single comment, edited on later runs, and a
-# "suggestion: <status>" label. Already-listed sources are closed. Editing the
-# issue runs the check again only if the link changed. The maintainer decides
-# what is added. Run it manually to check an issue again.
+# "suggestion: <status>" label. Already-listed sources are closed. Later events
+# (an edit, a label) run the check again only if the link differs from the one
+# last answered for. The maintainer decides what is added. Run it manually to
+# check an issue again.
 
 on:
   issues:
@@ -21,16 +22,17 @@ permissions:
   contents: read
   issues: write
 
-concurrency:
-  group: suggest-feed-${{ github.event.issue.number || inputs.issue }}
-  cancel-in-progress: true
-
 jobs:
   check:
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (contains(github.event.issue.labels.*.name, 'feed-suggestion') &&
        (github.event.action != 'labeled' || github.event.label.name == 'feed-suggestion'))
+    # at job level, so an event skipped by `if` never cancels a running check;
+    # a cancelled check is redone by the next run, as no answer records its link yet
+    concurrency:
+      group: suggest-feed-${{ github.event.issue.number || inputs.issue }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -43,22 +45,25 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Read the issue
-        env:
-          ACTION: ${{ github.event.action }}
-          PREVIOUS_BODY: ${{ github.event.changes.body.from }}
+      - name: Read the issue and the previous answer
         run: |
           gh issue view "$NUMBER" --json body,author,state > issue.json
-          if [ "$ACTION" = "edited" ]; then
-            printf '%s' "$PREVIOUS_BODY" > prev.md
+          gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$NUMBER/comments" \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | contains("<!-- feed-suggestion-bot -->"))) | "\(.id)"' |
+            head -1 > comment-id.txt
+          if [ -s comment-id.txt ]; then
+            gh api "repos/$GITHUB_REPOSITORY/issues/comments/$(cat comment-id.txt)" --jq .body > last.md
           fi
           author=$(jq -r .author.login issue.json)
           gh issue list --label feed-suggestion --author "$author" --state open --json number --jq length > open.txt
 
       - name: Check the suggested source
+        env:
+          EVENT: ${{ github.event_name }}
         run: |
           extra=()
-          if [ -f prev.md ]; then extra=(--previous-body-file prev.md); fi
+          if [ -f last.md ]; then extra+=(--last-comment-file last.md); fi
+          if [ "$EVENT" = "workflow_dispatch" ]; then extra+=(--force); fi
           python3 scripts/suggest_feed.py --issue issue.json "${extra[@]}" \
             --open-suggestions "$(cat open.txt)" --json result.json --comment comment.md
           cat comment.md >> "$GITHUB_STEP_SUMMARY"
@@ -70,8 +75,7 @@ jobs:
             echo "Nothing to do."
             exit 0
           fi
-          id=$(gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$NUMBER/comments" \
-            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | contains("<!-- feed-suggestion-bot -->"))) | .id' | head -1)
+          id=$(cat comment-id.txt)
           if [ -n "$id" ]; then
             gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$id" -F body=@comment.md > /dev/null
           else

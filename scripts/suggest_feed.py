@@ -14,7 +14,7 @@ Statuses:
 - needs-review: a feed declared by the site, but blocked to scripts or undated
 - invalid: the issue has no single http(s) link
 - limit: the author already has too many open suggestions
-- skip: nothing to do (closed issue, or the link did not change on an edit)
+- skip: nothing to do (closed issue, or already answered for this link)
 
 Usage:
     python3 scripts/suggest_feed.py --issue issue.json --open-suggestions 0 \\
@@ -53,9 +53,12 @@ LABELS = {
     "skip": None,
 }
 LANGUAGES = {"en": "English", "fr": "French"}
+MAX_SAME_SITE = 3  # "already followed" notes shown in the comment
 LINK_HEADING = "Link to an article"
 WHY_HEADING = "Why is it useful"
-URL_RE = re.compile(r"https?://[^\s<>]+")
+# brackets, braces and quotes end a URL: Markdown links, and no curl globbing pattern
+URL_RE = re.compile(r"https?://[^\s<>()\[\]{}\"'`]+")
+FEED_PATH_RE = re.compile(r"(?i)feed|rss|atom|\.xml")
 MD_SPECIAL = set("\\`*_[]<>|#")
 
 
@@ -79,7 +82,7 @@ def parse_issue(body):
     link_text = _field(sections, LINK_HEADING)
     if link_text is None:
         link_text = body  # blank issue, or form headings removed
-    urls = URL_RE.findall(link_text)
+    urls = list(dict.fromkeys(u.rstrip(".,;:!?") for u in URL_RE.findall(link_text)))
     link = urls[0] if len(urls) == 1 else None
     why = _field(sections, WHY_HEADING) or ""
     if why == "_No response_":
@@ -113,12 +116,16 @@ class FeedLinkParser(autofix_feeds.LinkParser):
 
 def discover_feeds(url, timeout):
     """Candidate feeds for a page, most likely first: [{"url", "guess"}]."""
-    if check_feeds.fetch(url, timeout).get("status") == "ok":
+    status = check_feeds.fetch(url, timeout).get("status")
+    if status == "ok":
         return [{"url": url, "guess": False}]
     parts = urlsplit(url)
     root = f"{parts.scheme}://{parts.netloc}/"
     parent = urljoin(url, "./")
     found = []
+    if status == "check" and FEED_PATH_RE.search(parts.path):
+        found.append((url, False))  # probably the feed itself, blocked to scripts
+    declared = []
     for page in dict.fromkeys([url, parent, root]):
         _, html = autofix_feeds.fetch_page(page, timeout)
         parser = FeedLinkParser()
@@ -126,8 +133,9 @@ def discover_feeds(url, timeout):
             parser.feed(html)
         except Exception:
             pass
-        found += [(urljoin(page, href), False) for href in parser.feeds]
-    if not found:
+        declared += [urljoin(page, href) for href in parser.feeds]
+    found += [(u, False) for u in declared]
+    if not declared:
         for base in dict.fromkeys([parent, root]):
             found += [(urljoin(base, path), True) for path in autofix_feeds.COMMON_PATHS]
     seen, out = set(), []
@@ -204,29 +212,34 @@ def _shared_segments(a, b):
 
 def analyse(link, known, timeout, now):
     """Find, check and describe the feed behind a suggested link (see the statuses above)."""
-    candidates = discover_feeds(link, timeout)
-    with ThreadPoolExecutor(8) as ex:
-        checked = list(ex.map(lambda c: check_feeds.fetch(c["url"], timeout), candidates))
     by_key = {}
     for k in known:
         by_key.setdefault(autofix_feeds.norm(k["url"]), k)
+    result = {"status": "no-feed", "link": link, "feed": None, "alternatives": [], "existing": None,
+              "same_site": [], "tried": 0}
+    if autofix_feeds.norm(link) in by_key:  # a listed feed pasted as is, even if it is down today
+        result.update(status="duplicate", existing=by_key[autofix_feeds.norm(link)])
+        return result
+    candidates = discover_feeds(link, timeout)
+    with ThreadPoolExecutor(8) as ex:
+        checked = list(ex.map(lambda c: check_feeds.fetch(c["url"], timeout), candidates))
+    result["tried"] = len(candidates)
     rows = []
     for c, res in zip(candidates, checked):
         final = res.get("final_url") or c["url"]
         rows.append({"url": c["url"], "guess": c["guess"], "res": res,
                      "class": check_feeds.classify(res, MAX_AGE_DAYS, ABANDONED_DAYS),
                      "known": by_key.get(autofix_feeds.norm(c["url"])) or by_key.get(autofix_feeds.norm(final))})
-    result = {"status": "no-feed", "link": link, "feed": None, "alternatives": [], "existing": None,
-              "same_site": [], "tried": len(candidates)}
 
     new_ok = [r for r in rows if r["class"] == "ok" and not r["known"]]
     if new_ok:
         # sorted() is stable: equally close feeds keep their discovery order
         new_ok = sorted(new_ok, key=lambda r: -_shared_segments(link, r["url"]))
         feed = describe(new_ok[0]["url"], timeout, now)
-        h = host(feed["url"])
+        # compare websites, not feed hosts: FeedBurner or Reddit host many unrelated feeds
+        h = host(feed["site"])
         result.update(status="ready", feed=feed, alternatives=[r["url"] for r in new_ok[1:]],
-                      same_site=[k for k in known if h in (host(k["url"]), host(k.get("html")))])
+                      same_site=[k for k in known if h and h == host(k.get("html"))])
         return result
     dup = next((r for r in rows if r["known"]), None)
     if dup:
@@ -243,15 +256,24 @@ def analyse(link, known, timeout, now):
     return result
 
 
-def run(issue, previous_body, open_suggestions, known, timeout, now):
-    """Result for one issue, as written to --json (`issue`: gh issue view --json body,author,state)."""
+def answered_link(comment):
+    """The link a previous bot answer was for, or None (no answer, or one that must not block a new check)."""
+    m = re.search(r"<!-- link: (\S*) -->", comment or "")
+    return m.group(1) if m else None
+
+
+def run(issue, last_comment, open_suggestions, known, timeout, now, force=False):
+    """Result for one issue, as written to --json (`issue`: gh issue view --json body,author,state).
+
+    `last_comment`: the bot's previous answer on the issue, if any. Nothing is done when it was for the
+    same link (an edit of the title or of the "why" field), unless `force` (a manual run)."""
     link, why = parse_issue(issue.get("body"))
     author = (issue.get("author") or {}).get("login", "")
     base = {"link": link, "why": why, "author": author}
     if (issue.get("state") or "").upper() == "CLOSED":
         return {**base, "status": "skip"}
-    if previous_body is not None and parse_issue(previous_body)[0] == link:
-        return {**base, "status": "skip"}  # edited, but not the link
+    if not force and link and answered_link(last_comment) == link:
+        return {**base, "status": "skip"}
     if not link:
         return {**base, "status": "invalid"}
     if open_suggestions > MAX_OPEN:
@@ -268,6 +290,8 @@ def render_comment(result, author):
     status, feed = result["status"], result.get("feed") or {}
     who = "@" + re.sub(r"[^A-Za-z0-9-]", "", author or "")  # GitHub logins: letters, digits, hyphens
     lines = [MARKER]
+    if status != "limit":  # a limited suggestion is checked on its next edit
+        lines.append(f"<!-- link: {result.get('link') or ''} -->")
     if status == "ready":
         rate = f"~{feed['rate']:g} posts/week" if feed.get("rate") is not None else "unknown"
         lines += [f"**Feed found**, thanks {who}!", "", "| | |", "|---|---|",
@@ -279,9 +303,12 @@ def render_comment(result, author):
                   f"| Language | {LANGUAGES.get(feed.get('language'), 'unknown')} |"]
         if feed.get("samples"):
             lines += ["", "Recent articles:"] + [f"- {md_text(title)}" for title in feed["samples"][:5]]
-        for k in result.get("same_site") or []:
+        same_site = result.get("same_site") or []
+        for k in same_site[:MAX_SAME_SITE]:
             lines += ["", f"> **Note:** this site is already followed via **{md_text(k['title'])}** "
                           f"({_code(k['url'])}) in {md_text(k['folder'])}."]
+        if len(same_site) > MAX_SAME_SITE:
+            lines += ["", f"> And {len(same_site) - MAX_SAME_SITE} more feeds of this site."]
         if result.get("alternatives"):
             lines += ["", "Other feeds found on this site: " + ", ".join(_code(u) for u in result["alternatives"])]
         lines += ["", "Next: the maintainer reviews this suggestion before adding it.", "",
@@ -311,15 +338,16 @@ def render_comment(result, author):
                   "_Lien manquant ou invalide : modifiez l'issue pour le corriger, la vérification sera relancée._"]
     elif status == "limit":
         lines += [f"**Too many open suggestions**: {who} already has more than {MAX_OPEN} open suggestions, "
-                  "this one will be checked once some are handled.", "",
-                  "_Trop de propositions ouvertes : celle-ci sera vérifiée plus tard._"]
+                  "edit this issue later to run the check again.", "",
+                  "_Trop de propositions ouvertes : modifiez l'issue plus tard pour relancer la vérification._"]
     return "\n".join(lines) + "\n"
 
 
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--issue", required=True, help="gh issue view --json body,author,state output")
-    p.add_argument("--previous-body-file", help="issue body before an edit, to skip edits that keep the link")
+    p.add_argument("--last-comment-file", help="the bot's previous answer on the issue, if any")
+    p.add_argument("--force", action="store_true", help="check again even if the link did not change")
     p.add_argument("--open-suggestions", type=int, default=0, help="open suggestions of the issue's author")
     p.add_argument("--json", required=True, help="where to write the result")
     p.add_argument("--comment", required=True, help="where to write the comment (empty when skipped)")
@@ -328,9 +356,9 @@ def main(argv=None):
     args = p.parse_args(argv)
 
     issue = json.loads(Path(args.issue).read_text(encoding="utf-8"))
-    previous = Path(args.previous_body_file).read_text(encoding="utf-8") if args.previous_body_file else None
+    last = Path(args.last_comment_file).read_text(encoding="utf-8") if args.last_comment_file else None
     known = check_feeds.load_feeds(args.opml)
-    result = run(issue, previous, args.open_suggestions, known, args.timeout, datetime.now(timezone.utc))
+    result = run(issue, last, args.open_suggestions, known, args.timeout, datetime.now(timezone.utc), args.force)
     Path(args.json).write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     comment = "" if result["status"] == "skip" else render_comment(result, result.get("author", ""))
     Path(args.comment).write_text(comment, encoding="utf-8")

@@ -32,6 +32,23 @@ class ParseIssueTest(unittest.TestCase):
             body = FORM.replace("https://blog.example.com/2026/10/post", value)
             self.assertIsNone(suggest_feed.parse_issue(body)[0], value)
 
+    def test_parse_issue_cleans_links(self):
+        cases = {"[read this](https://a.com/post)": "https://a.com/post",
+                 "https://a.com/post.": "https://a.com/post",
+                 "https://a.com/post https://a.com/post": "https://a.com/post",
+                 "https://a.com/x[1-99999]": "https://a.com/x"}  # no curl URL globbing pattern
+        for value, expected in cases.items():
+            body = FORM.replace("https://blog.example.com/2026/10/post", value)
+            self.assertEqual(suggest_feed.parse_issue(body)[0], expected, value)
+
+    def test_curl_globbing_disabled(self):
+        done = mock.Mock(returncode=0, stdout=b"", stderr=b"")
+        with mock.patch("subprocess.run", return_value=done) as run:
+            check_feeds.download("https://a.com/x", 5)
+            autofix_feeds.fetch_page("https://a.com/x", 5)
+        for call in run.call_args_list:
+            self.assertIn("-g", call.args[0])
+
     def test_parse_issue_without_headings(self):
         self.assertEqual(suggest_feed.parse_issue("Please add <https://a.com/post> thanks")[0], "https://a.com/post")
         self.assertIsNone(suggest_feed.parse_issue("https://a.com/1 and https://b.com/2")[0])
@@ -73,11 +90,12 @@ KNOWN = [{"title": "Main", "url": "https://a.com/feed/", "html": "https://a.com/
           "folder": "Threat Intelligence > Security News"}]
 
 
-def rss(days_ago):
-    """VALID_RSS whose two items are `days_ago` and `days_ago + 1` days old."""
+def rss(days_ago, site="https://example.com/"):
+    """VALID_RSS whose two items are `days_ago` and `days_ago + 1` days old, declaring `site`."""
     newest, older = (format_datetime(NOW - timedelta(days=d)).encode() for d in (days_ago, days_ago + 1))
     return (VALID_RSS.replace(b"Tue, 06 Jan 2026 10:00:00 +0000", newest)
-            .replace(b"Mon, 05 Jan 2026 10:00:00 +0000", older))
+            .replace(b"Mon, 05 Jan 2026 10:00:00 +0000", older)
+            .replace(b"<link>https://example.com/</link>", f"<link>{site}</link>".encode(), 1))
 
 
 RECENT, OLD = rss(3), rss(400)
@@ -88,7 +106,7 @@ def declares(*hrefs):
 
 
 class AnalyseTest(unittest.TestCase):
-    def run_analyse(self, link, pages=None, feeds=None, redirects=None, blocked=(), blocked_all=False):
+    def run_analyse(self, link, pages=None, feeds=None, redirects=None, blocked=(), blocked_all=False, known=KNOWN):
         """analyse() with a fake network: `feeds` serve bodies, `blocked` URLs answer 403, the rest 404."""
         pages, feeds, redirects = pages or {}, feeds or {}, redirects or {}
 
@@ -103,7 +121,7 @@ class AnalyseTest(unittest.TestCase):
         with mock.patch.object(check_feeds, "download", side_effect=download), \
                 mock.patch.object(check_feeds, "NOW", NOW), \
                 mock.patch.object(autofix_feeds, "fetch_page", side_effect=lambda u, t: pages.get(u, (0, ""))):
-            return suggest_feed.analyse(link, KNOWN, 5, NOW)
+            return suggest_feed.analyse(link, known, 5, NOW)
 
     def test_ready_new_feed(self):
         r = self.run_analyse("https://b.com/post", pages={"https://b.com/post": declares("https://b.com/feed")},
@@ -118,9 +136,31 @@ class AnalyseTest(unittest.TestCase):
     def test_same_site_other_feed_is_ready_with_notice(self):
         r = self.run_analyse("https://a.com/security/post",
                              pages={"https://a.com/security/post": declares("https://a.com/security/feed")},
-                             feeds={"https://a.com/security/feed": RECENT})
+                             feeds={"https://a.com/security/feed": rss(3, "https://a.com/security/")})
         self.assertEqual(r["status"], "ready")
         self.assertEqual([k["url"] for k in r["same_site"]], ["https://a.com/feed/"])
+
+    def test_shared_feed_host_is_not_same_site(self):
+        # a new FeedBurner feed for b.com is not "already followed" because another FeedBurner feed is listed
+        known = KNOWN + [{"title": "Other", "url": "https://feeds.feedburner.com/Other", "html": "https://other.com/",
+                          "folder": "X > Y"}]
+        with mock.patch.object(suggest_feed, "discover_feeds",
+                               return_value=[{"url": "https://feeds.feedburner.com/B", "guess": False}]):
+            r = self.run_analyse("https://b.com/post", feeds={"https://feeds.feedburner.com/B": rss(3, "https://b.com/")},
+                                 known=known)
+        self.assertEqual(r["status"], "ready")
+        self.assertEqual(r["same_site"], [])
+
+    def test_blocked_direct_feed_needs_review(self):
+        r = self.run_analyse("https://h.com/rss.xml", blocked={"https://h.com/rss.xml"})
+        self.assertEqual(r["status"], "needs-review")
+        self.assertEqual(r["feed"]["url"], "https://h.com/rss.xml")
+
+    def test_listed_feed_pasted_directly_is_duplicate_even_when_down(self):
+        known = KNOWN + [{"title": "All", "url": "https://k.com/feeds/all.atom", "html": "", "folder": "X > Y"}]
+        r = self.run_analyse("http://www.k.com/feeds/all.atom", known=known)  # 404 today, not a guessable path
+        self.assertEqual(r["status"], "duplicate")
+        self.assertEqual(r["existing"]["title"], "All")
 
     def test_duplicate(self):
         r = self.run_analyse("https://a.com/post", pages={"https://a.com/post": declares("http://www.a.com/feed")},
@@ -188,10 +228,30 @@ def sample_result(status, title="Example feed", same_site=False):
 class RunAndRenderTest(unittest.TestCase):
     def test_unchanged_link_skips(self):
         issue = {"body": FORM.replace("_No response_", "typo fixed"), "author": {"login": "v"}, "state": "OPEN"}
+        last = suggest_feed.render_comment(sample_result("ready"), "v")  # answered for https://b.com/post
+        issue["body"] = issue["body"].replace("https://blog.example.com/2026/10/post", "https://b.com/post")
         with mock.patch.object(suggest_feed, "analyse") as analyse:
-            r = suggest_feed.run(issue, FORM, 0, [], 5, NOW)
+            r = suggest_feed.run(issue, last, 0, [], 5, NOW)
         self.assertEqual(r["status"], "skip")
         analyse.assert_not_called()
+        with mock.patch.object(suggest_feed, "analyse", return_value=sample_result("ready")) as analyse:
+            suggest_feed.run(issue, last, 0, [], 5, NOW, force=True)  # manual run checks again
+        analyse.assert_called_once()
+
+    def test_new_link_or_no_answer_yet_runs(self):
+        issue = {"body": FORM, "author": {"login": "v"}, "state": "OPEN"}
+        last = suggest_feed.render_comment(sample_result("no-feed"), "v")  # answered for https://b.com/post
+        for previous in (last, None):  # link changed / previous run cancelled before answering
+            with mock.patch.object(suggest_feed, "analyse", return_value=sample_result("ready")) as analyse:
+                suggest_feed.run(issue, previous, 0, [], 5, NOW)
+            analyse.assert_called_once()
+
+    def test_limit_answer_does_not_block_a_later_check(self):
+        issue = {"body": FORM, "author": {"login": "v"}, "state": "OPEN"}
+        last = suggest_feed.render_comment({**sample_result("limit"), "link": "https://blog.example.com/2026/10/post"}, "v")
+        with mock.patch.object(suggest_feed, "analyse", return_value=sample_result("ready")) as analyse:
+            suggest_feed.run(issue, last, 0, [], 5, NOW)
+        analyse.assert_called_once()
 
     def test_closed_issue_skips(self):
         r = suggest_feed.run({"body": FORM, "author": {"login": "v"}, "state": "CLOSED"}, None, 0, [], 5, NOW)
