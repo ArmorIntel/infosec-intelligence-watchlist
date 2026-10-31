@@ -4,10 +4,20 @@ name: Feed suggestion
 # (label feed-suggestion): finds the site's feed from the pasted link, checks
 # that it is new, valid and active (scripts/suggest_feed.py), then answers on
 # the issue with a single comment, edited on later runs, and a
-# "suggestion: <status>" label. Already-listed sources are closed. Later events
-# (an edit, a label) run the check again only if the link differs from the one
-# last answered for. The maintainer decides what is added. Run it manually to
-# check an issue again.
+# "suggestion: <status>" label. Already-listed sources are closed. For a new
+# valid feed, it also opens a pull request adding it (branch
+# suggestion/issue-<n>, one commit on main): an AI proposes the subcategory and
+# the English and French descriptions (scripts/suggest_pr.py, scripts/suggest_ai.py),
+# the same checks as validate-pr.yml run first, and validate-pr.yml is then
+# started on the branch so the required "validate" check reports on the PR.
+# Later events (an edit, a label) run the check again only if the link differs
+# from the one last answered for. The bot never touches a branch that has
+# someone else's commits, or whose pull request was merged or closed. The
+# maintainer decides what is added. Run it manually to check an issue again.
+#
+# AI setup: secret AI_API_KEY, variable AI_MODEL, optional variable AI_API_URL
+# (OpenAI-compatible chat completions URL, Gemini by default). Without them,
+# pull requests open without descriptions.
 
 on:
   issues:
@@ -19,8 +29,10 @@ on:
         required: true
 
 permissions:
-  contents: read
+  contents: write
   issues: write
+  pull-requests: write
+  actions: write # start validate-pr.yml on the suggestion branch
 
 jobs:
   check:
@@ -40,6 +52,8 @@ jobs:
       NUMBER: ${{ github.event.issue.number || inputs.issue }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # the suggestion branch is compared with main
 
       - uses: actions/setup-python@v7
         with:
@@ -68,12 +82,87 @@ jobs:
             --open-suggestions "$(cat open.txt)" --json result.json --comment comment.md
           cat comment.md >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Prepare the pull request
+        # a failure here must not keep the visitor without an answer
+        continue-on-error: true
+        env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_MODEL: ${{ vars.AI_MODEL }}
+          AI_API_URL: ${{ vars.AI_API_URL }}
+        run: |
+          if [ "$(jq -r .status result.json)" != "ready" ]; then
+            exit 0
+          fi
+          url=$(jq -r .feed.url result.json)
+          branch="suggestion/issue-$NUMBER"
+
+          # another suggestion already proposes this feed
+          gh pr list --state open --json url,headRefName,body > prs.json
+          other=$(python3 -c 'import json, sys; sys.path.insert(0, "scripts"); import suggest_pr
+          prs = [p for p in json.load(open("prs.json")) if p["headRefName"] != sys.argv[2]]
+          print(suggest_pr.find_open_pr_for_url(prs, sys.argv[1]) or "")' "$url" "$branch")
+          if [ -n "$other" ]; then
+            echo "$other" > pr-url.txt
+            touch pr-existing
+            exit 0
+          fi
+
+          git fetch -q origin main
+          if git ls-remote --exit-code -q origin "refs/heads/$branch" > /dev/null; then
+            git fetch -q origin "$branch"
+            if git log "origin/main..origin/$branch" --format=%ae |
+                grep -qvxF "41898282+github-actions[bot]@users.noreply.github.com"; then
+              echo "::notice::$branch has commits from someone else, left untouched"
+              exit 0
+            fi
+            state=$(gh pr list --head "$branch" --state all --json state --jq '.[0].state // ""')
+            if [ "$state" = "MERGED" ] || [ "$state" = "CLOSED" ]; then
+              echo "::notice::The pull request of $branch is ${state,,}, left untouched"
+              exit 0
+            fi
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -q -C "$branch" origin/main
+          python3 scripts/suggest_pr.py --result result.json --issue "$NUMBER" --title-file title.txt \
+            --commit-message commit.txt --pr-body pr.md --new-urls new.txt
+
+          # same checks as validate-pr.yml, which does not run on pushes made with GITHUB_TOKEN
+          python3 -m unittest discover -s tests
+          python3 scripts/validate_opml.py
+          python3 scripts/check_feeds.py --urls-file new.txt --retry-delay 30 \
+            --fail-on dead,inactive,abandoned --markdown checks.md
+          { echo; echo "## Checks"; echo; cat checks.md; } >> pr.md
+
+          git add infosec-intelligence-watchlist.xml site/descriptions.json
+          git commit -q -F commit.txt
+          git push -q -f origin "HEAD:refs/heads/$branch"
+          existing=$(gh pr list --head "$branch" --state open --json url --jq '.[0].url')
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --title "$(cat title.txt)" --body-file pr.md
+            pr="$existing"
+          elif ! pr=$(gh pr create --base main --head "$branch" --title "$(cat title.txt)" --body-file pr.md); then
+            # Settings > Actions > "Allow GitHub Actions to create and approve pull requests" is off
+            pr="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/compare/main...${branch}?expand=1"
+            echo "::warning::Could not open the pull request, open it from $pr"
+          fi
+          echo "$pr" > pr-url.txt
+          # the required "validate" check: pushes made with GITHUB_TOKEN don't start validate-pr.yml
+          gh workflow run validate-pr.yml --ref "$branch"
+
       - name: Answer on the issue
         run: |
           status=$(jq -r .status result.json)
           if [ "$status" = "skip" ]; then
             echo "Nothing to do."
             exit 0
+          fi
+          if [ -s pr-url.txt ]; then
+            flags=()
+            if [ -f pr-existing ]; then flags=(--pr-existing); fi
+            python3 scripts/suggest_feed.py --render result.json --comment comment.md \
+              --pr-url "$(cat pr-url.txt)" "${flags[@]}"
           fi
           id=$(cat comment-id.txt)
           if [ -n "$id" ]; then
