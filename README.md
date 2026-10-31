@@ -51,6 +51,8 @@ The goal is to help professionals, researchers, and enthusiasts stay up to date 
   - `site_health.py` &mdash; keeps the 90-day health history of every feed, for the website's Health page and its "Unstable" badges
   - `site_render.py` &mdash; renders the website pages from the data
   - `suggest_feed.py` &mdash; finds and checks the feed of a source suggested by a visitor, and writes the answer posted on the issue
+  - `suggest_pr.py` &mdash; adds a suggested feed to the watchlist and writes its pull request
+  - `suggest_ai.py` &mdash; asks an AI (any OpenAI-compatible API) for the subcategory and descriptions of a suggested feed
 - `site/` &mdash; website content: `descriptions.json` (a short English and French description for every feed), `strings.json` (interface texts) and `static/` (styles and scripts)
 - `tests/` &mdash; unit tests of the scripts (`python3 -m unittest discover -s tests`)
 
@@ -142,8 +144,10 @@ The repository is maintained with GitHub Actions:
 | [Validate watchlist](.github/workflows/validate-pr.yml) | Pull requests changing the watchlist, the scripts, the site or the tests, and pushes to `main` changing the watchlist | Runs the unit tests, validates the OPML structure, rejects duplicates, and checks that every added feed answers, is valid RSS/Atom and published within the last 6 months |
 | [Sync generated files](.github/workflows/sync-generated.yml) | Pushes to `main` changing the watchlist | Regenerates the per-category OPML files and the generated parts of this README (category list, feed count, subscription table) and commits them |
 | [Publish the website](.github/workflows/site.yml) | Every 6 hours, pushes to `main` changing the watchlist, the site or its scripts, or manually | Runs the unit tests, builds the website with the latest articles of every feed (a feed that fails keeps its articles from the previous version), adds the result of every feed to its 90-day health history, and deploys it to GitHub Pages |
-| [Feed suggestion](.github/workflows/suggest-feed.yml) | Issue opened or edited with the "Suggest a source" form, or manually | Finds the site's feed from the link, checks it (new, valid, active) and answers on the issue with a comment and a [`suggestion: …`](../../labels) status label; already-listed sources are closed |
+| [Feed suggestion](.github/workflows/suggest-feed.yml) | Issue opened or edited with the "Suggest a source" form, or manually | Finds the site's feed from the link, checks it (new, valid, active) and answers on the issue with a comment and a [`suggestion: …`](../../labels) status label; already-listed sources are closed. For a new valid feed, opens a pull request adding it, with the subcategory and English/French descriptions proposed by an AI, to review |
 | [Release a reviewed watchlist](.github/workflows/release.yml) | Manually, after a review | Creates a dated release (e.g. `2026.10`) with the list of feeds added, removed and moved since the previous one, and the OPML files attached |
+
+Feed suggestions, AI setup: create a Gemini API key in Google AI Studio, add it as the `AI_API_KEY` repository secret, and set the `AI_MODEL` repository variable to a model available on your plan. To use another provider (e.g. OpenRouter), also set the `AI_API_URL` variable to its OpenAI-compatible chat completions URL. Without a key or a model, suggestion pull requests open without descriptions, placed in Security News.
 
 How the monthly check limits manual work:
 - **History**: each feed's status is kept month by month on the `feed-health-history` branch. A dead or unreachable feed is only reported after failing **3 months in a row**; until then it is listed as "under watch" in a collapsed section. Temporary outages and anti-bot blocks of GitHub servers therefore need no action
@@ -170,7 +174,7 @@ Contributions are welcome!
 
 ### Suggest a source
 
-The easiest way: [suggest a source](https://github.com/ArmorIntel/infosec-intelligence-watchlist/issues/new?template=suggest-feed.yml) (also linked at the bottom of every page of the website). Paste the link of one of its articles, no need to find the RSS feed. The link is checked automatically and the issue gets an answer within minutes. Every suggestion is reviewed before being added.
+The easiest way: [suggest a source](https://github.com/ArmorIntel/infosec-intelligence-watchlist/issues/new?template=suggest-feed.yml) (also linked at the bottom of every page of the website). Paste the link of one of its articles, no need to find the RSS feed. The link is checked automatically and the issue gets an answer within minutes; for a new feed, a pull request adding it is prepared for review. Every suggestion is reviewed before being added.
 
 ### Edit the watchlist yourself
 

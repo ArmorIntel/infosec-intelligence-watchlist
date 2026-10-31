@@ -285,8 +285,10 @@ def _code(url):
     return "`" + " ".join(str(url or "").replace("`", "").split()) + "`"
 
 
-def render_comment(result, author):
-    """Markdown answer posted on the issue; every value from a feed goes through md_text."""
+def render_comment(result, author, pr_url=None, pr_existing=False):
+    """Markdown answer posted on the issue; every value from a feed goes through md_text.
+
+    `pr_url`: the pull request prepared for a ready feed, or (`pr_existing`) one that already adds it."""
     status, feed = result["status"], result.get("feed") or {}
     who = "@" + re.sub(r"[^A-Za-z0-9-]", "", author or "")  # GitHub logins: letters, digits, hyphens
     lines = [MARKER]
@@ -311,8 +313,16 @@ def render_comment(result, author):
             lines += ["", f"> And {len(same_site) - MAX_SAME_SITE} more feeds of this site."]
         if result.get("alternatives"):
             lines += ["", "Other feeds found on this site: " + ", ".join(_code(u) for u in result["alternatives"])]
-        lines += ["", "Next: the maintainer reviews this suggestion before adding it.", "",
-                  "_Flux trouvé : le mainteneur relit la proposition avant de l'ajouter._"]
+        if pr_url and pr_existing:
+            lines += ["", f"This feed is already proposed in {_code(pr_url).strip('`')}.", "",
+                      "_Ce flux est déjà proposé dans une autre pull request._"]
+        elif pr_url:
+            lines += ["", f"Next: the maintainer reviews the pull request {_code(pr_url).strip('`')} "
+                          "before the feed is added.", "",
+                      "_Flux trouvé : le mainteneur relit la pull request avant de l'ajouter._"]
+        else:
+            lines += ["", "Next: the maintainer reviews this suggestion before adding it.", "",
+                      "_Flux trouvé : le mainteneur relit la proposition avant de l'ajouter._"]
     elif status == "duplicate":
         k = result["existing"]
         lines += [f"**Already in the watchlist**: **{md_text(k['title'])}** ({_code(k['url'])}) is listed in "
@@ -345,15 +355,25 @@ def render_comment(result, author):
 
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    p.add_argument("--issue", required=True, help="gh issue view --json body,author,state output")
+    p.add_argument("--issue", help="gh issue view --json body,author,state output (required unless --render)")
     p.add_argument("--last-comment-file", help="the bot's previous answer on the issue, if any")
     p.add_argument("--force", action="store_true", help="check again even if the link did not change")
     p.add_argument("--open-suggestions", type=int, default=0, help="open suggestions of the issue's author")
-    p.add_argument("--json", required=True, help="where to write the result")
+    p.add_argument("--json", help="where to write the result (required unless --render)")
+    p.add_argument("--render", help="only write the comment for this --json result (no check)")
+    p.add_argument("--pr-url", help="with --render: the pull request prepared for the feed")
+    p.add_argument("--pr-existing", action="store_true", help="with --pr-url: it was opened for another issue")
     p.add_argument("--comment", required=True, help="where to write the comment (empty when skipped)")
     p.add_argument("--opml", default=str(check_feeds.SOURCE))
     p.add_argument("--timeout", type=int, default=TIMEOUT)
     args = p.parse_args(argv)
+    if args.render:
+        result = json.loads(Path(args.render).read_text(encoding="utf-8"))
+        Path(args.comment).write_text(render_comment(result, result.get("author", ""), args.pr_url, args.pr_existing),
+                                      encoding="utf-8")
+        return
+    if not args.issue or not args.json:
+        p.error("--issue and --json are required unless --render")
 
     issue = json.loads(Path(args.issue).read_text(encoding="utf-8"))
     last = Path(args.last_comment_file).read_text(encoding="utf-8") if args.last_comment_file else None
