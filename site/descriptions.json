@@ -610,6 +610,10 @@
       "en": "Hacker News front page: community-voted links on programming, startups, security and tech, with active discussion threads. Good for spotting what engineers are reading.",
       "fr": "Page d'accueil de Hacker News : liens votés par la communauté sur la programmation, les startups, la sécurité et la tech, avec des fils de discussion actifs. Pour voir ce que lisent les ingénieurs."
     },
+    "https://newsroom.ibm.com/announcements?pagetemplate=rss": {
+      "en": "Official press releases and announcements from IBM covering corporate news, partnerships, product updates, and financial results.",
+      "fr": "Communiqués de presse et annonces officielles d'IBM couvrant l'actualité de l'entreprise, ses partenariats, ses mises à jour de produits et ses résultats financiers."
+    },
     "https://objective-see.org/rss.xml": {
       "en": "Objective-See, Patrick Wardle's macOS security project: free Mac security tools and malware analyses for Apple platforms.",
       "fr": "Objective-See, projet de sécurité macOS de Patrick Wardle : outils de sécurité gratuits pour Mac et analyses de malwares sur les plateformes Apple."
