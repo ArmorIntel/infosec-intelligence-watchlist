@@ -25,6 +25,7 @@ TOOLS_FILE = SITE_DIR / "tools.json"  # RSS readers and automation tools shown o
 LOGO_DIR = SITE_DIR / "logos"  # their logos, from Simple Icons (CC0), inlined in the page
 WATCHLIST_FILE = "infosec-intelligence-watchlist.xml"
 REPO_URL = "https://github.com/ArmorIntel/infosec-intelligence-watchlist"
+SUGGEST_URL = f"{REPO_URL}/issues/new?template=suggest-feed.yml"  # issue form for visitors' suggestions (.github/ISSUE_TEMPLATE/suggest-feed.yml)
 CREDIT_URL = "https://github.com/ArmorIntel"
 LANGS = ("en", "fr")
 LANG_PREFIX = {"en": "", "fr": "fr/"}
@@ -304,6 +305,7 @@ def page_catalogue(ctx):
 </section>""")
     return f"""
 <h1>{e(s["title_catalogue"])}</h1>
+<p class="suggest-line">{e(s["catalogue_suggest"])} <a href="{e(SUGGEST_URL)}" rel="noopener">{e(s["suggest_btn"])}</a></p>
 <div class="layout">
   <nav class="sidebar" aria-label="{e(s["categories"])}">
     {"".join(side)}
@@ -553,6 +555,10 @@ def _layout(ctx, key, path, title_key, body):
 </main>
 <footer class="site-footer">
   <div class="wrap">
+    <div class="suggest">
+      <p>{e(s["suggest_text"])}</p>
+      <a class="suggest-btn" href="{e(SUGGEST_URL)}" rel="noopener">{e(s["suggest_btn"])}</a>
+    </div>
     <div class="star">
       <p>{e(s["footer_star_text"])}</p>
       <a class="star-btn" href="{REPO_URL}" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>{e(s["footer_star"])}</a>

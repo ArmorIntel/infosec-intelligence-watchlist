@@ -1,0 +1,27 @@
+name: Suggest a source
+description: Suggest a website or feed for the watchlist, from the link of one of its articles
+title: "Suggest a source: "
+labels:
+  - feed-suggestion
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping the watchlist! Paste the link of an article (or any page) of the source: no need to find its RSS feed. Every suggestion is reviewed before being added.
+
+        _Proposez une source : collez le lien d'un de ses articles, inutile de chercher le flux RSS. Chaque proposition est relue avant d'être ajoutée._
+  - type: input
+    id: link
+    attributes:
+      label: Link to an article or page of the source
+      description: Lien vers un article ou une page de la source
+      placeholder: https://example.com/2026/10/an-interesting-article
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is it useful? (optional)
+      description: Pourquoi est-ce utile ? (facultatif)
+    validations:
+      required: false
