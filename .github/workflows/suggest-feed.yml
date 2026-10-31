@@ -86,6 +86,7 @@ jobs:
         # a failure here must not keep the visitor without an answer
         continue-on-error: true
         env:
+          EVENT: ${{ github.event_name }}
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           AI_MODEL: ${{ vars.AI_MODEL }}
           AI_API_URL: ${{ vars.AI_API_URL }}
@@ -97,7 +98,7 @@ jobs:
           branch="suggestion/issue-$NUMBER"
 
           # another suggestion already proposes this feed
-          gh pr list --state open --json url,headRefName,body > prs.json
+          gh pr list --state open --limit 200 --json url,headRefName,body,isCrossRepository,author > prs.json
           other=$(python3 -c 'import json, sys; sys.path.insert(0, "scripts"); import suggest_pr
           prs = [p for p in json.load(open("prs.json")) if p["headRefName"] != sys.argv[2]]
           print(suggest_pr.find_open_pr_for_url(prs, sys.argv[1]) or "")' "$url" "$branch")
@@ -107,19 +108,29 @@ jobs:
             exit 0
           fi
 
+          # the bot's own pull request for this issue (never a fork's or a person's of the same name)
+          gh pr list --head "$branch" --state all --limit 20 \
+            --json url,state,headRefName,isCrossRepository,author > own.json
+          read -r state own < <(python3 -c 'import json, sys; sys.path.insert(0, "scripts"); import suggest_pr
+          pr = suggest_pr.bot_pr_for_branch(json.load(open("own.json")), sys.argv[1]) or {}
+          print(pr.get("state", "NONE"), pr.get("url", ""))' "$branch")
+          if [ "$state" = "OPEN" ]; then echo "$own" > pr-url.txt; fi
+          if { [ "$state" = "MERGED" ] || [ "$state" = "CLOSED" ]; } && [ "$EVENT" != "workflow_dispatch" ]; then
+            echo "::notice::The pull request of $branch is ${state,,}, left untouched (run manually to start again)"
+            exit 0
+          fi
+
           git fetch -q origin main
+          lease="refs/heads/$branch:"  # the branch must not exist yet...
           if git ls-remote --exit-code -q origin "refs/heads/$branch" > /dev/null; then
-            git fetch -q origin "$branch"
-            if git log "origin/main..origin/$branch" --format=%ae |
+            git fetch -q origin "$branch:refs/remotes/origin/$branch"
+            # an amend or rebase keeps the bot as author: check committers too
+            if git log "origin/main..origin/$branch" --format='%ae%n%ce' |
                 grep -qvxF "41898282+github-actions[bot]@users.noreply.github.com"; then
               echo "::notice::$branch has commits from someone else, left untouched"
               exit 0
             fi
-            state=$(gh pr list --head "$branch" --state all --json state --jq '.[0].state // ""')
-            if [ "$state" = "MERGED" ] || [ "$state" = "CLOSED" ]; then
-              echo "::notice::The pull request of $branch is ${state,,}, left untouched"
-              exit 0
-            fi
+            lease="refs/heads/$branch:$(git rev-parse "origin/$branch")"  # ...or still be where it was checked
           fi
 
           git config user.name "github-actions[bot]"
@@ -137,8 +148,9 @@ jobs:
 
           git add infosec-intelligence-watchlist.xml site/descriptions.json
           git commit -q -F commit.txt
-          git push -q -f origin "HEAD:refs/heads/$branch"
-          existing=$(gh pr list --head "$branch" --state open --json url --jq '.[0].url')
+          git push -q --force-with-lease="$lease" origin "HEAD:refs/heads/$branch"
+          existing=""
+          if [ "$state" = "OPEN" ]; then existing="$own"; fi
           if [ -n "$existing" ]; then
             gh pr edit "$existing" --title "$(cat title.txt)" --body-file pr.md
             pr="$existing"

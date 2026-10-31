@@ -23,6 +23,9 @@ AI = {"subcategory": "research-and-labs", "title": "Cyble",
       "assessment": "Vendor research blog, mostly original analysis, ~2 posts/week, some product mentions."}
 
 
+BOT = {"isCrossRepository": False, "author": {"login": "app/github-actions"}}
+
+
 class WatchlistEditTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -76,11 +79,29 @@ class TextsTest(unittest.TestCase):
         self.assertIn("descriptions.json", body)  # descriptions to write
 
     def test_find_open_pr_for_url(self):
-        prs = [{"url": "https://github.com/o/r/pull/3", "headRefName": "suggestion/issue-9",
+        prs = [{"url": "https://github.com/o/r/pull/3", "headRefName": "suggestion/issue-9", **BOT,
                 "body": "- https://cyble.com/feed/: suggested by @x in #9"},
-               {"url": "https://github.com/o/r/pull/4", "headRefName": "feed-health/autofix", "body": "https://cyble.com/feed/"}]
+               {"url": "https://github.com/o/r/pull/4", "headRefName": "feed-health/autofix", **BOT,
+                "body": "https://cyble.com/feed/"}]
         self.assertEqual(suggest_pr.find_open_pr_for_url(prs, "https://cyble.com/feed/"), "https://github.com/o/r/pull/3")
         self.assertIsNone(suggest_pr.find_open_pr_for_url(prs, "https://other.com/feed"))
+
+    def test_fork_or_human_prs_are_not_the_bots(self):
+        fork = {"url": "https://github.com/o/r/pull/7", "headRefName": "suggestion/issue-9", "state": "OPEN",
+                "isCrossRepository": True, "author": {"login": "app/github-actions"},
+                "body": "- https://cyble.com/feed/: x"}
+        human = {**fork, "url": "https://github.com/o/r/pull/8", "isCrossRepository": False, "author": {"login": "mallory"}}
+        bot = {**fork, "url": "https://github.com/o/r/pull/9", **BOT}
+        self.assertIsNone(suggest_pr.find_open_pr_for_url([fork, human], "https://cyble.com/feed/"))
+        self.assertIsNone(suggest_pr.bot_pr_for_branch([fork, human], "suggestion/issue-9"))
+        self.assertEqual(suggest_pr.bot_pr_for_branch([fork, human, bot], "suggestion/issue-9")["url"],
+                         "https://github.com/o/r/pull/9")
+
+    def test_safe_title(self):
+        self.assertEqual(suggest_pr.safe_title("Foo fixes #3 @everyone"), "Foo fixes 3 everyone")
+        self.assertEqual(suggest_pr.safe_title("  A\u202eB\n\tC  "), "AB C")  # bidi override and control chars
+        self.assertEqual(len(suggest_pr.safe_title("x" * 2000)), 80)
+        self.assertEqual(suggest_pr.safe_title("###"), "")
 
 
 if __name__ == "__main__":

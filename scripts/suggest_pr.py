@@ -23,8 +23,10 @@ import json
 import os
 import re
 import sys
+import unicodedata
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from urllib.parse import urlsplit
 from xml.sax.saxutils import quoteattr
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -36,6 +38,27 @@ from suggest_feed import LANGUAGES, _code, md_text  # noqa: E402
 
 DESCRIPTIONS = Path(__file__).resolve().parent.parent / "site" / "descriptions.json"
 FALLBACK_SUBCATEGORY = "security-news"
+TITLE_MAX = 80
+BOT_LOGINS = {"app/github-actions", "github-actions[bot]"}  # author of PRs opened with GITHUB_TOKEN
+
+
+def safe_title(title):
+    """Feed title fit for the OPML, the commit subject and the PR title.
+
+    No # or @ (a "fixes #3" would close issue 3, a mention would ping someone), no control or
+    invisible formatting characters (bidi overrides), one line, at most TITLE_MAX characters."""
+    text = "".join(ch for ch in str(title or "") if ch not in "#@" and (ch.isspace() or unicodedata.category(ch) not in ("Cc", "Cf")))
+    return " ".join(text.split())[:TITLE_MAX].strip()
+
+
+def is_bot_pr(pr):
+    """True for a pull request the bot opened in this repository (not from a fork, not by a person)."""
+    return not pr.get("isCrossRepository") and (pr.get("author") or {}).get("login") in BOT_LOGINS
+
+
+def bot_pr_for_branch(prs, branch):
+    """The bot's latest pull request for a branch (gh lists newest first), or None."""
+    return next((pr for pr in prs if pr.get("headRefName") == branch and is_bot_pr(pr)), None)
 
 
 def _indent(line):
@@ -124,7 +147,8 @@ def pr_body(result, ai, sub_name, issue):
 def find_open_pr_for_url(prs, url):
     """URL of an open suggestion pull request that already adds this feed, or None."""
     for pr in prs:
-        if pr.get("headRefName", "").startswith("suggestion/") and f"- {url}:" in (pr.get("body") or ""):
+        if pr.get("headRefName", "").startswith("suggestion/") and is_bot_pr(pr) \
+                and f"- {url}:" in (pr.get("body") or ""):
             return pr["url"]
     return None
 
@@ -147,7 +171,7 @@ def main(argv=None):
     subs, examples = suggest_ai.catalog(watchlist, site_data.load_descriptions(args.descriptions))
     ai = suggest_ai.enrich(feed, result.get("why", ""), subs, examples, suggest_ai.config_from_env(os.environ))
     slug = ai["subcategory"] if ai else FALLBACK_SUBCATEGORY
-    title = ai["title"] if ai else re.sub(r"\s+", " ", feed["title"]).strip()
+    title = safe_title(ai["title"] if ai else feed["title"]) or safe_title(urlsplit(feed["url"]).netloc)
     sub_name = next(s["name"] for s in subs if s["slug"] == slug)
 
     add_feed(args.opml, slug, title, feed["url"], feed.get("site") or "")
