@@ -165,7 +165,14 @@ python3 scripts/check_feeds.py --markdown report.md
 ## Contributing
 
 Contributions are welcome!
-If you want to add new feeds or suggest improvements:
+
+### Suggest a source
+
+The easiest way: [suggest a source](https://github.com/ArmorIntel/infosec-intelligence-watchlist/issues/new?template=suggest-feed.yml) (also linked at the bottom of every page of the website). Paste the link of one of its articles, no need to find the RSS feed. Every suggestion is reviewed before being added.
+
+### Edit the watchlist yourself
+
+To add feeds or suggest improvements with a pull request:
 - Fork this repository
 - Update the xml file (`infosec-intelligence-watchlist.xml` is the only file to edit): keep two folder levels and feeds sorted alphabetically
 - Don't edit the `opml/` files or the generated parts of this README: they are regenerated automatically once your change is merged

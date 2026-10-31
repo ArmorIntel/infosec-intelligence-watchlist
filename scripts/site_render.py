@@ -25,6 +25,7 @@ TOOLS_FILE = SITE_DIR / "tools.json"  # RSS readers and automation tools shown o
 LOGO_DIR = SITE_DIR / "logos"  # their logos, from Simple Icons (CC0), inlined in the page
 WATCHLIST_FILE = "infosec-intelligence-watchlist.xml"
 REPO_URL = "https://github.com/ArmorIntel/infosec-intelligence-watchlist"
+SUGGEST_URL = f"{REPO_URL}/issues/new?template=suggest-feed.yml"  # issue form for visitors' suggestions (.github/ISSUE_TEMPLATE/suggest-feed.yml)
 CREDIT_URL = "https://github.com/ArmorIntel"
 LANGS = ("en", "fr")
 LANG_PREFIX = {"en": "", "fr": "fr/"}

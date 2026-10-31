@@ -412,5 +412,24 @@ class HealthRenderTest(unittest.TestCase):
         self.assertNotIn("badge unstable", cat)
 
 
+TEMPLATE = ROOT / ".github" / "ISSUE_TEMPLATE" / "suggest-feed.yml"
+
+
+class SuggestTemplateTest(unittest.TestCase):
+    def test_suggest_template_matches_url(self):
+        self.assertTrue(site_render.SUGGEST_URL.startswith(site_render.REPO_URL + "/issues/new?template="))
+        name = site_render.SUGGEST_URL.split("template=", 1)[1]
+        self.assertEqual(name, TEMPLATE.name)
+        self.assertTrue(TEMPLATE.is_file())
+
+    def test_suggest_template_fields(self):
+        text = TEMPLATE.read_text(encoding="utf-8")
+        self.assertIn("id: link", text)
+        self.assertIn("id: why", text)
+        self.assertIn("label: Link to an article or page of the source", text)
+        self.assertIn("- feed-suggestion", text)
+        self.assertIn("Proposez une source", text)  # French intro line
+
+
 if __name__ == "__main__":
     unittest.main()
