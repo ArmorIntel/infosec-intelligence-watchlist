@@ -229,6 +229,24 @@ class RenderTest(unittest.TestCase):
             self.assertIn('class="star-btn" href="https://github.com/ArmorIntel/infosec-intelligence-watchlist"', footer)
         self.assertIn("Created and maintained by", self.page("index.html"))
 
+    def test_suggest_footer(self):
+        url = 'href="https://github.com/ArmorIntel/infosec-intelligence-watchlist/issues/new?template=suggest-feed.yml"'
+        for rel in ["index.html", "catalogue/index.html", "news/index.html", "changes/index.html", "health/index.html",
+                    "fr/index.html", "fr/catalogue/index.html", "fr/news/index.html", "fr/changes/index.html",
+                    "fr/health/index.html"]:
+            html = self.page(rel)
+            footer = html[html.index("<footer"):]
+            self.assertIn('class="suggest-btn" ' + url, footer, rel)
+        self.assertIn("Suggest a source", self.page("index.html"))
+        self.assertIn("Proposer une source", self.page("fr/index.html"))
+
+    def test_suggest_catalogue(self):
+        en, fr = self.page("catalogue/index.html"), self.page("fr/catalogue/index.html")
+        main = en[en.index("<main"):en.index("<footer")]
+        self.assertIn("Missing a source?", main)
+        self.assertIn("issues/new?template=suggest-feed.yml", main)
+        self.assertIn("Il manque une source ?", fr[fr.index("<main"):fr.index("<footer")])
+
     def test_changes_page(self):
         html = self.page("changes/index.html")
         self.assertNotIn(XSS, html)
