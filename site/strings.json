@@ -121,7 +121,8 @@
     "footer_star": "Star on GitHub",
     "suggest_text": "Spotted a source worth following? Paste the link of one of its articles, no need to find the RSS feed. Every suggestion is reviewed before being added.",
     "suggest_btn": "Suggest a source",
-    "catalogue_suggest": "Missing a source?"
+    "catalogue_suggest": "Missing a source?",
+    "catalogue_suggest_text": "Paste the link of one of its articles, no need to find the RSS feed. Every suggestion is reviewed before being added."
   },
   "fr": {
     "skip": "Aller au contenu",
@@ -245,6 +246,7 @@
     "footer_star": "Mettre une étoile sur GitHub",
     "suggest_text": "Vous avez repéré une source à suivre ? Collez le lien d'un de ses articles, inutile de chercher le flux RSS. Chaque proposition est relue avant d'être ajoutée.",
     "suggest_btn": "Proposer une source",
-    "catalogue_suggest": "Il manque une source ?"
+    "catalogue_suggest": "Il manque une source ?",
+    "catalogue_suggest_text": "Collez le lien d'un de ses articles, inutile de chercher le flux RSS. Chaque proposition est relue avant d'être ajoutée."
   }
 }

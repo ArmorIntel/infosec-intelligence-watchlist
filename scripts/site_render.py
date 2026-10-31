@@ -48,6 +48,11 @@ def safe_url(url):
     return str(url).strip() if scheme in ("http", "https") else None
 
 
+def asset_version(name):
+    """Short hash of a static file, appended to its URL so browsers drop a cached copy once it changes."""
+    return hashlib.sha1((STATIC_DIR / name).read_bytes()).hexdigest()[:8]
+
+
 def plural(s, key, n):
     """The `key` string of `s` for count `n`: `key_one` when n is 1, else `key` with {n} filled in."""
     return s[key + "_one"] if n == 1 else s[key].replace("{n}", str(n))
@@ -305,7 +310,11 @@ def page_catalogue(ctx):
 </section>""")
     return f"""
 <h1>{e(s["title_catalogue"])}</h1>
-<p class="suggest-line">{e(s["catalogue_suggest"])} <a href="{e(SUGGEST_URL)}" rel="noopener">{e(s["suggest_btn"])}</a></p>
+<aside class="suggest-callout">
+  <div><p class="suggest-title">{e(s["catalogue_suggest"])}</p>
+  <p>{e(s["catalogue_suggest_text"])}</p></div>
+  <a class="btn primary suggest-cta" href="{e(SUGGEST_URL)}" rel="noopener">{PLUS_ICON}{e(s["suggest_btn"])}</a>
+</aside>
 <div class="layout">
   <nav class="sidebar" aria-label="{e(s["categories"])}">
     {"".join(side)}
@@ -498,6 +507,9 @@ MARK = ('<svg class="mark" viewBox="0 0 32 32" aria-hidden="true" focusable="fal
         '<ellipse class="meridian" cx="16" cy="16" rx="13" ry="13"/>'
         '<ellipse class="meridian late" cx="16" cy="16" rx="13" ry="13"/></g>'
         '<circle class="signal" cx="23" cy="9" r="2.2" fill="#ff3d71"/></svg>')
+# The "+" of the "Suggest a source" buttons.
+PLUS_ICON = ('<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
+             '<path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>')
 
 
 def _layout(ctx, key, path, title_key, body):
@@ -533,8 +545,8 @@ def _layout(ctx, key, path, title_key, body):
 <title>{e(title)}</title>
 <meta name="description" content="{e(s["meta_description"])}">
 <link rel="alternate" hreflang="{other}" href="{e(switch)}">
-<link rel="stylesheet" href="{e(root)}static/style.css">
-<script src="{e(root)}static/app.js" defer></script>
+<link rel="stylesheet" href="{e(root)}static/style.css?v={asset_version("style.css")}">
+<script src="{e(root)}static/app.js?v={asset_version("app.js")}" defer></script>
 </head>
 <body data-page="{e(key)}">
 <a class="skip" href="#content">{e(s["skip"])}</a>
@@ -557,7 +569,7 @@ def _layout(ctx, key, path, title_key, body):
   <div class="wrap">
     <div class="suggest">
       <p>{e(s["suggest_text"])}</p>
-      <a class="suggest-btn" href="{e(SUGGEST_URL)}" rel="noopener">{e(s["suggest_btn"])}</a>
+      <a class="suggest-btn" href="{e(SUGGEST_URL)}" rel="noopener">{PLUS_ICON}{e(s["suggest_btn"])}</a>
     </div>
     <div class="star">
       <p>{e(s["footer_star_text"])}</p>

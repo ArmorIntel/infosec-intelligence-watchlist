@@ -112,14 +112,28 @@ h3 { font-size: 1.05rem; margin: 0 0 0.4rem; }
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 .star p, .suggest p { margin: 0; max-width: 62ch; font-size: 0.95rem; color: #e6ecf7; }
-/* outline button, so the star stays the strongest call to action */
 .site-footer .suggest-btn {
-  display: inline-flex; align-items: center; padding: 10px 18px; border-radius: 999px; flex: none;
-  border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; font-weight: 600; text-decoration: none;
-  transition: transform 0.2s, border-color 0.2s;
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 999px; flex: none;
+  background: linear-gradient(90deg, #22c4ff, #7c5cff); color: #ffffff; font-weight: 600; text-decoration: none;
+  box-shadow: 0 8px 30px rgba(34, 196, 255, 0.3); transition: transform 0.2s, box-shadow 0.2s;
 }
-.site-footer .suggest-btn:hover { transform: translateY(-1px); border-color: #ffffff; }
-.suggest-line { margin: 4px 0 20px; color: var(--muted); }
+.site-footer .suggest-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 40px rgba(124, 92, 255, 0.5); }
+.suggest-btn svg, .suggest-cta svg { width: 16px; height: 16px; flex: none; }
+
+/* "Missing a source?" callout at the top of the catalogue */
+.suggest-callout {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px;
+  margin: 0 0 28px; padding: 16px 20px; border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-left: 4px solid var(--accent);
+}
+.suggest-callout p { margin: 0; max-width: 70ch; color: var(--muted); }
+.suggest-callout .suggest-title { margin-bottom: 4px; font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.btn.suggest-cta {
+  display: inline-flex; align-items: center; gap: 8px; flex: none;
+  padding: 10px 18px; border-radius: 999px; font-size: 0.95rem; font-weight: 600;
+}
 .site-footer .star-btn {
   display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 999px; flex: none;
   background: #ffffff; color: #05070d; font-weight: 600; text-decoration: none;

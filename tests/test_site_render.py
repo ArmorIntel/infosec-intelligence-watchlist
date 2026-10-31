@@ -111,8 +111,8 @@ class RenderTest(unittest.TestCase):
             html = self.page(rel)
             self.assertIn(needle, html, rel)
             self.assertNotRegex(html, r'(href|src)="/(?!/)', rel)
-        self.assertIn('href="../static/style.css"', self.page("catalogue/index.html"))
-        self.assertIn('href="../../static/style.css"', self.page("fr/news/index.html"))
+        self.assertIn('href="../static/style.css?v=', self.page("catalogue/index.html"))
+        self.assertIn('href="../../static/style.css?v=', self.page("fr/news/index.html"))
 
     def test_escaping(self):
         for rel in ["catalogue/index.html", "news/index.html", "fr/catalogue/index.html"]:
@@ -246,6 +246,17 @@ class RenderTest(unittest.TestCase):
         self.assertIn("Missing a source?", main)
         self.assertIn("issues/new?template=suggest-feed.yml", main)
         self.assertIn("Il manque une source ?", fr[fr.index("<main"):fr.index("<footer")])
+        self.assertIn('class="suggest-callout"', main)
+        self.assertIn('class="btn primary suggest-cta"', main)
+        self.assertIn("no need to find the RSS feed", main)
+
+    def test_static_assets_versioned(self):
+        # a new build must never pair new HTML with a stylesheet cached from the previous one
+        for name in ("style.css", "app.js"):
+            version = site_render.asset_version(name)
+            self.assertRegex(version, r"^[0-9a-f]{8}$")
+            self.assertIn(f'static/{name}?v={version}"', self.page("index.html"))
+            self.assertIn(f'../../static/{name}?v={version}"', self.page("fr/news/index.html"))
 
     def test_changes_page(self):
         html = self.page("changes/index.html")
