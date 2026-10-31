@@ -274,6 +274,22 @@ class RunAndRenderTest(unittest.TestCase):
         self.assertNotIn("<b>", ready)
         self.assertNotIn("<i>", ready)
 
+    def test_render_ready_with_pr(self):
+        text = suggest_feed.render_comment(sample_result("ready"), "visitor", "https://github.com/o/r/pull/12")
+        self.assertIn("Next: the maintainer reviews the pull request https://github.com/o/r/pull/12", text)
+        self.assertIn("_Flux trouvé : le mainteneur relit la pull request avant de l'ajouter._", text)
+        self.assertNotIn("reviews this suggestion before", text)
+        text = suggest_feed.render_comment(sample_result("ready"), "visitor", "https://github.com/o/r/pull/3", True)
+        self.assertIn("This feed is already proposed in https://github.com/o/r/pull/3.", text)
+
+    def test_cli_render_mode(self):
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            (d / "result.json").write_text(json.dumps(sample_result("ready")))
+            suggest_feed.main(["--render", str(d / "result.json"), "--comment", str(d / "comment.md"),
+                               "--pr-url", "https://github.com/o/r/pull/12"])
+            self.assertIn("pull/12", (d / "comment.md").read_text())
+
     def test_cli_writes_outputs(self):
         with tempfile.TemporaryDirectory() as d:
             d = Path(d)
