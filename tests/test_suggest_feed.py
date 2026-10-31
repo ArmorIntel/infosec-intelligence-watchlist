@@ -1,3 +1,4 @@
+import io
 import json
 import sys
 import tempfile
@@ -217,7 +218,8 @@ class RunAndRenderTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             d = Path(d)
             (d / "issue.json").write_text(json.dumps({"body": FORM, "author": {"login": "v"}, "state": "OPEN"}))
-            with mock.patch.object(suggest_feed, "analyse", return_value=sample_result("ready")):
+            with mock.patch.object(suggest_feed, "analyse", return_value=sample_result("ready")), \
+                    mock.patch("sys.stdout", io.StringIO()):
                 suggest_feed.main(["--issue", str(d / "issue.json"), "--open-suggestions", "0",
                                    "--json", str(d / "result.json"), "--comment", str(d / "comment.md")])
             self.assertEqual(json.loads((d / "result.json").read_text())["status"], "ready")

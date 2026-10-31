@@ -1,0 +1,100 @@
+name: Feed suggestion
+
+# Checks a source suggested by a visitor with the "Suggest a source" issue form
+# (label feed-suggestion): finds the site's feed from the pasted link, checks
+# that it is new, valid and active (scripts/suggest_feed.py), then answers on
+# the issue with a single comment, edited on later runs, and a
+# "suggestion: <status>" label. Already-listed sources are closed. Editing the
+# issue runs the check again only if the link changed. The maintainer decides
+# what is added. Run it manually to check an issue again.
+
+on:
+  issues:
+    types: [opened, edited, labeled]
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: "Issue number to check again"
+        required: true
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: suggest-feed-${{ github.event.issue.number || inputs.issue }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (contains(github.event.issue.labels.*.name, 'feed-suggestion') &&
+       (github.event.action != 'labeled' || github.event.label.name == 'feed-suggestion'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      NUMBER: ${{ github.event.issue.number || inputs.issue }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Read the issue
+        env:
+          ACTION: ${{ github.event.action }}
+          PREVIOUS_BODY: ${{ github.event.changes.body.from }}
+        run: |
+          gh issue view "$NUMBER" --json body,author,state > issue.json
+          if [ "$ACTION" = "edited" ]; then
+            printf '%s' "$PREVIOUS_BODY" > prev.md
+          fi
+          author=$(jq -r .author.login issue.json)
+          gh issue list --label feed-suggestion --author "$author" --state open --json number --jq length > open.txt
+
+      - name: Check the suggested source
+        run: |
+          extra=()
+          if [ -f prev.md ]; then extra=(--previous-body-file prev.md); fi
+          python3 scripts/suggest_feed.py --issue issue.json "${extra[@]}" \
+            --open-suggestions "$(cat open.txt)" --json result.json --comment comment.md
+          cat comment.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Answer on the issue
+        run: |
+          status=$(jq -r .status result.json)
+          if [ "$status" = "skip" ]; then
+            echo "Nothing to do."
+            exit 0
+          fi
+          id=$(gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$NUMBER/comments" \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | contains("<!-- feed-suggestion-bot -->"))) | .id' | head -1)
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$id" -F body=@comment.md > /dev/null
+          else
+            gh issue comment "$NUMBER" --body-file comment.md
+          fi
+
+          while read -r name color; do
+            gh label create "suggestion: $name" --color "$color" --description "Feed suggestion check result" --force
+          done <<'EOF'
+          ready 2f9e5b
+          duplicate 8a929e
+          no-feed e08a00
+          inactive 8a929e
+          needs-review 1f8fb3
+          invalid c93a3a
+          EOF
+          gh issue view "$NUMBER" --json labels --jq '.labels[].name | select(startswith("suggestion: "))' |
+            while read -r old; do
+              if [ "$old" != "suggestion: $status" ]; then gh issue edit "$NUMBER" --remove-label "$old"; fi
+            done
+          if [ "$status" != "limit" ]; then
+            gh issue edit "$NUMBER" --add-label "suggestion: $status"
+          fi
+          if [ "$status" = "duplicate" ]; then
+            gh issue close "$NUMBER" --reason "not planned"
+          fi
