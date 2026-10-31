@@ -122,7 +122,7 @@ def download(url, timeout):
     when the download failed (curl error or HTTP error code).
     """
     res = {"url": url}
-    cmd = ["curl", "-sS", "-L", "--compressed", "--http1.1", "--max-time", str(timeout), "--max-filesize", "20000000",
+    cmd = ["curl", "-sS", "-g", "-L", "--compressed", "--http1.1", "--max-time", str(timeout), "--max-filesize", "20000000",
            "-A", UA, "-H", "Accept: application/rss+xml, application/atom+xml, application/xml;q=0.9, */*;q=0.8",
            "-w", META.decode() + "%{http_code} %{url_effective}", url]
     p = subprocess.run(cmd, capture_output=True)

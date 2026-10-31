@@ -60,7 +60,7 @@ def norm(url):
 
 def fetch_page(url, timeout):
     """Return (curl exit code, HTML of the page)."""
-    p = subprocess.run(["curl", "-sS", "-L", "--compressed", "--http1.1", "--max-time", str(timeout),
+    p = subprocess.run(["curl", "-sS", "-g", "-L", "--compressed", "--http1.1", "--max-time", str(timeout),
                         "-A", UA, url], capture_output=True)
     return p.returncode, p.stdout.decode("utf-8", "replace")
 
