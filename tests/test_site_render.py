@@ -181,6 +181,15 @@ class RenderTest(unittest.TestCase):
         self.assertIn(self.strings_en()["news_empty"], ai)
         self.assertIn('href="https://a.com/1"', html)
 
+    def test_news_language_filter(self):
+        html = self.page("news/index.html")
+        self.assertIn('<fieldset class="lang-filter" hidden>', html)  # shown by app.js
+        self.assertIn('<input type="radio" name="news-lang" value="" checked> Both', html)
+        self.assertIn('<li lang="en"><a class="title" href="https://a.com/1"', html)
+        self.assertIn(self.strings_en()["news_lang_empty"], html)
+        self.assertIn("> Les deux</label>", self.page("fr/news/index.html"))
+        self.assertIn('<span class="filter-label" id="news-tabs-label">Categories</span>', html)
+
     def strings_en(self):
         return fixture()[3]["en"]
 
@@ -217,6 +226,7 @@ class RenderTest(unittest.TestCase):
             self.assertIn('href="https://github.com/ArmorIntel"', footer)
             self.assertIn('href="https://github.com/ArmorIntel/infosec-intelligence-watchlist"', footer)
             self.assertIn(f'<time datetime="{NOW.isoformat()}"', footer)
+            self.assertIn('class="star-btn" href="https://github.com/ArmorIntel/infosec-intelligence-watchlist"', footer)
         self.assertIn("Created and maintained by", self.page("index.html"))
 
     def test_changes_page(self):
@@ -291,6 +301,38 @@ class RenderTest(unittest.TestCase):
         self.assertIn(">3<", html)  # feeds
         self.assertIn(">2<", html)  # subcategories
 
+    def test_home_tools(self):
+        html = self.page("index.html")
+        self.assertIn('<h2 id="workflow">Plug it into your watch</h2>', html)
+        tools = html[html.index('<section class="howto"'):]
+        self.assertIn("<h4>Inoreader</h4>", tools)
+        self.assertIn('<svg aria-hidden="true" focusable="false" fill="#1875F3"', tools)  # inlined logo
+        self.assertIn("<strong>Add feed › Import feeds</strong>", tools)
+        self.assertIn('href="https://docs.feedly.com/article/51-how-to-import-opml-into-feedly"', tools)
+        self.assertIn("Documentation officielle", self.page("fr/index.html"))
+
+    def test_tools_file_complete(self):
+        tools = json.loads(site_render.TOOLS_FILE.read_text(encoding="utf-8"))
+        for tool in tools["readers"] + tools["automation"]:
+            self.assertTrue((site_render.LOGO_DIR / f"{tool['id']}.svg").is_file(), tool["id"])
+            self.assertTrue(tool["docs"].startswith("https://"), tool["id"])
+            for lang in ("en", "fr"):
+                self.assertTrue(tool["kind"][lang] and tool["steps"][lang], (tool["id"], lang))
+            self.assertEqual(len(tool["steps"]["en"]), len(tool["steps"]["fr"]), tool["id"])
+            if "note" in tool:
+                self.assertEqual(set(tool["note"]), {"en", "fr"}, tool["id"])
+
+    def test_home_hero(self):
+        html = self.page("index.html")
+        s = self.strings_en()
+        self.assertIn("<dt>Articles in 7 days</dt><dd>1</dd>", html)
+        self.assertNotIn(s["stat_up"], html)  # no health history in this fixture
+        ticker = html[html.index('class="intel-ticker"'):]
+        self.assertEqual(ticker.count('href="https://a.com/1"'), 2)  # list, then its copy for the loop
+        self.assertIn('<ul aria-hidden="true"><li><a tabindex="-1" href="https://a.com/1"', ticker)
+        self.assertNotIn("<script>alert", ticker)
+        self.assertIn(">Transformez le bruit<", self.page("fr/index.html"))
+
 
 A_URL = "https://a.com/feed?x=1&y=2"
 HEALTH = {
@@ -327,6 +369,10 @@ class HealthRenderTest(unittest.TestCase):
         self.assertIn('hreflang="fr" href="../fr/health/"', html)
         self.assertIn(">Santé des flux<", self.page("fr/health/index.html"))
         self.assertIn(">Health<", self.page("index.html"))
+
+    def test_home_up_share(self):
+        # Feeds A and C worked at the last build; B's collection issue is left out.
+        self.assertIn("<dt>Feeds up at last check</dt><dd>100%</dd>", self.page("index.html"))
 
     def test_groups_and_order(self):
         html = self.page("health/index.html")

@@ -172,5 +172,47 @@ class NewsTest(unittest.TestCase):
         self.assertEqual(len(out["all"]), 1)
 
 
+    def test_news_language_and_cap_per_language(self):
+        a = [item(i, 0.001 * i + 0.5) for i in range(60)]  # English titles ("t0"...)
+        c = [item(1000 + i, 2 + 0.001 * i, "Une faille dans le pare-feu est exploitée") for i in range(3)]
+        out = site_data.news(self.wl, self.state(a, c), NOW)
+        self.assertEqual({i["lang"] for i in out["vendors"]}, {"en"})
+        self.assertEqual({i["lang"] for i in out["media-and-blogs"]}, {"fr"})
+        self.assertEqual(len([i for i in out["vendors"] if i["lang"] == "en"]), 50)
+        # The 3 older French articles stay in "all" although 60 English ones are newer.
+        self.assertEqual(len(out["all"]), 63)
+        dates = [i["date"] for i in out["all"]]
+        self.assertEqual(dates, sorted(dates, reverse=True))
+
+
+class TickerTest(unittest.TestCase):
+    def setUp(self):
+        self.wl = watchlist_fixture()
+        empty = {"latest": None, "items": [], "rate": None, "fetched": None}
+        fr = [item(10 + i, 0.1 * i, "Une faille critique dans le pare-feu est exploitée") for i in range(3)]
+        en = [item(20 + i, 0.1 * i, "New ransomware group targets the energy sector") for i in range(3)]
+        other = [item(30, 0.05, "The best gaming mouse deals of the week")]
+        self.state = {"https://a.com/feed": {**empty, "items": en},
+                      "https://b.com/feed": {**empty, "items": fr},
+                      "https://c.com/feed": {**empty, "items": other}}  # outside the cyber category
+
+    def test_feed_language(self):
+        self.assertEqual(site_data.feed_language(self.state["https://b.com/feed"]["items"]), "fr")
+        self.assertEqual(site_data.feed_language(self.state["https://a.com/feed"]["items"]), "en")
+        self.assertEqual(site_data.feed_language([]), "en")
+
+    def test_ticker_by_language_and_category(self):
+        en = site_data.ticker(self.wl, self.state, NOW, "en", 10)
+        self.assertEqual([i["link"] for i in en], ["https://x.com/20", "https://x.com/21"])  # 2 per feed
+        self.assertEqual(en[0]["source"], "Feed A")
+        fr = site_data.ticker(self.wl, self.state, NOW, "fr", 10)
+        self.assertEqual({i["source"] for i in fr}, {"Feed B"})
+
+    def test_ticker_skips_excluded_subcategories(self):
+        for sub in self.wl[0]["subcategories"]:
+            sub["slug"] = "alerts-and-monitoring"
+        self.assertEqual(site_data.ticker(self.wl, self.state, NOW, "en", 10), [])
+
+
 if __name__ == "__main__":
     unittest.main()
