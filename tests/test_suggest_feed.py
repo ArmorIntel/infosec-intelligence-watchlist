@@ -1,4 +1,6 @@
+import json
 import sys
+import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from email.utils import format_datetime
@@ -152,12 +154,74 @@ class AnalyseTest(unittest.TestCase):
         self.assertEqual(r["status"], "no-feed")
         self.assertGreater(r["tried"], 0)
 
+    def test_comment_feeds_are_ignored(self):
+        # WordPress declares the main feed (known), the site comments feed and the post's comments feed
+        page = (0, '<link rel="alternate" type="application/rss+xml" title="A &raquo; Feed" href="https://a.com/feed/">'
+                   '<link rel="alternate" type="application/rss+xml" title="A &raquo; Comments Feed" '
+                   'href="https://a.com/comments/feed/">'
+                   '<link rel="alternate" type="application/rss+xml" title="A &raquo; Post Comments Feed" '
+                   'href="https://a.com/2026/10/post/feed/">')
+        r = self.run_analyse("https://a.com/2026/10/post/", pages={"https://a.com/2026/10/post/": page},
+                             feeds={"https://a.com/feed/": RECENT, "https://a.com/comments/feed/": RECENT,
+                                    "https://a.com/2026/10/post/feed/": RECENT})
+        self.assertEqual(r["status"], "duplicate")
+
     def test_prefers_feed_closest_to_the_article(self):
         r = self.run_analyse("https://d.com/security/post",
                              pages={"https://d.com/security/post": declares("/feed", "/security/feed")},
                              feeds={"https://d.com/feed": RECENT, "https://d.com/security/feed": RECENT})
         self.assertEqual(r["feed"]["url"], "https://d.com/security/feed")
         self.assertEqual(r["alternatives"], ["https://d.com/feed"])
+
+
+def sample_result(status, title="Example feed", same_site=False):
+    feed = {"url": "https://b.com/feed", "title": title, "site": "https://b.com/", "latest": "2026-10-28T00:00:00+00:00",
+            "items": 2, "rate": 3.5, "language": "en", "samples": ["First <i>", "Second"], "error": None}
+    return {"status": status, "link": "https://b.com/post",
+            "feed": feed if status in ("ready", "inactive", "needs-review") else None,
+            "alternatives": ["https://b.com/other"] if status == "ready" else [],
+            "existing": KNOWN[0] if status == "duplicate" else None,
+            "same_site": KNOWN if same_site else [], "tried": 12, "why": "", "author": "visitor"}
+
+
+class RunAndRenderTest(unittest.TestCase):
+    def test_unchanged_link_skips(self):
+        issue = {"body": FORM.replace("_No response_", "typo fixed"), "author": {"login": "v"}, "state": "OPEN"}
+        with mock.patch.object(suggest_feed, "analyse") as analyse:
+            r = suggest_feed.run(issue, FORM, 0, [], 5, NOW)
+        self.assertEqual(r["status"], "skip")
+        analyse.assert_not_called()
+
+    def test_closed_issue_skips(self):
+        r = suggest_feed.run({"body": FORM, "author": {"login": "v"}, "state": "CLOSED"}, None, 0, [], 5, NOW)
+        self.assertEqual(r["status"], "skip")
+
+    def test_invalid_and_limit(self):
+        bad = {"body": "no link here", "author": {"login": "v"}, "state": "OPEN"}
+        self.assertEqual(suggest_feed.run(bad, None, 0, [], 5, NOW)["status"], "invalid")
+        ok = {"body": FORM, "author": {"login": "v"}, "state": "OPEN"}
+        self.assertEqual(suggest_feed.run(ok, None, 6, [], 5, NOW)["status"], "limit")  # more than MAX_OPEN = 5
+
+    def test_render_every_status(self):
+        for status in ["ready", "duplicate", "no-feed", "inactive", "needs-review", "invalid", "limit"]:
+            text = suggest_feed.render_comment(sample_result(status), "visitor")
+            self.assertTrue(text.startswith("<!-- feed-suggestion-bot -->\n"), status)
+            self.assertRegex(text.strip().splitlines()[-1], r"^_.+_$", status)  # French line last
+        ready = suggest_feed.render_comment(sample_result("ready", title="@everyone <b>x</b>", same_site=True), "visitor")
+        self.assertIn("already followed via", ready)
+        self.assertNotIn("@everyone", ready)
+        self.assertNotIn("<b>", ready)
+        self.assertNotIn("<i>", ready)
+
+    def test_cli_writes_outputs(self):
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            (d / "issue.json").write_text(json.dumps({"body": FORM, "author": {"login": "v"}, "state": "OPEN"}))
+            with mock.patch.object(suggest_feed, "analyse", return_value=sample_result("ready")):
+                suggest_feed.main(["--issue", str(d / "issue.json"), "--open-suggestions", "0",
+                                   "--json", str(d / "result.json"), "--comment", str(d / "comment.md")])
+            self.assertEqual(json.loads((d / "result.json").read_text())["status"], "ready")
+            self.assertTrue((d / "comment.md").read_text().startswith("<!-- feed-suggestion-bot -->"))
 
 
 if __name__ == "__main__":
