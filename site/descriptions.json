@@ -546,6 +546,10 @@
       "en": "Javvad Malik's personal blog: security commentary and industry opinion, with a 'Breach of Confidence' roundup. Light-toned and aimed at awareness and culture.",
       "fr": "Le blog personnel de Javvad Malik : commentaires et opinions sur le secteur, avec la revue « Breach of Confidence ». Ton léger, orienté sensibilisation et culture sécurité."
     },
+    "https://joho-todai.com/en/rss/": {
+      "en": "Joho no Todai publishes broad technology and cybersecurity news covering software, hardware, policy, and AI developments.",
+      "fr": "Joho no Todai publie des actualités générales sur la technologie et la cybersécurité, couvrant les logiciels, le matériel, la politique et les évolutions de l'IA."
+    },
     "https://josephthacker.com/feed.xml": {
       "en": "Personal blog of security researcher Joseph Thacker (rez0) on AI security, bug bounty and hacking with LLMs.",
       "fr": "Blog personnel du chercheur Joseph Thacker (rez0) sur la sécurité de l'IA, le bug bounty et le piratage assisté par LLM."
