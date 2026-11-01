@@ -8,6 +8,7 @@ name: Feed suggestion
 # valid feed, it also opens a pull request adding it (branch
 # suggestion/issue-<n>, one commit on main): an AI proposes the subcategory and
 # the English and French descriptions (scripts/suggest_pr.py, scripts/suggest_ai.py),
+# the per-category OPML files and the README are regenerated in the same commit,
 # and the same checks as validate-pr.yml run first. GitHub holds validate-pr.yml
 # on the bot's pull requests until the maintainer clicks "Approve workflows to
 # run": the required "validate" check then reports on the PR.
@@ -138,6 +139,8 @@ jobs:
           git switch -q -C "$branch" origin/main
           python3 scripts/suggest_pr.py --result result.json --issue "$NUMBER" --title-file title.txt \
             --commit-message commit.txt --pr-body pr.md --new-urls new.txt
+          # main only takes pull requests: the generated files come with the change
+          python3 scripts/build_category_opml.py --readme
 
           # same checks as validate-pr.yml, whose run waits for the maintainer's approval
           python3 -m unittest discover -s tests
@@ -146,7 +149,7 @@ jobs:
             --fail-on dead,inactive,abandoned --markdown checks.md
           { echo; echo "## Checks"; echo; cat checks.md; } >> pr.md
 
-          git add infosec-intelligence-watchlist.xml site/descriptions.json
+          git add infosec-intelligence-watchlist.xml site/descriptions.json opml README.md
           git commit -q -F commit.txt
           git push -q --force-with-lease="$lease" origin "HEAD:refs/heads/$branch"
           existing=""

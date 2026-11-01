@@ -96,8 +96,10 @@ jobs:
             exit 0
           fi
           python3 scripts/validate_opml.py
+          # main only takes pull requests: the generated files come with the change
+          python3 scripts/build_category_opml.py --readme
           git switch -q -c "$FIX_BRANCH"
-          git add infosec-intelligence-watchlist.xml scripts/feed-exceptions.txt
+          git add infosec-intelligence-watchlist.xml scripts/feed-exceptions.txt opml README.md
           git commit -q -F commit.txt
           git push -q -f origin "HEAD:refs/heads/$FIX_BRANCH"
           title="Feed fixes - $(date -u +%Y-%m)"
