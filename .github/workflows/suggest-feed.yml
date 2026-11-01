@@ -8,8 +8,9 @@ name: Feed suggestion
 # valid feed, it also opens a pull request adding it (branch
 # suggestion/issue-<n>, one commit on main): an AI proposes the subcategory and
 # the English and French descriptions (scripts/suggest_pr.py, scripts/suggest_ai.py),
-# the same checks as validate-pr.yml run first, and validate-pr.yml is then
-# started on the branch so the required "validate" check reports on the PR.
+# and the same checks as validate-pr.yml run first. GitHub holds validate-pr.yml
+# on the bot's pull requests until the maintainer clicks "Approve workflows to
+# run": the required "validate" check then reports on the PR.
 # Later events (an edit, a label) run the check again only if the link differs
 # from the one last answered for. The bot never touches a branch that has
 # someone else's commits, or whose pull request was merged or closed. The
@@ -32,7 +33,6 @@ permissions:
   contents: write
   issues: write
   pull-requests: write
-  actions: write # start validate-pr.yml on the suggestion branch
 
 jobs:
   check:
@@ -139,7 +139,7 @@ jobs:
           python3 scripts/suggest_pr.py --result result.json --issue "$NUMBER" --title-file title.txt \
             --commit-message commit.txt --pr-body pr.md --new-urls new.txt
 
-          # same checks as validate-pr.yml, which does not run on pushes made with GITHUB_TOKEN
+          # same checks as validate-pr.yml, whose run waits for the maintainer's approval
           python3 -m unittest discover -s tests
           python3 scripts/validate_opml.py
           python3 scripts/check_feeds.py --urls-file new.txt --retry-delay 30 \
@@ -160,8 +160,6 @@ jobs:
             echo "::warning::Could not open the pull request, open it from $pr"
           fi
           echo "$pr" > pr-url.txt
-          # the required "validate" check: pushes made with GITHUB_TOKEN don't start validate-pr.yml
-          gh workflow run validate-pr.yml --ref "$branch"
 
       - name: Answer on the issue
         run: |
