@@ -370,6 +370,10 @@
       "en": "Meta Engineering blog: write-ups on infrastructure, AI, security and developer tooling at Meta's scale. Written by its engineers; good for architecture insight.",
       "fr": "Blog d'ingénierie de Meta : articles sur l'infrastructure, l'IA, la sécurité et les outils de développement à l'échelle de Meta. Écrit par ses ingénieurs ; utile pour l'architecture."
     },
+    "https://epoch.ai/atom.xml": {
+      "en": "Epoch AI's research blog covering artificial intelligence trends, computing capacity growth, and machine learning development metrics.",
+      "fr": "Blog de recherche d'Epoch AI couvrant les tendances de l'intelligence artificielle, la croissance de la capacité de calcul et les métriques de développement du machine learning."
+    },
     "https://export.arxiv.org/rss/cs.AI": {
       "en": "New cs.AI preprints from arXiv, the open research repository. Raw, unreviewed AI papers; useful to follow research ahead of publication.",
       "fr": "Nouveaux préprints cs.AI d'arXiv, le dépôt ouvert de recherche. Articles IA bruts, non relus ; utile pour suivre la recherche avant sa publication."
