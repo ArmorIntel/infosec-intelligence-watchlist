@@ -32,6 +32,7 @@
         <outline text="Hacker News" title="Hacker News" type="rss" xmlUrl="https://news.ycombinator.com/rss" htmlUrl="https://news.ycombinator.com/" />
         <outline text="IBM Newsroom" title="IBM Newsroom" type="rss" xmlUrl="https://newsroom.ibm.com/announcements?pagetemplate=rss" htmlUrl="https://newsroom.ibm.com/" />
         <outline text="Interesting Engineering" title="Interesting Engineering" type="rss" xmlUrl="https://interestingengineering.com/feed" htmlUrl="https://interestingengineering.com/" />
+        <outline text="Joho no Todai" title="Joho no Todai" type="rss" xmlUrl="https://joho-todai.com/en/rss/" htmlUrl="https://joho-todai.com/" />
         <outline text="Korben" title="Korben" type="rss" xmlUrl="https://feeds.feedburner.com/KorbensBlog-UpgradeYourMind" htmlUrl="https://korben.info/" />
         <outline text="Les Numériques" title="Les Numériques" type="rss" xmlUrl="https://www.lesnumeriques.com/rss.xml" htmlUrl="https://www.lesnumeriques.com/" />
         <outline text="Lifehacker" title="Lifehacker" type="rss" xmlUrl="https://lifehacker.com/feed/rss" htmlUrl="https://lifehacker.com/" />
