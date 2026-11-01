@@ -11,7 +11,7 @@ The goal is to help professionals, researchers, and enthusiasts stay up to date 
 ## Repository contents
 
 <!-- BEGIN generated:categories -->
-- `infosec-intelligence-watchlist.xml` &mdash; is an OPML (Outline Processor Markup Language) file of 309 feeds, grouped by categories:
+- `infosec-intelligence-watchlist.xml` &mdash; is an OPML (Outline Processor Markup Language) file of 311 feeds, grouped by categories:
   - **Threat Intelligence**
     - Security News
     - Research & Labs
@@ -99,8 +99,8 @@ If you don't want the whole watchlist (or if your RSS reader plan limits the num
 | Threat Intelligence | [Knowledge Sharing & Podcasts](./opml/threat-intelligence/knowledge-sharing-and-podcasts.opml) | 3 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/threat-intelligence/knowledge-sharing-and-podcasts.opml` |
 | Threat Intelligence | [Intelligence Newsletters](./opml/threat-intelligence/intelligence-newsletters.opml) | 11 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/threat-intelligence/intelligence-newsletters.opml` |
 | Threat Intelligence | [OSINT & Tooling](./opml/threat-intelligence/osint-and-tooling.opml) | 8 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/threat-intelligence/osint-and-tooling.opml` |
-| Technology Intelligence | [Industry & Innovation](./opml/technology-intelligence/industry-and-innovation.opml) | 44 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/industry-and-innovation.opml` |
-| Technology Intelligence | [AI & Data Science](./opml/technology-intelligence/ai-and-data-science.opml) | 11 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/ai-and-data-science.opml` |
+| Technology Intelligence | [Industry & Innovation](./opml/technology-intelligence/industry-and-innovation.opml) | 45 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/industry-and-innovation.opml` |
+| Technology Intelligence | [AI & Data Science](./opml/technology-intelligence/ai-and-data-science.opml) | 12 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/ai-and-data-science.opml` |
 | Technology Intelligence | [Privacy, Compliance & Governance](./opml/technology-intelligence/privacy-compliance-and-governance.opml) | 11 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/privacy-compliance-and-governance.opml` |
 | Technology Intelligence | [Cryptocurrency & Blockchain](./opml/technology-intelligence/cryptocurrency-and-blockchain.opml) | 15 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/cryptocurrency-and-blockchain.opml` |
 | Technology Intelligence | [Apple Ecosystem](./opml/technology-intelligence/apple-ecosystem.opml) | 11 | `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/opml/technology-intelligence/apple-ecosystem.opml` |
@@ -141,8 +141,8 @@ The repository is maintained with GitHub Actions:
 | Workflow | Trigger | What it does |
 |---|---|---|
 | [Monthly feed health check](.github/workflows/feed-health.yml) | 1st of each month, or manually | Checks every feed, opens a pull request with automatic fixes (replacement URL found on the same website for dead feeds, removal of abandoned feeds) and keeps a single [`feed-health`](../../issues?q=label%3Afeed-health) issue with what is left to review |
-| [Validate watchlist](.github/workflows/validate-pr.yml) | Pull requests changing the watchlist, the scripts, the site or the tests, and pushes to `main` changing the watchlist | Runs the unit tests, validates the OPML structure, rejects duplicates, and checks that every added feed answers, is valid RSS/Atom and published within the last 6 months |
-| [Sync generated files](.github/workflows/sync-generated.yml) | Pushes to `main` changing the watchlist | Regenerates the per-category OPML files and the generated parts of this README (category list, feed count, subscription table) and commits them |
+| [Validate watchlist](.github/workflows/validate-pr.yml) | Pull requests changing the watchlist, the generated files, the scripts, the site or the tests, and pushes to `main` changing the watchlist | Runs the unit tests, validates the OPML structure, rejects duplicates, checks that the per-category OPML files and the generated parts of this README are up to date, and checks that every added feed answers, is valid RSS/Atom and published within the last 6 months |
+| [Sync generated files](.github/workflows/sync-generated.yml) | Pushes to `main` changing the watchlist | Safety net: regenerates the per-category OPML files and the generated parts of this README (category list, feed count, subscription table) and, if they were out of date, opens a `sync/generated-files` pull request (`main` only takes pull requests, which come with these files regenerated) |
 | [Publish the website](.github/workflows/site.yml) | Every 6 hours, pushes to `main` changing the watchlist, the site or its scripts, or manually | Runs the unit tests, builds the website with the latest articles of every feed (a feed that fails keeps its articles from the previous version), adds the result of every feed to its 90-day health history, and deploys it to GitHub Pages |
 | [Feed suggestion](.github/workflows/suggest-feed.yml) | Issue opened or edited with the "Suggest a source" form, or manually | Finds the site's feed from the link, checks it (new, valid, active) and answers on the issue with a comment and a [`suggestion: …`](../../labels) status label; already-listed sources are closed. For a new valid feed, opens a pull request adding it, with the subcategory and English/French descriptions proposed by an AI, to review |
 | [Release a reviewed watchlist](.github/workflows/release.yml) | Manually, after a review | Creates a dated release (e.g. `2026.10`) with the list of feeds added, removed and moved since the previous one, and the OPML files attached |
@@ -181,7 +181,7 @@ The easiest way: [suggest a source](https://github.com/ArmorIntel/infosec-intell
 To add feeds or suggest improvements with a pull request:
 - Fork this repository
 - Update the xml file (`infosec-intelligence-watchlist.xml` is the only file to edit): keep two folder levels and feeds sorted alphabetically
-- Don't edit the `opml/` files or the generated parts of this README: they are regenerated automatically once your change is merged
+- Don't edit the `opml/` files or the generated parts of this README by hand: regenerate them with `python3 scripts/build_category_opml.py --readme` and commit the result with your change (the pull request check fails when they are out of date)
 - For a new feed, also add its English and French descriptions to `site/descriptions.json` (the website build lists the feeds that are missing)
 - In the commit message, give the reason for each feed you add, remove, move or fix with one line per feed, `- <feed URL>: <reason>` (e.g. `- https://example.com/feed: dead feed, replaced by https://example.com/rss`). The website's Changes page shows it next to the change; without such a line it shows the commit's subject line
 - Submit a pull request with a description

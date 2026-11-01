@@ -1,12 +1,15 @@
 name: Validate watchlist
 
 # Runs on every pull request (and push to main) that touches the watchlist:
-# structure checks on the OPML, then a live check of the feeds added by the PR.
+# structure checks on the OPML, generated files in sync with it, then a live
+# check of the feeds added by the PR.
 
 on:
   pull_request:
     paths:
       - "infosec-intelligence-watchlist.xml"
+      - "opml/**"
+      - "README.md"
       - "scripts/**"
       - "site/**"
       - "tests/**"
@@ -50,6 +53,17 @@ jobs:
 
       - name: Validate OPML structure
         run: python3 scripts/validate_opml.py --base base.xml --new-urls new-urls.txt
+
+      - name: Check the generated files
+        # main only takes pull requests, so they must come with the watchlist change
+        run: |
+          python3 scripts/build_category_opml.py --readme > /dev/null
+          git add -A -N opml README.md
+          if ! git diff --quiet -- opml README.md; then
+            git diff --stat -- opml README.md
+            echo "::error::opml/ or README.md is out of date: run 'python3 scripts/build_category_opml.py --readme' and commit the result"
+            exit 1
+          fi
 
       - name: Check the added feeds
         # new feeds must answer, be valid RSS/Atom and have published within 6 months
