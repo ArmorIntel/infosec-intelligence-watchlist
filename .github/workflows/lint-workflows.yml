@@ -1,0 +1,59 @@
+name: Lint workflows
+
+# Checks the workflows of every pull request (and push to main) that changes
+# them: actionlint for syntax, expressions and the shell scripts (shellcheck),
+# zizmor for security issues (script injection, unpinned actions, too broad
+# permissions, credentials left in the checkout...). Both tools are pinned:
+# actionlint by the checksum of its release, zizmor by the hashes of
+# .github/linters/requirements.txt (kept up to date by Dependabot).
+
+on:
+  pull_request:
+    paths:
+      - ".github/**"
+  push:
+    branches: [main]
+    paths:
+      - ".github/**"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: lint-workflows-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  ACTIONLINT_VERSION: "1.7.12"
+  ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - name: Install the linters
+        run: |
+          archive="actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          curl -sSfL -o "$RUNNER_TEMP/$archive" \
+            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/$archive"
+          echo "$ACTIONLINT_SHA256  $RUNNER_TEMP/$archive" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/$archive" -C "$RUNNER_TEMP" actionlint
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+          python3 -m pip install -q --require-hashes --no-deps -r .github/linters/requirements.txt
+
+      - name: actionlint
+        run: actionlint -color
+
+      - name: zizmor
+        run: zizmor --format github .github/workflows

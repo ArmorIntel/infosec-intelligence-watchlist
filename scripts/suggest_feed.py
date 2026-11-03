@@ -13,12 +13,17 @@ Statuses:
 - inactive: the feed found has published nothing for more than 6 months
 - needs-review: a feed declared by the site, but blocked to scripts or undated
 - invalid: the issue has no single http(s) link
-- limit: the author already has too many open suggestions
+- limit: too many suggestions or checks (see MAX_OPEN, MAX_DAILY and MAX_CHECKS)
 - skip: nothing to do (closed issue, or already answered for this link)
 
 Usage:
-    python3 scripts/suggest_feed.py --issue issue.json --open-suggestions 0 \\
+    python3 scripts/suggest_feed.py --issue issue.json --open-suggestions 0 --recent-suggestions 0 \\
         --json result.json --comment comment.md
+
+Anyone can open an issue, and each check downloads a few dozen pages of the
+suggested site: the limits keep the workflow from being used to hit a site
+again and again, or to spend the AI quota. A manual run (--force) checks the
+issue whatever its number of checks.
 """
 import argparse
 import json
@@ -42,6 +47,8 @@ TIMEOUT = 20
 SAMPLE_TITLES = 10
 MARKER = "<!-- feed-suggestion-bot -->"
 MAX_OPEN = 5  # open suggestions per author before new ones wait
+MAX_DAILY = 10  # suggestions per author opened in the last 24 hours, closed ones included
+MAX_CHECKS = 5  # checks of one issue (each with another link); then the maintainer decides
 LABELS = {
     "ready": "suggestion: ready",
     "duplicate": "suggestion: duplicate",
@@ -262,23 +269,36 @@ def answered_link(comment):
     return m.group(1) if m else None
 
 
-def run(issue, last_comment, open_suggestions, known, timeout, now, force=False):
+def answered_checks(comment):
+    """How many times the issue was checked, as recorded in the bot's previous answer."""
+    m = re.search(r"<!-- checks: (\d+) -->", comment or "")
+    return int(m.group(1)) if m else 0
+
+
+def run(issue, last_comment, open_suggestions, known, timeout, now, force=False, recent_suggestions=0):
     """Result for one issue, as written to --json (`issue`: gh issue view --json body,author,state).
 
     `last_comment`: the bot's previous answer on the issue, if any. Nothing is done when it was for the
-    same link (an edit of the title or of the "why" field), unless `force` (a manual run)."""
+    same link (an edit of the title or of the "why" field), unless `force` (a manual run).
+    `open_suggestions` / `recent_suggestions`: the author's open suggestions, and those opened in the
+    last 24 hours. "checks" counts the checks of the issue (see MAX_CHECKS)."""
     link, why = parse_issue(issue.get("body"))
     author = (issue.get("author") or {}).get("login", "")
-    base = {"link": link, "why": why, "author": author}
+    checks = answered_checks(last_comment)
+    base = {"link": link, "why": why, "author": author, "checks": checks}
     if (issue.get("state") or "").upper() == "CLOSED":
         return {**base, "status": "skip"}
     if not force and link and answered_link(last_comment) == link:
         return {**base, "status": "skip"}
     if not link:
         return {**base, "status": "invalid"}
+    if not force and checks >= MAX_CHECKS:
+        return {**base, "status": "limit", "limit": "checks"}
     if open_suggestions > MAX_OPEN:
-        return {**base, "status": "limit"}
-    return {**analyse(link, known, timeout, now), **base}
+        return {**base, "status": "limit", "limit": "open"}
+    if recent_suggestions > MAX_DAILY:
+        return {**base, "status": "limit", "limit": "daily"}
+    return {**analyse(link, known, timeout, now), **base, "checks": checks + 1}
 
 
 def _code(url):
@@ -291,7 +311,7 @@ def render_comment(result, author, pr_url=None, pr_existing=False):
     `pr_url`: the pull request prepared for a ready feed, or (`pr_existing`) one that already adds it."""
     status, feed = result["status"], result.get("feed") or {}
     who = "@" + re.sub(r"[^A-Za-z0-9-]", "", author or "")  # GitHub logins: letters, digits, hyphens
-    lines = [MARKER]
+    lines = [MARKER, f"<!-- checks: {int(result.get('checks') or 0)} -->"]
     if status != "limit":  # a limited suggestion is checked on its next edit
         lines.append(f"<!-- link: {result.get('link') or ''} -->")
     if status == "ready":
@@ -346,6 +366,14 @@ def render_comment(result, author, pr_url=None, pr_existing=False):
         lines += ["**No link found**: the link field must contain one http(s) URL. "
                   "Edit this issue to fix it: the check runs again.", "",
                   "_Lien manquant ou invalide : modifiez l'issue pour le corriger, la vérification sera relancée._"]
+    elif status == "limit" and result.get("limit") == "checks":
+        lines += [f"**Checked {MAX_CHECKS} times already**: thanks {who}, the maintainer will look at this "
+                  "suggestion by hand.", "",
+                  "_Proposition déjà vérifiée plusieurs fois : le mainteneur la regardera à la main._"]
+    elif status == "limit" and result.get("limit") == "daily":
+        lines += [f"**Too many suggestions today**: {who} opened more than {MAX_DAILY} suggestions in the last "
+                  "24 hours, edit this issue tomorrow to run the check again.", "",
+                  "_Trop de propositions aujourd'hui : modifiez l'issue demain pour relancer la vérification._"]
     elif status == "limit":
         lines += [f"**Too many open suggestions**: {who} already has more than {MAX_OPEN} open suggestions, "
                   "edit this issue later to run the check again.", "",
@@ -359,6 +387,8 @@ def main(argv=None):
     p.add_argument("--last-comment-file", help="the bot's previous answer on the issue, if any")
     p.add_argument("--force", action="store_true", help="check again even if the link did not change")
     p.add_argument("--open-suggestions", type=int, default=0, help="open suggestions of the issue's author")
+    p.add_argument("--recent-suggestions", type=int, default=0,
+                   help="suggestions of the issue's author opened in the last 24 hours")
     p.add_argument("--json", help="where to write the result (required unless --render)")
     p.add_argument("--render", help="only write the comment for this --json result (no check)")
     p.add_argument("--pr-url", help="with --render: the pull request prepared for the feed")
@@ -378,7 +408,8 @@ def main(argv=None):
     issue = json.loads(Path(args.issue).read_text(encoding="utf-8"))
     last = Path(args.last_comment_file).read_text(encoding="utf-8") if args.last_comment_file else None
     known = check_feeds.load_feeds(args.opml)
-    result = run(issue, last, args.open_suggestions, known, args.timeout, datetime.now(timezone.utc), args.force)
+    result = run(issue, last, args.open_suggestions, known, args.timeout, datetime.now(timezone.utc), args.force,
+                 args.recent_suggestions)
     Path(args.json).write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     comment = "" if result["status"] == "skip" else render_comment(result, result.get("author", ""))
     Path(args.comment).write_text(comment, encoding="utf-8")

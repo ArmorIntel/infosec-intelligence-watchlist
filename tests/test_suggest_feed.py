@@ -49,6 +49,16 @@ class ParseIssueTest(unittest.TestCase):
         for call in run.call_args_list:
             self.assertIn("-g", call.args[0])
 
+    def test_curl_limited_to_http(self):
+        done = mock.Mock(returncode=0, stdout=b"", stderr=b"")
+        with mock.patch("subprocess.run", return_value=done) as run:
+            check_feeds.download("https://a.com/x", 5)
+            autofix_feeds.fetch_page("https://a.com/x", 5)
+        for call in run.call_args_list:
+            cmd = call.args[0]
+            self.assertEqual(cmd[cmd.index("--proto") + 1], "=http,https")
+            self.assertEqual(cmd[cmd.index("--proto-redir") + 1], "=http,https")
+
     def test_parse_issue_without_headings(self):
         self.assertEqual(suggest_feed.parse_issue("Please add <https://a.com/post> thanks")[0], "https://a.com/post")
         self.assertIsNone(suggest_feed.parse_issue("https://a.com/1 and https://b.com/2")[0])
@@ -262,6 +272,32 @@ class RunAndRenderTest(unittest.TestCase):
         self.assertEqual(suggest_feed.run(bad, None, 0, [], 5, NOW)["status"], "invalid")
         ok = {"body": FORM, "author": {"login": "v"}, "state": "OPEN"}
         self.assertEqual(suggest_feed.run(ok, None, 6, [], 5, NOW)["status"], "limit")  # more than MAX_OPEN = 5
+
+    def test_checks_are_counted_and_capped(self):
+        issue = {"body": FORM, "author": {"login": "v"}, "state": "OPEN"}
+        last = None
+        for n in range(1, suggest_feed.MAX_CHECKS + 1):
+            other = {**issue, "body": FORM.replace("/post", f"/post-{n}")}  # each edit pastes another link
+            with mock.patch.object(suggest_feed, "analyse", return_value=sample_result("no-feed")):
+                result = suggest_feed.run(other, last, 0, [], 5, NOW)
+            self.assertEqual(result["checks"], n)
+            last = suggest_feed.render_comment(result, "v")
+        with mock.patch.object(suggest_feed, "analyse") as analyse:
+            limited = suggest_feed.run(issue, last, 0, [], 5, NOW)
+            analyse.assert_not_called()
+        self.assertEqual((limited["status"], limited["limit"]), ("limit", "checks"))
+        self.assertIn("will look at this suggestion by hand", suggest_feed.render_comment(limited, "v"))
+        # the limit answer keeps the count, and a manual run checks anyway
+        self.assertEqual(suggest_feed.answered_checks(suggest_feed.render_comment(limited, "v")), suggest_feed.MAX_CHECKS)
+        with mock.patch.object(suggest_feed, "analyse", return_value=sample_result("ready")) as analyse:
+            suggest_feed.run(issue, last, 0, [], 5, NOW, force=True)
+            analyse.assert_called_once()
+
+    def test_daily_limit(self):
+        issue = {"body": FORM, "author": {"login": "v"}, "state": "OPEN"}
+        result = suggest_feed.run(issue, None, 0, [], 5, NOW, recent_suggestions=suggest_feed.MAX_DAILY + 1)
+        self.assertEqual((result["status"], result["limit"]), ("limit", "daily"))
+        self.assertIn("Too many suggestions today", suggest_feed.render_comment(result, "v"))
 
     def test_render_every_status(self):
         for status in ["ready", "duplicate", "no-feed", "inactive", "needs-review", "invalid", "limit"]:

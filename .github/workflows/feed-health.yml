@@ -14,10 +14,7 @@ on:
     - cron: "0 6 1 * *" # 1st day of each month, 06:00 UTC
   workflow_dispatch:
 
-permissions:
-  contents: write
-  issues: write
-  pull-requests: write
+permissions: {}
 
 concurrency:
   group: feed-health
@@ -32,17 +29,27 @@ jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # the fix branch is compared with main
+          persist-credentials: false # git asks gh for the token, only in the steps that push
 
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.12"
 
       - name: Configure git
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git config user.name "github-actions[bot]"
+          git config user.name "github-actions[bot]"  # for the history branch
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          gh auth setup-git
 
       - name: Load the history of previous checks
         run: |
@@ -60,6 +67,8 @@ jobs:
             --persist-months "$PERSIST_MONTHS" --json results.json > /dev/null
 
       - name: Save the history
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if [ -n "$HISTORY_EXISTS" ]; then
             git worktree add -q history-branch "origin/$HISTORY_BRANCH"
@@ -87,31 +96,23 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          existing=$(gh pr list --head "$FIX_BRANCH" --state open --json url --jq '.[0].url')
+          # scripts/bot_pr.py exits 3 when the branch has someone else's commits: left untouched
+          rc=0
           if [ ! -s pr.md ]; then
-            if [ -n "$existing" ]; then
-              gh pr close "$existing" --delete-branch --comment "No automatic fix needed any more."
-            fi
+            python3 scripts/bot_pr.py close --branch "$FIX_BRANCH" \
+              --comment "No automatic fix needed any more." --output pr-url.txt || rc=$?
+            if [ "$rc" = 3 ]; then echo "PR_URL=$(cat pr-url.txt)" >> "$GITHUB_ENV"; exit 0; fi
             echo "PR_URL=" >> "$GITHUB_ENV"
-            exit 0
+            exit "$rc"
           fi
           python3 scripts/validate_opml.py
           # main only takes pull requests: the generated files come with the change
           python3 scripts/build_category_opml.py --readme
-          git switch -q -c "$FIX_BRANCH"
-          git add infosec-intelligence-watchlist.xml scripts/feed-exceptions.txt opml README.md
-          git commit -q -F commit.txt
-          git push -q -f origin "HEAD:refs/heads/$FIX_BRANCH"
-          title="Feed fixes - $(date -u +%Y-%m)"
-          if [ -n "$existing" ]; then
-            gh pr edit "$existing" --title "$title" --body-file pr.md
-            url="$existing"
-          elif ! url=$(gh pr create --base main --head "$FIX_BRANCH" --title "$title" --body-file pr.md); then
-            # Settings > Actions > "Allow GitHub Actions to create and approve pull requests" is off
-            url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/compare/main...${FIX_BRANCH}?expand=1"
-            echo "::warning::Could not open the pull request, open it from $url"
-          fi
-          echo "PR_URL=$url" >> "$GITHUB_ENV"
+          python3 scripts/bot_pr.py publish --branch "$FIX_BRANCH" --title "Feed fixes - $(date -u +%Y-%m)" \
+            --body-file pr.md --commit-message-file commit.txt --output pr-url.txt \
+            infosec-intelligence-watchlist.xml scripts/feed-exceptions.txt opml README.md || rc=$?
+          if [ "$rc" != 0 ] && [ "$rc" != 3 ]; then exit "$rc"; fi
+          echo "PR_URL=$(cat pr-url.txt)" >> "$GITHUB_ENV"
 
       - name: Write the report
         run: |
@@ -153,7 +154,7 @@ jobs:
 
       - name: Upload full report
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: feed-health-report
           path: |

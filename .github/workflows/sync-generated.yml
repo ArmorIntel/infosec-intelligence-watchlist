@@ -18,9 +18,7 @@ on:
       - "scripts/build_category_opml.py"
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
+permissions: {}
 
 concurrency:
   group: sync-generated
@@ -33,12 +31,18 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # the sync branch is compared with main
+          persist-credentials: false # git asks gh for the token when it pushes
 
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.12"
 
@@ -48,30 +52,21 @@ jobs:
       - name: Regenerate category OPML files and README
         run: python3 scripts/build_category_opml.py --readme
 
-      - name: Open or update the pull request
+      - name: Open, update or close the pull request
         run: |
-          existing=$(gh pr list --head "$SYNC_BRANCH" --state open --json url --jq '.[0].url')
-          git add -A opml README.md
-          if git diff --cached --quiet; then
+          # scripts/bot_pr.py exits 3 when the branch has someone else's commits: left untouched
+          rc=0
+          if [ -z "$(git status --porcelain -- opml README.md)" ]; then
             echo "Generated files already up to date."
-            if [ -n "$existing" ]; then
-              gh pr close "$existing" --delete-branch --comment "Generated files are up to date on main."
-            fi
-            exit 0
+            python3 scripts/bot_pr.py close --branch "$SYNC_BRANCH" \
+              --comment "Generated files are up to date on main." || rc=$?
+            if [ "$rc" = 3 ]; then exit 0; fi
+            exit "$rc"
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch -q -c "$SYNC_BRANCH"
-          git commit -q -m "Regenerate category OPML files and README"
-          git push -q -f origin "HEAD:refs/heads/$SYNC_BRANCH"
-          title="Regenerate category OPML files and README"
-          body="The per-category OPML files or the generated parts of the README were out of date on main after $GITHUB_SHA. This regenerates them with \`python3 scripts/build_category_opml.py --readme\`."
-          if [ -n "$existing" ]; then
-            gh pr edit "$existing" --body "$body"
-            url="$existing"
-          elif ! url=$(gh pr create --base main --head "$SYNC_BRANCH" --title "$title" --body "$body"); then
-            # Settings > Actions > "Allow GitHub Actions to create and approve pull requests" is off
-            url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/compare/main...${SYNC_BRANCH}?expand=1"
-            echo "::warning::Could not open the pull request, open it from $url"
-          fi
-          echo "Generated files out of date, pull request: $url" | tee -a "$GITHUB_STEP_SUMMARY"
+          printf 'Regenerate category OPML files and README\n' > commit.txt
+          printf '%s\n' "The per-category OPML files or the generated parts of the README were out of date on main after $GITHUB_SHA. This regenerates them with \`python3 scripts/build_category_opml.py --readme\`." > body.md
+          gh auth setup-git
+          python3 scripts/bot_pr.py publish --branch "$SYNC_BRANCH" --title "Regenerate category OPML files and README" \
+            --body-file body.md --commit-message-file commit.txt --output pr-url.txt opml README.md || rc=$?
+          if [ "$rc" != 0 ] && [ "$rc" != 3 ]; then exit "$rc"; fi
+          echo "Generated files out of date, pull request: $(cat pr-url.txt)" | tee -a "$GITHUB_STEP_SUMMARY"

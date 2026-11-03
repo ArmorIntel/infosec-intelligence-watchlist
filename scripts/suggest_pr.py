@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Prepare the pull request that adds a feed suggested by a visitor.
 
-From the result of suggest_feed.py (status "ready"), ask the AI configured in
-the environment (see suggest_ai.py) for the subcategory, title and EN/FR
-descriptions, then:
+From the result of suggest_feed.py (status "ready") and the answer of the AI
+(suggest_ai.py --out: subcategory, title and EN/FR descriptions, or null), then:
 - insert the feed in the watchlist, in its subcategory at its alphabetical
   place (one new line, the rest of the file untouched)
 - add its descriptions to site/descriptions.json
@@ -15,12 +14,11 @@ When the AI is unavailable, the feed keeps its own title, goes to
 FALLBACK_SUBCATEGORY and gets no description: the pull request says so.
 
 Usage:
-    python3 scripts/suggest_pr.py --result result.json --issue 12 --title-file title.txt \\
+    python3 scripts/suggest_pr.py --result result.json --ai ai.json --issue 12 --title-file title.txt \\
         --commit-message commit.txt --pr-body pr.md --new-urls new.txt
 """
 import argparse
 import json
-import os
 import re
 import sys
 import unicodedata
@@ -39,7 +37,6 @@ from suggest_feed import LANGUAGES, _code, md_text  # noqa: E402
 DESCRIPTIONS = Path(__file__).resolve().parent.parent / "site" / "descriptions.json"
 FALLBACK_SUBCATEGORY = "security-news"
 TITLE_MAX = 80
-BOT_LOGINS = {"app/github-actions", "github-actions[bot]"}  # author of PRs opened with GITHUB_TOKEN
 
 
 def safe_title(title):
@@ -49,16 +46,6 @@ def safe_title(title):
     invisible formatting characters (bidi overrides), one line, at most TITLE_MAX characters."""
     text = "".join(ch for ch in str(title or "") if ch not in "#@" and (ch.isspace() or unicodedata.category(ch) not in ("Cc", "Cf")))
     return " ".join(text.split())[:TITLE_MAX].strip()
-
-
-def is_bot_pr(pr):
-    """True for a pull request the bot opened in this repository (not from a fork, not by a person)."""
-    return not pr.get("isCrossRepository") and (pr.get("author") or {}).get("login") in BOT_LOGINS
-
-
-def bot_pr_for_branch(prs, branch):
-    """The bot's latest pull request for a branch (gh lists newest first), or None."""
-    return next((pr for pr in prs if pr.get("headRefName") == branch and is_bot_pr(pr)), None)
 
 
 def _indent(line):
@@ -144,18 +131,10 @@ def pr_body(result, ai, sub_name, issue):
     return "\n".join(lines) + "\n"
 
 
-def find_open_pr_for_url(prs, url):
-    """URL of an open suggestion pull request that already adds this feed, or None."""
-    for pr in prs:
-        if pr.get("headRefName", "").startswith("suggestion/") and is_bot_pr(pr) \
-                and f"- {url}:" in (pr.get("body") or ""):
-            return pr["url"]
-    return None
-
-
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--result", required=True, help="suggest_feed.py --json output, status ready")
+    p.add_argument("--ai", help="suggest_ai.py --out output (null when the AI was unavailable)")
     p.add_argument("--issue", type=int, required=True)
     p.add_argument("--title-file", required=True, help="where to write the pull request title")
     p.add_argument("--commit-message", required=True)
@@ -168,8 +147,10 @@ def main(argv=None):
     result = json.loads(Path(args.result).read_text(encoding="utf-8"))
     feed = result["feed"]
     watchlist = site_data.load_watchlist(args.opml)
-    subs, examples = suggest_ai.catalog(watchlist, site_data.load_descriptions(args.descriptions))
-    ai = suggest_ai.enrich(feed, result.get("why", ""), subs, examples, suggest_ai.config_from_env(os.environ))
+    subs, _ = suggest_ai.catalog(watchlist, site_data.load_descriptions(args.descriptions))
+    ai = json.loads(Path(args.ai).read_text(encoding="utf-8")) if args.ai else None
+    if ai is not None:  # checked again: it went through another job
+        ai = suggest_ai.parse_answer(json.dumps(ai), {s["slug"] for s in subs})
     slug = ai["subcategory"] if ai else FALLBACK_SUBCATEGORY
     title = safe_title(ai["title"] if ai else feed["title"]) or safe_title(urlsplit(feed["url"]).netloc)
     sub_name = next(s["name"] for s in subs if s["slug"] == slug)
