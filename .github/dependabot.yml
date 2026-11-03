@@ -1,0 +1,21 @@
+# The actions are pinned to a commit SHA (a tag can be moved to other code):
+# Dependabot proposes each new release as a pull request that updates the SHA
+# and its version comment. The scripts only use the Python standard library:
+# the pip entry is for the workflow linters (.github/linters).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7 # let a compromised release be caught before it is proposed
+    groups:
+      actions:
+        patterns: ["*"]
+  - package-ecosystem: pip
+    directory: /.github/linters
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7

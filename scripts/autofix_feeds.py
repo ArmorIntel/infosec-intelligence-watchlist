@@ -31,7 +31,7 @@ from urllib.parse import urljoin, urlsplit
 from xml.sax.saxutils import quoteattr
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from check_feeds import EXCEPTIONS, SOURCE, UA, fetch, load_exceptions  # noqa: E402
+from check_feeds import EXCEPTIONS, PROTOCOLS, SOURCE, UA, fetch, load_exceptions  # noqa: E402
 
 FEED_TYPES = ("application/rss+xml", "application/atom+xml", "application/feed+json", "application/rdf+xml")
 COMMON_PATHS = ["feed/", "feed", "rss/", "rss", "rss.xml", "feed.xml", "atom.xml", "index.xml",
@@ -61,7 +61,7 @@ def norm(url):
 def fetch_page(url, timeout):
     """Return (curl exit code, HTML of the page)."""
     p = subprocess.run(["curl", "-sS", "-g", "-L", "--compressed", "--http1.1", "--max-time", str(timeout),
-                        "-A", UA, url], capture_output=True)
+                        "--max-filesize", "20000000", *PROTOCOLS, "-A", UA, url], capture_output=True)
     return p.returncode, p.stdout.decode("utf-8", "replace")
 
 

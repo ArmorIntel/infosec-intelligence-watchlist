@@ -14,12 +14,26 @@ subcategory (one of the given slugs), title (1-80 chars), description_en
 without < or >. Anything else is rejected: the caller then treats the AI as
 unavailable. The AI only fills these fields; it never chooses files, branches
 or commands.
+
+The workflow calls it in a job of its own, the only one that holds the API key:
+it has no write access, and suggest_pr.py validates its answer again.
+
+Usage:
+    python3 scripts/suggest_ai.py --result result.json --out ai.json
 """
+import argparse
 import json
+import os
 import re
 import sys
 import urllib.error
 import urllib.request
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import site_data  # noqa: E402
+
+ROOT = Path(__file__).resolve().parent.parent
 
 DEFAULT_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
 TIMEOUT = 60
@@ -125,3 +139,21 @@ def enrich(feed, why, subcategories, examples, config, timeout=TIMEOUT):
     if result is None:
         print("AI unavailable: answer does not match the schema", file=sys.stderr)
     return result
+
+
+def main(argv=None):
+    p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    p.add_argument("--result", required=True, help="suggest_feed.py --json output, status ready")
+    p.add_argument("--out", required=True, help="where to write the validated answer (null when unavailable)")
+    p.add_argument("--opml", default=str(ROOT / "infosec-intelligence-watchlist.xml"))
+    p.add_argument("--descriptions", default=str(ROOT / "site" / "descriptions.json"))
+    args = p.parse_args(argv)
+    result = json.loads(Path(args.result).read_text(encoding="utf-8"))
+    subs, examples = catalog(site_data.load_watchlist(args.opml), site_data.load_descriptions(args.descriptions))
+    answer = enrich(result["feed"], result.get("why", ""), subs, examples, config_from_env(os.environ))
+    Path(args.out).write_text(json.dumps(answer, ensure_ascii=False) + "\n", encoding="utf-8")
+    print("AI answer written" if answer else "AI unavailable")
+
+
+if __name__ == "__main__":
+    main()

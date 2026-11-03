@@ -1,6 +1,7 @@
 import io
 import json
 import sys
+import tempfile
 import unittest
 import urllib.error
 from pathlib import Path
@@ -75,6 +76,13 @@ class EnrichTest(unittest.TestCase):
         req = urlopen.call_args.args[0]
         self.assertEqual(req.get_header("Authorization"), "Bearer k")
         self.assertEqual(json.loads(req.data)["model"], "m")
+
+    def test_main_writes_null_without_configuration(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.dict("os.environ", {}, clear=True):
+            result, out = Path(tmp) / "result.json", Path(tmp) / "ai.json"
+            result.write_text(json.dumps({"feed": FEED, "why": ""}), encoding="utf-8")
+            suggest_ai.main(["--result", str(result), "--out", str(out)])
+            self.assertIsNone(json.loads(out.read_text(encoding="utf-8")))
 
     def test_enrich_unavailable(self):
         self.assertIsNone(suggest_ai.enrich(FEED, "", SUBS, EXAMPLES, None))

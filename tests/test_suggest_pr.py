@@ -23,8 +23,6 @@ AI = {"subcategory": "research-and-labs", "title": "Cyble",
       "assessment": "Vendor research blog, mostly original analysis, ~2 posts/week, some product mentions."}
 
 
-BOT = {"isCrossRepository": False, "author": {"login": "app/github-actions"}}
-
 
 class WatchlistEditTest(unittest.TestCase):
     def setUp(self):
@@ -47,6 +45,28 @@ class WatchlistEditTest(unittest.TestCase):
         line = next(l for l in after if "z.com/feed" in l)
         self.assertRegex(line, r'^\s+<outline text=.* title=.* type="rss" xmlUrl=.* htmlUrl=.* />$')
         self.assertIn("&amp;", line)
+
+    def run_main(self, ai):
+        d = Path(self.tmp.name)
+        (d / "result.json").write_text(json.dumps(READY), encoding="utf-8")
+        (d / "ai.json").write_text(json.dumps(ai), encoding="utf-8")
+        out = {name: d / name for name in ("title.txt", "commit.txt", "pr.md", "new.txt")}
+        suggest_pr.main(["--result", str(d / "result.json"), "--ai", str(d / "ai.json"), "--issue", "12",
+                         "--title-file", str(out["title.txt"]), "--commit-message", str(out["commit.txt"]),
+                         "--pr-body", str(out["pr.md"]), "--new-urls", str(out["new.txt"]),
+                         "--opml", str(self.opml), "--descriptions", str(self.desc)])
+        return {name: path.read_text(encoding="utf-8") for name, path in out.items()}
+
+    def test_main_uses_the_ai_answer(self):
+        out = self.run_main(AI)
+        self.assertEqual(out["title.txt"], "Add Cyble\n")
+        self.assertIn("## Descriptions", out["pr.md"])
+        self.assertIn("https://cyble.com/feed/", json.loads(self.desc.read_text(encoding="utf-8"))["feeds"])
+
+    def test_main_checks_the_ai_answer_again(self):
+        out = self.run_main({**AI, "subcategory": "../../etc", "title": "<script>"})
+        self.assertIn("AI unavailable", out["pr.md"])  # rejected: default placement, no descriptions
+        self.assertNotIn("https://cyble.com/feed/", json.loads(self.desc.read_text(encoding="utf-8"))["feeds"])
 
     def test_add_feed_unknown_subcategory(self):
         with self.assertRaises(ValueError):
@@ -77,25 +97,6 @@ class TextsTest(unittest.TestCase):
         self.assertIn("AI unavailable", body)
         self.assertIn("Security News", body)  # fallback placement flagged
         self.assertIn("descriptions.json", body)  # descriptions to write
-
-    def test_find_open_pr_for_url(self):
-        prs = [{"url": "https://github.com/o/r/pull/3", "headRefName": "suggestion/issue-9", **BOT,
-                "body": "- https://cyble.com/feed/: suggested by @x in #9"},
-               {"url": "https://github.com/o/r/pull/4", "headRefName": "feed-health/autofix", **BOT,
-                "body": "https://cyble.com/feed/"}]
-        self.assertEqual(suggest_pr.find_open_pr_for_url(prs, "https://cyble.com/feed/"), "https://github.com/o/r/pull/3")
-        self.assertIsNone(suggest_pr.find_open_pr_for_url(prs, "https://other.com/feed"))
-
-    def test_fork_or_human_prs_are_not_the_bots(self):
-        fork = {"url": "https://github.com/o/r/pull/7", "headRefName": "suggestion/issue-9", "state": "OPEN",
-                "isCrossRepository": True, "author": {"login": "app/github-actions"},
-                "body": "- https://cyble.com/feed/: x"}
-        human = {**fork, "url": "https://github.com/o/r/pull/8", "isCrossRepository": False, "author": {"login": "mallory"}}
-        bot = {**fork, "url": "https://github.com/o/r/pull/9", **BOT}
-        self.assertIsNone(suggest_pr.find_open_pr_for_url([fork, human], "https://cyble.com/feed/"))
-        self.assertIsNone(suggest_pr.bot_pr_for_branch([fork, human], "suggestion/issue-9"))
-        self.assertEqual(suggest_pr.bot_pr_for_branch([fork, human, bot], "suggestion/issue-9")["url"],
-                         "https://github.com/o/r/pull/9")
 
     def test_safe_title(self):
         self.assertEqual(suggest_pr.safe_title("Foo fixes #3 @everyone"), "Foo fixes 3 everyone")

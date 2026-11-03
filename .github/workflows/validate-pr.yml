@@ -3,17 +3,14 @@ name: Validate watchlist
 # Runs on every pull request (and push to main) that touches the watchlist:
 # structure checks on the OPML, generated files in sync with it, then a live
 # check of the feeds added by the PR.
+#
+# "validate" is a required check of main, so it reports on every pull request:
+# one that changes none of the files below (only another workflow, the
+# screenshots...) passes at once. A `paths:` filter would leave such a pull
+# request waiting forever for the check.
 
 on:
   pull_request:
-    paths:
-      - "infosec-intelligence-watchlist.xml"
-      - "opml/**"
-      - "README.md"
-      - "scripts/**"
-      - "site/**"
-      - "tests/**"
-      - ".github/workflows/validate-pr.yml"
   push:
     branches: [main]
     paths:
@@ -28,20 +25,45 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
 
-      - uses: actions/setup-python@v7
+      - name: Find what the pull request changes
+        id: scope
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ "$EVENT" != "pull_request" ]; then
+            echo "validate=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # the files that the watchlist, its generated files and the checks depend on
+          if git diff --name-only "origin/$BASE_REF" HEAD |
+              grep -qE '^(infosec-intelligence-watchlist\.xml|README\.md|opml/|scripts/|site/|tests/|\.github/workflows/validate-pr\.yml$)'; then
+            echo "validate=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Nothing to validate: the pull request changes none of the watchlist files." | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        if: steps.scope.outputs.validate == 'true'
         with:
           python-version: "3.12"
 
       - name: Find the base version of the watchlist
+        if: steps.scope.outputs.validate == 'true'
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            base="origin/${{ github.base_ref }}"
-          elif [ "${{ github.event_name }}" = "push" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
-            base="${{ github.event.before }}"
+          if [ "$EVENT" = "pull_request" ]; then
+            base="origin/$BASE_REF"
+          elif [ "$EVENT" = "push" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
+            base="$BEFORE"
           else
             base="HEAD~1"
           fi
@@ -49,12 +71,15 @@ jobs:
           echo "Comparing with $base"
 
       - name: Run the unit tests
+        if: steps.scope.outputs.validate == 'true'
         run: python3 -m unittest discover -s tests
 
       - name: Validate OPML structure
+        if: steps.scope.outputs.validate == 'true'
         run: python3 scripts/validate_opml.py --base base.xml --new-urls new-urls.txt
 
       - name: Check the generated files
+        if: steps.scope.outputs.validate == 'true'
         # main only takes pull requests, so they must come with the watchlist change
         run: |
           python3 scripts/build_category_opml.py --readme > /dev/null
@@ -66,6 +91,7 @@ jobs:
           fi
 
       - name: Check the added feeds
+        if: steps.scope.outputs.validate == 'true'
         # new feeds must answer, be valid RSS/Atom and have published within 6 months
         run: |
           if [ -s new-urls.txt ]; then

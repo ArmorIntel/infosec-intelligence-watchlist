@@ -7,19 +7,30 @@ name: Feed suggestion
 # "suggestion: <status>" label. Already-listed sources are closed. For a new
 # valid feed, it also opens a pull request adding it (branch
 # suggestion/issue-<n>, one commit on main): an AI proposes the subcategory and
-# the English and French descriptions (scripts/suggest_pr.py, scripts/suggest_ai.py),
+# the English and French descriptions (scripts/suggest_ai.py, scripts/suggest_pr.py),
 # the per-category OPML files and the README are regenerated in the same commit,
 # and the same checks as validate-pr.yml run first. GitHub holds validate-pr.yml
 # on the bot's pull requests until the maintainer clicks "Approve workflows to
 # run": the required "validate" check then reports on the PR.
 # Later events (an edit, a label) run the check again only if the link differs
-# from the one last answered for. The bot never touches a branch that has
-# someone else's commits, or whose pull request was merged or closed. The
-# maintainer decides what is added. Run it manually to check an issue again.
+# from the one last answered for, and at most MAX_CHECKS times per issue
+# (scripts/suggest_feed.py). The bot never touches a branch that has
+# someone else's commits, or whose pull request was merged or closed
+# (scripts/bot_pr.py). The maintainer decides what is added. Run it manually
+# to check an issue again.
 #
-# AI setup: secret AI_API_KEY, variable AI_MODEL, optional variable AI_API_URL
-# (OpenAI-compatible chat completions URL, Gemini by default). Without them,
-# pull requests open without descriptions.
+# Anyone can open an issue, so each job only gets what it needs:
+# - analyse downloads the suggested site's pages: read access only, no secret
+# - describe asks the AI: the only job with the API key, no write access
+# - propose opens the pull request: writes to the repository, no secret, and
+#   downloads nothing from the suggested site
+# - answer comments on the issue: writes to issues only
+# They hand their results over as artifacts and job outputs.
+#
+# AI setup: secret AI_API_KEY (best as a secret of the "ai" environment,
+# Settings > Environments, so that only the describe job can read it), variable
+# AI_MODEL, optional variable AI_API_URL (OpenAI-compatible chat completions URL,
+# Gemini by default). Without them, pull requests open without descriptions.
 
 on:
   issues:
@@ -30,37 +41,43 @@ on:
         description: "Issue number to check again"
         required: true
 
-permissions:
-  contents: write
-  issues: write
-  pull-requests: write
+permissions: {}
+
+env:
+  NUMBER: ${{ github.event.issue.number || inputs.issue }}
 
 jobs:
-  check:
+  analyse:
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (contains(github.event.issue.labels.*.name, 'feed-suggestion') &&
        (github.event.action != 'labeled' || github.event.label.name == 'feed-suggestion'))
     # at job level, so an event skipped by `if` never cancels a running check;
-    # a cancelled check is redone by the next run, as no answer records its link yet
+    # every job shares the group, so a newer check cancels the whole older run.
+    # A cancelled check is redone by the next run, as no answer records its link yet
     concurrency:
       group: suggest-feed-${{ github.event.issue.number || inputs.issue }}
       cancel-in-progress: true
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      GH_TOKEN: ${{ github.token }}
-      NUMBER: ${{ github.event.issue.number || inputs.issue }}
+    permissions:
+      contents: read
+      issues: read
+    outputs:
+      status: ${{ steps.check.outputs.status }}
+      feed_ok: ${{ steps.feed.outputs.ok }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0 # the suggestion branch is compared with main
+          persist-credentials: false
 
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.12"
 
       - name: Read the issue and the previous answer
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh issue view "$NUMBER" --json body,author,state > issue.json
           gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$NUMBER/comments" \
@@ -71,8 +88,12 @@ jobs:
           fi
           author=$(jq -r .author.login issue.json)
           gh issue list --label feed-suggestion --author "$author" --state open --json number --jq length > open.txt
+          since=$(date -u -d '24 hours ago' +%Y-%m-%dT%H:%M:%SZ)
+          gh issue list --label feed-suggestion --author "$author" --state all --limit 100 \
+            --search "created:>=$since" --json number --jq length > recent.txt
 
       - name: Check the suggested source
+        id: check
         env:
           EVENT: ${{ github.event_name }}
         run: |
@@ -80,104 +101,195 @@ jobs:
           if [ -f last.md ]; then extra+=(--last-comment-file last.md); fi
           if [ "$EVENT" = "workflow_dispatch" ]; then extra+=(--force); fi
           python3 scripts/suggest_feed.py --issue issue.json "${extra[@]}" \
-            --open-suggestions "$(cat open.txt)" --json result.json --comment comment.md
+            --open-suggestions "$(cat open.txt)" --recent-suggestions "$(cat recent.txt)" \
+            --json result.json --comment comment.md
           cat comment.md >> "$GITHUB_STEP_SUMMARY"
+          echo "status=$(jq -r .status result.json)" >> "$GITHUB_OUTPUT"
 
-      - name: Prepare the pull request
-        # a failure here must not keep the visitor without an answer
-        continue-on-error: true
+      - name: Check the feed like validate-pr.yml
+        id: feed
+        if: steps.check.outputs.status == 'ready'
+        run: |
+          jq -r .feed.url result.json > new.txt
+          if python3 scripts/check_feeds.py --urls-file new.txt --retry-delay 30 \
+              --fail-on dead,inactive,abandoned --markdown checks.md; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: suggestion
+          path: |
+            result.json
+            comment.md
+            comment-id.txt
+            checks.md
+          if-no-files-found: error
+          retention-days: 7
+
+  describe:
+    needs: analyse
+    if: needs.analyse.outputs.status == 'ready' && needs.analyse.outputs.feed_ok == 'true'
+    concurrency:
+      group: suggest-feed-${{ github.event.issue.number || inputs.issue }}
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment:
+      name: ai
+      deployment: false
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: suggestion
+
+      - name: Ask the AI for the placement and the descriptions
         env:
-          EVENT: ${{ github.event_name }}
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           AI_MODEL: ${{ vars.AI_MODEL }}
           AI_API_URL: ${{ vars.AI_API_URL }}
+        run: python3 scripts/suggest_ai.py --result result.json --out ai.json
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ai
+          path: ai.json
+          if-no-files-found: error
+          retention-days: 7
+
+  propose:
+    needs: [analyse, describe]
+    concurrency:
+      group: suggest-feed-${{ github.event.issue.number || inputs.issue }}
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      url: ${{ steps.pr.outputs.url }}
+      existing: ${{ steps.pr.outputs.existing }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # the suggestion branch is compared with main
+          persist-credentials: false # git asks gh for the token when it pushes
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: ${{ runner.temp }}/handover
+          merge-multiple: true
+
+      - name: Open or update the pull request
+        id: pr
+        env:
+          EVENT: ${{ github.event_name }}
+          HANDOVER: ${{ runner.temp }}/handover
         run: |
-          if [ "$(jq -r .status result.json)" != "ready" ]; then
-            exit 0
-          fi
-          url=$(jq -r .feed.url result.json)
+          url=$(jq -r .feed.url "$HANDOVER/result.json")
           branch="suggestion/issue-$NUMBER"
 
           # another suggestion already proposes this feed
-          gh pr list --state open --limit 200 --json url,headRefName,body,isCrossRepository,author > prs.json
-          other=$(python3 -c 'import json, sys; sys.path.insert(0, "scripts"); import suggest_pr
-          prs = [p for p in json.load(open("prs.json")) if p["headRefName"] != sys.argv[2]]
-          print(suggest_pr.find_open_pr_for_url(prs, sys.argv[1]) or "")' "$url" "$branch")
-          if [ -n "$other" ]; then
-            echo "$other" > pr-url.txt
-            touch pr-existing
+          python3 scripts/bot_pr.py find --url "$url" --prefix suggestion/ --exclude-branch "$branch" --output other.txt
+          if [ -s other.txt ]; then
+            { echo "url=$(cat other.txt)"; echo "existing=true"; } >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          # the bot's own pull request for this issue (never a fork's or a person's of the same name)
-          gh pr list --head "$branch" --state all --limit 20 \
-            --json url,state,headRefName,isCrossRepository,author > own.json
-          read -r state own < <(python3 -c 'import json, sys; sys.path.insert(0, "scripts"); import suggest_pr
-          pr = suggest_pr.bot_pr_for_branch(json.load(open("own.json")), sys.argv[1]) or {}
-          print(pr.get("state", "NONE"), pr.get("url", ""))' "$branch")
-          if [ "$state" = "OPEN" ]; then echo "$own" > pr-url.txt; fi
+          # the bot's own pull request for this issue
+          python3 scripts/bot_pr.py state --branch "$branch" --output own.txt
+          read -r state own < own.txt
+          if [ "$state" = "OPEN" ]; then echo "url=$own" >> "$GITHUB_OUTPUT"; fi
           if { [ "$state" = "MERGED" ] || [ "$state" = "CLOSED" ]; } && [ "$EVENT" != "workflow_dispatch" ]; then
             echo "::notice::The pull request of $branch is ${state,,}, left untouched (run manually to start again)"
             exit 0
           fi
 
-          git fetch -q origin main
-          lease="refs/heads/$branch:"  # the branch must not exist yet...
-          if git ls-remote --exit-code -q origin "refs/heads/$branch" > /dev/null; then
-            git fetch -q origin "$branch:refs/remotes/origin/$branch"
-            # an amend or rebase keeps the bot as author: check committers too
-            if git log "origin/main..origin/$branch" --format='%ae%n%ce' |
-                grep -qvxF "41898282+github-actions[bot]@users.noreply.github.com"; then
-              echo "::notice::$branch has commits from someone else, left untouched"
-              exit 0
-            fi
-            lease="refs/heads/$branch:$(git rev-parse "origin/$branch")"  # ...or still be where it was checked
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch -q -C "$branch" origin/main
-          python3 scripts/suggest_pr.py --result result.json --issue "$NUMBER" --title-file title.txt \
-            --commit-message commit.txt --pr-body pr.md --new-urls new.txt
+          git switch -q --detach origin/main
+          python3 scripts/suggest_pr.py --result "$HANDOVER/result.json" --ai "$HANDOVER/ai.json" --issue "$NUMBER" \
+            --title-file title.txt --commit-message commit.txt --pr-body pr.md --new-urls new.txt
           # main only takes pull requests: the generated files come with the change
           python3 scripts/build_category_opml.py --readme
 
-          # same checks as validate-pr.yml, whose run waits for the maintainer's approval
+          # same checks as validate-pr.yml, whose run waits for the maintainer's
+          # approval (the feed itself was checked by the analyse job)
           python3 -m unittest discover -s tests
           python3 scripts/validate_opml.py
-          python3 scripts/check_feeds.py --urls-file new.txt --retry-delay 30 \
-            --fail-on dead,inactive,abandoned --markdown checks.md
-          { echo; echo "## Checks"; echo; cat checks.md; } >> pr.md
+          { echo; echo "## Checks"; echo; cat "$HANDOVER/checks.md"; } >> pr.md
 
-          git add infosec-intelligence-watchlist.xml site/descriptions.json opml README.md
-          git commit -q -F commit.txt
-          git push -q --force-with-lease="$lease" origin "HEAD:refs/heads/$branch"
-          existing=""
-          if [ "$state" = "OPEN" ]; then existing="$own"; fi
-          if [ -n "$existing" ]; then
-            gh pr edit "$existing" --title "$(cat title.txt)" --body-file pr.md
-            pr="$existing"
-          elif ! pr=$(gh pr create --base main --head "$branch" --title "$(cat title.txt)" --body-file pr.md); then
-            # Settings > Actions > "Allow GitHub Actions to create and approve pull requests" is off
-            pr="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/compare/main...${branch}?expand=1"
-            echo "::warning::Could not open the pull request, open it from $pr"
-          fi
-          echo "$pr" > pr-url.txt
+          gh auth setup-git
+          rc=0
+          python3 scripts/bot_pr.py publish --branch "$branch" --title "$(cat title.txt)" --body-file pr.md \
+            --commit-message-file commit.txt --output pr-url.txt \
+            infosec-intelligence-watchlist.xml site/descriptions.json opml README.md || rc=$?
+          if [ "$rc" = 3 ]; then exit 0; fi  # someone else's commits: left untouched
+          if [ "$rc" != 0 ]; then exit "$rc"; fi
+          echo "url=$(cat pr-url.txt)" >> "$GITHUB_OUTPUT"
+
+  answer:
+    needs: [analyse, describe, propose]
+    # also after a failed describe or propose: the visitor always gets an answer
+    if: ${{ !cancelled() && needs.analyse.result == 'success' }}
+    concurrency:
+      group: suggest-feed-${{ github.event.issue.number || inputs.issue }}
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: suggestion
+          path: ${{ runner.temp }}/handover
 
       - name: Answer on the issue
+        env:
+          HANDOVER: ${{ runner.temp }}/handover
+          PR_URL: ${{ needs.propose.outputs.url }}
+          PR_EXISTING: ${{ needs.propose.outputs.existing }}
         run: |
-          status=$(jq -r .status result.json)
+          status=$(jq -r .status "$HANDOVER/result.json")
           if [ "$status" = "skip" ]; then
             echo "Nothing to do."
             exit 0
           fi
-          if [ -s pr-url.txt ]; then
+          cp "$HANDOVER/comment.md" comment.md
+          if [ -n "$PR_URL" ]; then
             flags=()
-            if [ -f pr-existing ]; then flags=(--pr-existing); fi
-            python3 scripts/suggest_feed.py --render result.json --comment comment.md \
-              --pr-url "$(cat pr-url.txt)" "${flags[@]}"
+            if [ "$PR_EXISTING" = "true" ]; then flags=(--pr-existing); fi
+            python3 scripts/suggest_feed.py --render "$HANDOVER/result.json" --comment comment.md \
+              --pr-url "$PR_URL" "${flags[@]}"
           fi
-          id=$(cat comment-id.txt)
+          id=$(cat "$HANDOVER/comment-id.txt")
           if [ -n "$id" ]; then
             gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$id" -F body=@comment.md > /dev/null
           else
@@ -203,4 +315,21 @@ jobs:
           fi
           if [ "$status" = "duplicate" ]; then
             gh issue close "$NUMBER" --reason "not planned"
+          fi
+
+      - name: Report a pull request that could not be prepared
+        env:
+          STATUS: ${{ needs.analyse.outputs.status }}
+          FEED_OK: ${{ needs.analyse.outputs.feed_ok }}
+          DESCRIBE: ${{ needs.describe.result }}
+          PROPOSE: ${{ needs.propose.result }}
+        run: |
+          if [ "$STATUS" != "ready" ]; then exit 0; fi
+          if [ "$FEED_OK" != "true" ]; then
+            echo "::error::The feed failed the checks of validate-pr.yml, see the analyse job"
+            exit 1
+          fi
+          if [ "$DESCRIBE" = "failure" ] || [ "$PROPOSE" = "failure" ]; then
+            echo "::error::The pull request could not be prepared, see the describe and propose jobs"
+            exit 1
           fi

@@ -51,6 +51,8 @@ DATE_TAGS = {"pubdate", "published", "updated", "date", "issued", "modified"}
 XML_ENTITIES = {"amp", "lt", "gt", "quot", "apos"}
 NOW = datetime.now(timezone.utc)
 META = b"\n__CHECK_FEEDS__"
+# URLs come from websites and visitors: no file://, gopher://... even after a redirect
+PROTOCOLS = ["--proto", "=http,https", "--proto-redir", "=http,https"]
 
 
 def parse_date(text):
@@ -123,7 +125,7 @@ def download(url, timeout):
     """
     res = {"url": url}
     cmd = ["curl", "-sS", "-g", "-L", "--compressed", "--http1.1", "--max-time", str(timeout), "--max-filesize", "20000000",
-           "-A", UA, "-H", "Accept: application/rss+xml, application/atom+xml, application/xml;q=0.9, */*;q=0.8",
+           *PROTOCOLS, "-A", UA, "-H", "Accept: application/rss+xml, application/atom+xml, application/xml;q=0.9, */*;q=0.8",
            "-w", META.decode() + "%{http_code} %{url_effective}", url]
     p = subprocess.run(cmd, capture_output=True)
     body, _, meta = p.stdout.rpartition(META)
