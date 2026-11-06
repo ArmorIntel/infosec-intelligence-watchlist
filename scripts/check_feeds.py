@@ -48,6 +48,7 @@ UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/130.0 Safari/537.36")
 CHECK_CODES = {401, 403, 418, 419, 429}
 DATE_TAGS = {"pubdate", "published", "updated", "date", "issued", "modified"}
+EDIT_TAGS = {"updated", "modified"}  # used only when an item has no publication date
 XML_ENTITIES = {"amp", "lt", "gt", "quot", "apos"}
 NOW = datetime.now(timezone.utc)
 META = b"\n__CHECK_FEEDS__"
@@ -103,11 +104,22 @@ def parse_feed(body):
     items = [e for e in root.iter() if local(e.tag) in ("item", "entry")]
     best = None
     for item in items:
+        # an item's publication date wins over its edit date: editing an old
+        # article must not make an abandoned feed look recent
+        published, edited = None, None
         for child in item:
-            if local(child.tag) in DATE_TAGS:
+            tag = local(child.tag)
+            if tag in DATE_TAGS:
                 d = parse_date(child.text)
-                if d and (best is None or d > best):
-                    best = d
+                if not d:
+                    continue
+                if tag in EDIT_TAGS:
+                    edited = max(edited, d) if edited else d
+                else:
+                    published = max(published, d) if published else d
+        d = published or edited
+        if d and (best is None or d > best):
+            best = d
     if best is None:  # undated items: fall back to the channel build date
         for e in root.iter():
             if local(e.tag) in ("lastbuilddate", "updated", "pubdate"):
