@@ -94,10 +94,6 @@
       "en": "Blog of BH Consulting, an Irish security and privacy consultancy: roundups and practical posts on awareness and threats.",
       "fr": "Blog de BH Consulting, cabinet irlandais de sécurité et de protection des données : synthèses et billets pratiques sur la sensibilisation et les menaces."
     },
-    "http://feeds.arstechnica.com/arstechnica/science": {
-      "en": "Feed of Ars Technica's science section, covering space, physics, health and research. General-interest science reading, only loosely related to security.",
-      "fr": "Flux de la rubrique science d'Ars Technica : espace, physique, santé et recherche. Lecture scientifique généraliste, seulement liée de loin à la sécurité."
-    },
     "http://feeds.feedburner.com/Abusech": {
       "en": "The abuse.ch blog: news on its community threat-sharing projects such as URLhaus, MalwareBazaar and ThreatFox. Useful for sourcing free malware and IOC data.",
       "fr": "Le blog d'abuse.ch : actualités de ses projets communautaires de partage de menaces comme URLhaus, MalwareBazaar et ThreatFox. Utile pour trouver des données gratuites de malwares et d'IOC."
@@ -113,14 +109,6 @@
     "http://feeds.mashable.com/Mashable": {
       "en": "Mashable, a general entertainment and consumer tech site covering digital culture, gadgets and deals. Little relevance to security work.",
       "fr": "Mashable, site généraliste de divertissement et de tech grand public : culture numérique, gadgets et bons plans. Peu pertinent pour le travail en sécurité."
-    },
-    "http://feeds.trendmicro.com/TrendMicroResearch": {
-      "en": "Trend Micro Research: threat research and analysis from the vendor: malware, APT and vulnerability reports. Useful for technical campaign write-ups.",
-      "fr": "Trend Micro Research : recherches et analyses de menaces de l'éditeur : rapports sur les malwares, les APT et les vulnérabilités. Utile pour des analyses techniques de campagnes."
-    },
-    "http://feeds.trendmicro.com/TrendMicroSimplySecurity": {
-      "en": "Trend Micro's Simply Security blog: the vendor's more general posts on security trends, cloud and awareness. Lighter and more marketing-oriented than its research feed.",
-      "fr": "Le blog Simply Security de Trend Micro : billets plus généraux de l'éditeur sur les tendances, le cloud et la sensibilisation. Plus léger et plus marketing que son flux de recherche."
     },
     "http://gouvsi.blogspot.com/feeds/posts/default": {
       "en": "Blog in French on information systems governance, covering IT governance, regulation, compliance and the impact of AI. Useful for French-speaking CISOs and managers.",
@@ -241,10 +229,6 @@
     "https://blogs.microsoft.com/on-the-issues/feed/": {
       "en": "Microsoft's policy blog covering regulation, responsible AI, privacy, cybersecurity policy and digital society. Corporate viewpoint; useful to follow a major vendor's stance.",
       "fr": "Blog de Microsoft sur les politiques publiques : régulation, IA responsable, vie privée, cybersécurité et société numérique. Point de vue d'un grand éditeur, utile pour suivre sa position."
-    },
-    "https://boingboing.net/feed": {
-      "en": "Boing Boing, a long-running general culture blog covering tech, internet culture, digital rights and oddities. Mixed content, with occasional privacy and security topics.",
-      "fr": "Boing Boing, blog culturel généraliste de longue date : tech, culture internet, droits numériques et curiosités. Contenu varié, avec parfois des sujets de vie privée et de sécurité."
     },
     "https://cert.at/cert-at.en.blog.rss_2.0.xml": {
       "en": "The blog of CERT.at, Austria's national CERT: short posts on incident handling, coordination and national practice, for practitioners.",
@@ -426,17 +410,9 @@
       "en": "French news magazine on hacking, data leaks, scams and cybercrime, with scoops on French-language incidents.",
       "fr": "Magazine français d'actualité sur le piratage, les fuites de données, les arnaques et la cybercriminalité, avec des révélations sur des incidents francophones."
     },
-    "https://feeds.feedburner.com/businessinsider/science": {
-      "en": "Business Insider's science section: general-audience news on science and technology, mixed with other trending stories. Not specialised or technical.",
-      "fr": "Rubrique science de Business Insider : actualité scientifique et tech grand public, mêlée à d'autres sujets du moment. Ni spécialisé ni technique."
-    },
     "https://feeds.feedburner.com/tenable/qaXL": {
       "en": "Tenable's blog: vulnerability and exposure management posts, exploit analyses and sector-focused guidance. Useful for vulnerability prioritization, with some product content.",
       "fr": "Le blog de Tenable : gestion des vulnérabilités et de l'exposition, analyses d'exploits et conseils sectoriels. Utile pour prioriser les vulnérabilités, avec du contenu produit."
-    },
-    "https://feeds.feedburner.com/theiphoneblog": {
-      "en": "iMore, a long-running Apple news and how-to site. Its latest post announces it is closing, so the feed may no longer be updated.",
-      "fr": "iMore, site historique d'actualité et de tutoriels Apple. Son dernier article annonce sa fermeture : le flux pourrait ne plus être alimenté."
     },
     "https://feeds.feedburner.com/threatintelligence/pvexyqv7v0v": {
       "en": "Threat intelligence from Google's Threat Intelligence Group and Mandiant: tracked threat actors, intrusion campaigns and incident response findings.",
@@ -457,10 +433,6 @@
     "https://feeds.megaphone.fm/darknetdiaries": {
       "en": "Storytelling podcast on true hacking and cybercrime stories, told through interviews with the people involved. Engaging for learning how real incidents unfolded.",
       "fr": "Podcast narratif d'histoires vraies de piratage et de cybercriminalité, racontées via des entretiens avec les protagonistes. Pour comprendre comment de vrais incidents se sont déroulés."
-    },
-    "https://feeds2.feedburner.com/businessinsider": {
-      "en": "Main feed of Business Insider, covering business, tech, finance and lifestyle. Very broad, so only part of it is relevant to a security reader.",
-      "fr": "Flux principal de Business Insider : économie, tech, finance et société. Très large, donc seule une partie intéresse un lecteur orienté sécurité."
     },
     "https://first.org/newsroom/news/rss.xml": {
       "en": "News from FIRST, the global forum of incident response and security teams: community events, member stories and announcements. Useful for the CSIRT community landscape.",
@@ -534,10 +506,6 @@
       "en": "Interesting Engineering, a general site on engineering, energy, space, defence and emerging tech. Broad science and tech interest, rarely security-specific.",
       "fr": "Interesting Engineering, site généraliste sur l'ingénierie, l'énergie, l'espace, la défense et les technologies émergentes. Culture scientifique et technique, rarement centré sur la sécurité."
     },
-    "https://ir.netflix.net/rss/pressrelease.aspx": {
-      "en": "Netflix investor relations press releases, mainly financial results and corporate announcements. Low security relevance; useful only to follow the company.",
-      "fr": "Communiqués de presse des relations investisseurs de Netflix, surtout résultats financiers et annonces corporate. Peu lié à la sécurité ; utile seulement pour suivre l'entreprise."
-    },
     "https://isc.sans.edu/rssfeed.xml": {
       "en": "SANS Internet Storm Center diary: handler posts on active threats, malware analysis and techniques, plus the Stormcast podcast. Practical and technical.",
       "fr": "Le journal du SANS Internet Storm Center : billets des handlers sur les menaces actives, l'analyse de malwares et les techniques, plus le podcast Stormcast. Pratique et technique."
@@ -573,10 +541,6 @@
     "https://letsencrypt.org/feed.xml": {
       "en": "Blog of Let's Encrypt, the free certificate authority. Announcements on ACME, certificate policy changes and TLS ecosystem news, directly from the CA.",
       "fr": "Blog de Let's Encrypt, l'autorité de certification gratuite. Annonces sur ACME, changements de politique de certificats et actualités TLS, directement de l'AC."
-    },
-    "https://lifehacker.com/feed/rss": {
-      "en": "Lifehacker, a consumer site with tips, how-tos and deals on tech and daily life. Occasional practical privacy and security advice for non-experts.",
-      "fr": "Lifehacker, site grand public de conseils, tutoriels et bons plans sur la tech et la vie quotidienne. Parfois des conseils pratiques de vie privée et de sécurité pour non-experts."
     },
     "https://loopinsight.com/feed/": {
       "en": "The Loop, a long-running Apple-focused blog with news, commentary and opinion pieces. Relevant for following the Apple ecosystem.",
@@ -653,10 +617,6 @@
     "https://rekt.news/rss/feed.xml": {
       "en": "Rekt, a publication analysing DeFi hacks and exploits with write-ups of how each attack worked, for smart-contract security and incident learning.",
       "fr": "Rekt, publication qui analyse les piratages et exploits DeFi en détaillant le fonctionnement de chaque attaque, pour la sécurité des smart contracts et le retour d'expérience."
-    },
-    "https://reporterre.net/spip.php?page=backend-simple": {
-      "en": "Reporterre, a French independent news outlet on ecology and the environment. Not a security source; useful for environmental and societal context in French.",
-      "fr": "Reporterre, média indépendant français de l'écologie et de l'environnement. Pas une source de sécurité ; utile pour le contexte environnemental et sociétal en français."
     },
     "https://research.checkpoint.com/feed": {
       "en": "Threat research from Check Point's research team: malware analysis, campaigns, vulnerabilities and threat intelligence recaps.",
@@ -1146,10 +1106,6 @@
       "en": "r/CryptoCurrencies, a large Reddit community discussing crypto projects, news and markets. Opinionated and speculative; treat as sentiment, not verified reporting.",
       "fr": "r/CryptoCurrencies, grande communauté Reddit sur les projets, l'actualité et les marchés crypto. Opinions et spéculation : à lire comme un baromètre, pas comme de l'information vérifiée."
     },
-    "https://www.reddit.com/r/ITCareerQuestions/.rss": {
-      "en": "Reddit community where people ask for advice on IT careers, certifications and job moves. Useful for entry-level guidance and for seeing what newcomers struggle with.",
-      "fr": "Communauté Reddit d'entraide sur les carrières IT : certifications, reconversion, premiers postes. Utile pour les conseils aux débutants et pour voir leurs difficultés."
-    },
     "https://www.reddit.com/r/Information_Security/.rss": {
       "en": "Reddit community on general information security: news, career questions and practitioner discussion. Useful for gauging what the wider security crowd is talking about.",
       "fr": "Communauté Reddit sur la sécurité de l'information : actualités, questions de carrière et échanges entre praticiens. Utile pour sentir les sujets qui occupent la communauté."
@@ -1197,10 +1153,6 @@
     "https://www.reddit.com/r/redteamsec/.rss": {
       "en": "Reddit community for red team operators: offensive tooling, adversary emulation, evasion techniques and write-ups. Good for tracking current offensive tradecraft.",
       "fr": "Communauté Reddit des équipes red team : outils offensifs, émulation d'adversaires, techniques d'évasion et retours d'expérience. Utile pour suivre le savoir-faire offensif actuel."
-    },
-    "https://www.reddit.com/r/science/.rss": {
-      "en": "r/science, a large Reddit community sharing and discussing peer-reviewed science news across all fields. Moderated, but broad rather than security-specific.",
-      "fr": "r/science, grande communauté Reddit qui partage et discute l'actualité scientifique évaluée par les pairs, tous domaines. Modérée, mais généraliste et non centrée sécurité."
     },
     "https://www.reddit.com/r/selfhosted/.rss": {
       "en": "r/selfhosted, a Reddit community about running your own services at home or on a server. Good for tool discovery and homelab ideas; opinions vary.",
@@ -1258,10 +1210,6 @@
       "en": "Security section of TechRepublic aimed at IT pros and general users: patches, scams and practical advice, lighter than specialist outlets.",
       "fr": "Rubrique sécurité de TechRepublic pour les pros de l'IT et le grand public : correctifs, arnaques et conseils pratiques, plus léger que les médias spécialisés."
     },
-    "https://www.ted.com/feeds/talks.rss": {
-      "en": "TED Talks Daily, a podcast and video feed of TED talks on ideas across science, technology and society. General inspiration rather than security-specific.",
-      "fr": "TED Talks Daily, flux de conférences TED sur des idées en science, technologie et société. Inspiration générale, sans lien particulier avec la sécurité."
-    },
     "https://www.tenable.com/feed/news": {
       "en": "Tenable's press and news feed: company announcements, partnerships and recognitions. Mostly corporate news, useful only to follow the vendor itself.",
       "fr": "Le flux d'actualités et communiqués de Tenable : annonces, partenariats et distinctions. Surtout de la communication d'entreprise, utile pour suivre l'éditeur lui-même."
@@ -1278,10 +1226,6 @@
       "en": "Main feed of The Verge, a tech news site on gadgets, AI, platforms and policy. Useful for consumer-facing tech news and big-platform stories.",
       "fr": "Flux principal de The Verge, site d'actualité tech sur les gadgets, l'IA, les plateformes et les politiques publiques. Utile pour l'actualité grand public et les grandes plateformes."
     },
-    "https://www.theverge.com/rss/science/index.xml": {
-      "en": "Science section of The Verge, covering space, energy, climate and health along with tech policy angles. General science reading, not security-focused.",
-      "fr": "Rubrique science de The Verge : espace, énergie, climat et santé, avec des angles politiques et tech. Lecture scientifique généraliste, sans focus sécurité."
-    },
     "https://www.thezdi.com/blog?format=rss": {
       "en": "Trend Micro Zero Day Initiative blog: vulnerability write-ups, Patch Tuesday reviews and exploit research from its bug bounty program.",
       "fr": "Blog de la Zero Day Initiative de Trend Micro : analyses de vulnérabilités, bilans du Patch Tuesday et recherche d'exploits issue de son programme de bug bounty."
@@ -1297,10 +1241,6 @@
     "https://www.wired.com/feed/category/backchannel/latest/rss": {
       "en": "WIRED's Backchannel section: long-form features on technology and its social impact. General tech storytelling rather than security news, for background reading.",
       "fr": "La rubrique Backchannel de WIRED : grands formats sur la technologie et son impact social. Du récit tech généraliste plutôt que de l'actualité sécurité, pour une lecture de fond."
-    },
-    "https://www.wired.com/feed/category/science/latest/rss": {
-      "en": "WIRED's science section: magazine-style reporting on science, environment and technology. General-audience journalism rather than technical material.",
-      "fr": "Rubrique science de WIRED : reportages de type magazine sur la science, l'environnement et la tech. Journalisme grand public plutôt que contenu technique."
     },
     "https://www.wired.com/feed/category/security/latest/rss": {
       "en": "Security coverage from WIRED: long-form reporting on hacking, surveillance, privacy and digital threats, aimed at a broad audience.",
@@ -1321,10 +1261,6 @@
     "https://www.youtube.com/feeds/videos.xml?channel_id=UCefQC4Y-X9MBRuYBKc2waiQ": {
       "en": "YouTube channel Enter The Crypto Matrix: French-language videos on crypto news, markets and the economy. Commentary-style content, so check claims independently.",
       "fr": "Chaîne YouTube Enter The Crypto Matrix : vidéos en français sur l'actualité crypto, les marchés et l'économie. Format commentaire, à recouper avec d'autres sources."
-    },
-    "https://www.youtube.com/feeds/videos.xml?channel_id=UCqeXB2WsPdzcdCdP-bUc52g": {
-      "en": "YouTube channel of Fast Company: business, innovation and technology video content. General business and tech culture rather than security.",
-      "fr": "Chaîne YouTube de Fast Company : vidéos sur l'entreprise, l'innovation et la technologie. Plutôt culture business et tech que sécurité."
     },
     "https://www.zerodayinitiative.com/rss/upcoming/": {
       "en": "Zero Day Initiative's upcoming advisories: reported but unpatched vulnerabilities, listed by vendor with only limited detail. Handy for early signs of coming patches.",
