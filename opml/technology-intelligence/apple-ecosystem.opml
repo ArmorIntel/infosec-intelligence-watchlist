@@ -15,7 +15,6 @@
         <outline text="AppleInsider" title="AppleInsider" type="rss" xmlUrl="https://appleinsider.com/rss/news" htmlUrl="https://appleinsider.com/" />
         <outline text="Cult of Mac" title="Cult of Mac" type="rss" xmlUrl="https://www.cultofmac.com/feed/" htmlUrl="https://www.cultofmac.com/" />
         <outline text="iClarified" title="iClarified" type="rss" xmlUrl="https://www.iclarified.com/rss/rss.xml" htmlUrl="https://www.iclarified.com/" />
-        <outline text="iMore" title="iMore" type="rss" xmlUrl="https://feeds.feedburner.com/theiphoneblog" htmlUrl="https://www.imore.com/" />
         <outline text="MacRumors - All Stories" title="MacRumors - All Stories" type="rss" xmlUrl="https://feeds.macrumors.com/MacRumors-All" htmlUrl="https://www.macrumors.com/" />
         <outline text="MacRumors - Front Page" title="MacRumors - Front Page" type="rss" xmlUrl="https://feeds.macrumors.com/MacRumors-Front" htmlUrl="https://www.macrumors.com" />
         <outline text="MacStories" title="MacStories" type="rss" xmlUrl="https://www.macstories.net/feed/" htmlUrl="https://www.macstories.net/" />

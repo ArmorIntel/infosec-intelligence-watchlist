@@ -37,8 +37,6 @@
         <outline text="Tenable - Resources" title="Tenable - Resources" type="rss" xmlUrl="https://www.xorlab.com/en/blog/rss.xml" htmlUrl="https://www.xorlab.com/en/blog" />
         <outline text="Tenable Blog" title="Tenable Blog" type="rss" xmlUrl="https://feeds.feedburner.com/tenable/qaXL" htmlUrl="https://www.tenable.com/podcast" />
         <outline text="Tenable News" title="Tenable News" type="rss" xmlUrl="https://www.tenable.com/feed/news" htmlUrl="https://www.tenable.com/feed/news" />
-        <outline text="Trend Micro Research" title="Trend Micro Research" type="rss" xmlUrl="http://feeds.trendmicro.com/TrendMicroResearch" htmlUrl="https://www.trendmicro.com/en_us/research.html" />
-        <outline text="Trend Micro Simply Security" title="Trend Micro Simply Security" type="rss" xmlUrl="http://feeds.trendmicro.com/TrendMicroSimplySecurity" htmlUrl="https://blog.trendmicro.com/" />
         <outline text="VirusTotal Blog" title="VirusTotal Blog" type="rss" xmlUrl="https://blog.virustotal.com/feeds/posts/default" htmlUrl="https://blog.virustotal.com/" />
         <outline text="WeLiveSecurity" title="WeLiveSecurity" type="rss" xmlUrl="https://www.welivesecurity.com/en/rss/feed/" htmlUrl="" />
       </outline>
