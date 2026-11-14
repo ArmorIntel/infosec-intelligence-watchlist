@@ -1,6 +1,6 @@
 # Infosec Intelligence Watchlist
 
-A maintained OPML list of RSS feeds for threat intelligence and technology monitoring, ready to import into your RSS reader.
+A maintained OPML list of RSS feeds for threat intelligence, threat hunting and technology monitoring, ready to import into your RSS reader.
 
 - Sources are grouped by topic, from CERT bulletins and threat research to AI security and technology.
 - Automated monthly health checks propose fixes for dead feeds and the removal of abandoned feeds, for human review.
