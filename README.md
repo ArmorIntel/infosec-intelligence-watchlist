@@ -8,7 +8,7 @@ A maintained OPML list of RSS feeds for threat intelligence and technology monit
 - Dated releases include OPML downloads and a summary of feeds added, removed and moved.
 - The website shows recent articles, changes with their reasons, and a 90-day feed health history.
 
-**[Browse the website](https://armorintel.github.io/infosec-intelligence-watchlist/)** — security and technology monitoring for security engineers, CTI/SOC analysts and CISOs, with your existing tools.
+**[Browse the website](https://armorintel.github.io/infosec-intelligence-watchlist/)** — security and technology monitoring for security engineers, CTI/SOC analysts, CISOs, researchers and enthusiasts, with your existing tools.
 
 ## Quick start
 
