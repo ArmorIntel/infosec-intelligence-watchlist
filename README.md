@@ -1,12 +1,10 @@
 # Infosec Intelligence Watchlist
 
-This repository contains a curated list of RSS feeds related to Cyber Threat Intelligence, Threat Hunting, and Information Security.
-It consolidates high-signal RSS sources used for security monitoring, threat intelligence production, and **ongoing situational awareness**.
-The list is curated for practitioners who need rapid access to advisories, research, vendor updates, and wider technology context without too much noise.
+A categorized OPML watchlist of RSS feeds for cybersecurity and threat intelligence.
 
-**Website**: <https://armorintel.github.io/infosec-intelligence-watchlist/>
+The repository brings together security and technology sources, organized by topic, for security practitioners, researchers, and anyone tracking these fields. Import the full list or choose only the categories relevant to your work to follow advisories, research, investigations, and industry updates in your RSS reader.
 
-The goal is to help professionals, researchers, and enthusiasts stay up to date with the latest news, research, and discoveries in the cybersecurity landscape.
+**Start in 30 seconds:** [Browse the website](https://armorintel.github.io/infosec-intelligence-watchlist/), import [`infosec-intelligence-watchlist.xml`](./infosec-intelligence-watchlist.xml) into an RSS reader, or [subscribe to a single category](#subscribe-to-a-single-category).
 
 ## Repository contents
 
@@ -60,24 +58,21 @@ Last review: **October 2026**.
 
 ## How to use the watchlist
 
-1. Download the OPML file from this repository
-2. Import the file into your RSS reader (tested with Inoreader, should be compatible with most RSS readers)
-3. Review the folders, adjust notification rules, and fine-tune for your needs with filters, rules or tags in your RSS reader
+Import the [global OPML file](./infosec-intelligence-watchlist.xml) into your RSS reader. It contains all feeds organized into categories and subcategories. To follow fewer feeds, import or subscribe to one of the [category OPML files](#subscribe-to-a-single-category). Reader support for OPML subscriptions varies; check your reader's documentation for details.
 
 ### Inoreader example
 
 #### Import feeds
 
-There are two options, either you import all feeds and manage them, or you subscribe to the OPML file and get updates whenere it's updated.
+Inoreader can import the feeds once or subscribe to the OPML file to receive updates when the list changes.
 
-One shot import :
+Import the feeds once:
 ![Importing feeds into Inoreader](./inoreader_screens/import_feeds.png)
 
-Beware, if you use the free plan of Inoreader, you might be limited on the number of feeds you can import.
+Inoreader plan limits may restrict how many feeds you can add.
 ![Error feed limit](./inoreader_screens/feed_limit.png)
 
-Subscribing to the OPML file :
-You will need to use the raw file url from the xml file of this repository.
+To subscribe to the OPML file, use its raw URL:
 `https://raw.githubusercontent.com/ArmorIntel/infosec-intelligence-watchlist/refs/heads/main/infosec-intelligence-watchlist.xml`
 ![Subscribing to OPML file](./inoreader_screens/subscribe_opml.png)
 
@@ -118,8 +113,6 @@ If you don't want the whole watchlist (or if your RSS reader plan limits the num
 
 #### Create custom dashboards
 ![Dashboard view](./inoreader_screens/dashboard_view.png)
-
-Pro tips : you can subscribe to Telegram channels, use tags, filter feeds and create automated rules (some features are in the paid plan). There is even an n8n node available, API key, etc. if you want to go further.
 
 ## Maintenance
 
@@ -170,7 +163,7 @@ python3 scripts/check_feeds.py --markdown report.md
 
 ## Contributing
 
-Contributions are welcome!
+Contributions are welcome.
 
 ### Suggest a source
 
@@ -180,11 +173,10 @@ The easiest way: [suggest a source](https://github.com/ArmorIntel/infosec-intell
 
 To add feeds or suggest improvements with a pull request:
 - Fork this repository
-- Update the xml file (`infosec-intelligence-watchlist.xml` is the only file to edit): keep two folder levels and feeds sorted alphabetically
+- Update `infosec-intelligence-watchlist.xml`, the source file for the watchlist: keep two folder levels and feeds sorted alphabetically
 - Don't edit the `opml/` files or the generated parts of this README by hand: regenerate them with `python3 scripts/build_category_opml.py --readme` and commit the result with your change (the pull request check fails when they are out of date)
 - For a new feed, also add its English and French descriptions to `site/descriptions.json` (the website build lists the feeds that are missing)
 - In the commit message, give the reason for each feed you add, remove, move or fix with one line per feed, `- <feed URL>: <reason>` (e.g. `- https://example.com/feed: dead feed, replaced by https://example.com/rss`). The website's Changes page shows it next to the change; without such a line it shows the commit's subject line
 - Submit a pull request with a description
 
 Maintained by [ArmorIntel](https://github.com/ArmorIntel/).
-You can reach out for collaboration or CTI discussions.
